@@ -50,6 +50,22 @@ def verify_dns_record(fqdn: str, type: str, expected_value: str, debug: bool = F
 	return False
 
 
+def get_host_by_ip(ip_address: str, raise_exception: bool = False) -> str | None:
+	"""Returns host for the given IP address."""
+
+	import socket
+
+	err_msg = None
+
+	try:
+		return socket.gethostbyaddr(ip_address)[0]
+	except Exception as e:
+		err_msg = _(str(e))
+
+	if raise_exception and err_msg:
+		frappe.throw(err_msg)
+
+
 def enqueue_job(method: str | Callable, **kwargs) -> None:
 	"""Enqueues a background job."""
 
