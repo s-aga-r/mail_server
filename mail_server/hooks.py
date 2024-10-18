@@ -4,11 +4,27 @@ app_publisher = "Frappe Technologies Pvt. Ltd."
 app_description = "Frappe Mail Server"
 app_email = "developers@frappe.io"
 app_license = "agpl-3.0"
-
-# Apps
-# ------------------
-
 # required_apps = []
+
+
+website_redirects = [
+	{
+		"source": "/spamd/scan",
+		"target": "/api/method/mail.api.spamd.scan",
+		"redirect_http_status": 307,
+	},
+	{
+		"source": "/spamd/is-spam",
+		"target": "/api/method/mail.api.spamd.is_spam",
+		"redirect_http_status": 307,
+	},
+	{
+		"source": "/spamd/score",
+		"target": "/api/method/mail.api.spamd.get_spam_score",
+		"redirect_http_status": 307,
+	},
+]
+
 
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [
@@ -238,6 +254,4 @@ app_license = "agpl-3.0"
 # Automatically update python controller files with type annotations for this app.
 # export_python_type_annotations = True
 
-# default_log_clearing_doctypes = {
-# 	"Logging DocType Name": 30  # days to retain logs
-# }
+default_log_clearing_doctypes = {"Spam Check Log": 7}
