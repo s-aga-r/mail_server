@@ -9,7 +9,9 @@
   "domain_name",
   "enabled",
   "is_verified",
+  "is_subdomain",
   "column_break_gjk4",
+  "domain_owner",
   "dkim_key_size"
  ],
  "fields": [
@@ -53,6 +55,24 @@
    "fieldtype": "Select",
    "label": "DKIM Key Size (Bits)",
    "options": "\n1024\n2048\n4096"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval: !doc.__islocal",
+   "fieldname": "is_subdomain",
+   "fieldtype": "Check",
+   "label": "Subdomain",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "domain_owner",
+   "fieldtype": "Link",
+   "label": "Domain Owner",
+   "no_copy": 1,
+   "options": "User",
+   "reqd": 1,
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -63,7 +83,7 @@
    "link_fieldname": "domain_name"
   }
  ],
- "modified": "2024-10-19 15:05:05.307807",
+ "modified": "2024-10-19 17:53:00.878255",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Domain Registry",
