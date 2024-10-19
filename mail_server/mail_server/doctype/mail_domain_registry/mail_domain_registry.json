@@ -1,25 +1,73 @@
 {
  "actions": [],
- "allow_rename": 1,
+ "autoname": "field:domain_name",
  "creation": "2024-10-19 13:52:17.138171",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_rkij"
+  "section_break_rkij",
+  "domain_name",
+  "enabled",
+  "is_verified",
+  "column_break_gjk4",
+  "dkim_key_size"
  ],
  "fields": [
   {
    "fieldname": "section_break_rkij",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "domain_name",
+   "fieldtype": "Data",
+   "label": "Domain Name",
+   "no_copy": 1,
+   "reqd": 1,
+   "set_only_once": 1,
+   "unique": 1
+  },
+  {
+   "default": "1",
+   "depends_on": "eval: !doc.__islocal",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "search_index": 1
+  },
+  {
+   "default": "0",
+   "depends_on": "eval: !doc.__islocal",
+   "fieldname": "is_verified",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Verified",
+   "no_copy": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "column_break_gjk4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "dkim_key_size",
+   "fieldtype": "Select",
+   "label": "DKIM Key Size (Bits)",
+   "options": "\n1024\n2048\n4096"
   }
  ],
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2024-10-19 13:52:43.851031",
+ "links": [
+  {
+   "group": "Reference",
+   "link_doctype": "DKIM Key",
+   "link_fieldname": "domain_name"
+  }
+ ],
+ "modified": "2024-10-19 15:05:05.307807",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Domain Registry",
- "naming_rule": "Set by user",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
