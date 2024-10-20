@@ -139,7 +139,7 @@ def create_or_update_dns_record(
 	dns_record.ttl = ttl
 	dns_record.priority = priority
 	dns_record.category = category
-	dns_record.save()
+	dns_record.insert(ignore_permissions=True)
 
 	return dns_record
 

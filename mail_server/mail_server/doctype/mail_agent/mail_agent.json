@@ -94,7 +94,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-10 11:04:56.747870",
+ "modified": "2024-10-20 18:16:22.709504",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Agent",
@@ -110,14 +110,6 @@
    "report": 1,
    "role": "System Manager",
    "write": 1
-  },
-  {
-   "role": "Domain Owner",
-   "select": 1
-  },
-  {
-   "role": "Mailbox User",
-   "select": 1
   }
  ],
  "sort_field": "modified",

@@ -13,6 +13,8 @@ from mail_server.mail_server.doctype.dkim_key.dkim_key import (
 from mail_server.mail_server.doctype.mail_server_settings.mail_server_settings import (
 	validate_mail_server_settings,
 )
+from mail_server.utils.cache import delete_cache
+from mail_server.utils.user import has_role, is_system_manager
 
 
 class MailDomainRegistry(Document):
@@ -27,6 +29,14 @@ class MailDomainRegistry(Document):
 			self.last_verified_at = now()
 			validate_mail_server_settings()
 			create_dkim_key(self.domain_name, cint(self.dkim_key_size))
+
+	def on_update(self) -> None:
+		delete_cache(f"user|{self.domain_owner}")
+
+		if not self.is_new() and self.has_value_changed("domain_owner"):
+			previous_doc = self.get_doc_before_save()
+			if previous_doc and previous_doc.get("domain_owner"):
+				delete_cache(f"user|{previous_doc.get('domain_owner')}")
 
 	def validate_domain_name(self) -> None:
 		"""Validates Domain Name"""
@@ -54,6 +64,11 @@ class MailDomainRegistry(Document):
 
 		if not self.domain_owner:
 			self.domain_owner = frappe.session.user
+
+		if not has_role(self.domain_owner, "Domain Owner") and not is_system_manager(self.domain_owner):
+			frappe.throw(
+				_("User {0} does not have Domain Owner role.").format(frappe.bold(self.domain_owner))
+			)
 
 	def validate_dkim_key_size(self) -> None:
 		"""Validates DKIM Key Size"""
@@ -146,3 +161,48 @@ class MailDomainRegistry(Document):
 		"""Returns DKIM Selector and Private Key"""
 
 		return get_dkim_selector_and_private_key(self.domain_name, raise_exception=True)
+
+
+@frappe.whitelist()
+@frappe.validate_and_sanitize_search_inputs
+def get_domain_owner(
+	doctype: str | None = None,
+	txt: str | None = None,
+	searchfield: str | None = None,
+	start: int = 0,
+	page_len: int = 20,
+	filters: dict | None = None,
+) -> list:
+	"""Returns Domain Owner"""
+
+	USER = frappe.qb.DocType("User")
+	HAS_ROLE = frappe.qb.DocType("Has Role")
+	return (
+		frappe.qb.from_(USER)
+		.left_join(HAS_ROLE)
+		.on(USER.name == HAS_ROLE.parent)
+		.select(USER.name)
+		.where(
+			(USER.enabled == 1)
+			& (USER.name.like(f"%{txt}%"))
+			& (HAS_ROLE.role == "Domain Owner")
+			& (HAS_ROLE.parenttype == "User")
+		)
+	).run(as_dict=False)
+
+
+def get_permission_query_condition(user: str | None = None) -> str:
+	if not user:
+		user = frappe.session.user
+
+	if is_system_manager(user):
+		return ""
+
+	return f"(`tabMail Domain Registry`.`domain_owner` = {frappe.db.escape(user)})"
+
+
+def has_permission(doc: "Document", ptype: str, user: str) -> bool:
+	if doc.doctype != "Mail Domain Registry":
+		return False
+
+	return (user == doc.domain_owner) or is_system_manager(user)

@@ -133,13 +133,13 @@ website_redirects = [
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+permission_query_conditions = {
+	"Mail Domain Registry": "mail_server.mail_server.doctype.mail_domain_registry.mail_domain_registry.get_permission_query_condition",
+}
+
+has_permission = {
+	"Mail Domain Registry": "mail_server.mail_server.doctype.mail_domain_registry.mail_domain_registry.has_permission",
+}
 
 # DocType Class
 # ---------------
@@ -255,3 +255,10 @@ website_redirects = [
 # export_python_type_annotations = True
 
 default_log_clearing_doctypes = {"Spam Check Log": 7}
+
+fixtures = [
+	{
+		"dt": "Role",
+		"filters": [["role_name", "in", ["Domain Owner"]]],
+	},
+]

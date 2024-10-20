@@ -37,6 +37,7 @@
    "fieldname": "enabled",
    "fieldtype": "Check",
    "label": "Enabled",
+   "permlevel": 1,
    "search_index": 1
   },
   {
@@ -47,6 +48,7 @@
    "in_list_view": 1,
    "label": "Verified",
    "no_copy": 1,
+   "permlevel": 1,
    "search_index": 1
   },
   {
@@ -57,7 +59,8 @@
    "fieldname": "dkim_key_size",
    "fieldtype": "Select",
    "label": "DKIM Key Size (Bits)",
-   "options": "\n1024\n2048\n4096"
+   "options": "\n1024\n2048\n4096",
+   "permlevel": 1
   },
   {
    "default": "0",
@@ -74,6 +77,7 @@
    "label": "Domain Owner",
    "no_copy": 1,
    "options": "User",
+   "permlevel": 1,
    "search_index": 1
   },
   {
@@ -105,7 +109,7 @@
    "link_fieldname": "domain_name"
   }
  ],
- "modified": "2024-10-20 11:17:24.968652",
+ "modified": "2024-10-20 18:27:23.117188",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Domain Registry",
@@ -123,6 +127,35 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "export": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Domain Owner",
+   "write": 1
+  },
+  {
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Domain Owner",
+   "share": 1
   }
  ],
  "sort_field": "creation",
