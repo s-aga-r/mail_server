@@ -13,13 +13,14 @@ def get_dns_record(fqdn: str, type: str = "A", raise_exception: bool = False) ->
 	try:
 		resolver = dns.resolver.Resolver(configure=False)
 		resolver.nameservers = [
-			"8.8.8.8",
-			"8.8.4.4",
 			"1.1.1.1",
+			"8.8.4.4",
+			"8.8.8.8",
 			"9.9.9.9",
 		]
 
-		return resolver.resolve(fqdn, type)
+		r = resolver.resolve(fqdn, type)
+		return r
 	except dns.resolver.NXDOMAIN:
 		err_msg = _("{0} does not exist.").format(frappe.bold(fqdn))
 	except dns.resolver.NoAnswer:

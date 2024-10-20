@@ -4,7 +4,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import cint
+from frappe.utils import cint, now
 
 from mail_server.mail_server.doctype.dkim_key.dkim_key import (
 	create_dkim_key,
@@ -24,6 +24,7 @@ class MailDomainRegistry(Document):
 		self.validate_dkim_key_size()
 
 		if self.is_new() or self.has_value_changed("dkim_key_size"):
+			self.last_verified_at = now()
 			validate_mail_server_settings()
 			create_dkim_key(self.domain_name, cint(self.dkim_key_size))
 
@@ -119,6 +120,27 @@ class MailDomainRegistry(Document):
 				)
 
 		return records
+
+	def verify_dns_records(self, save: bool = True) -> None:
+		"""Verifies DNS Records"""
+
+		from mail_server.utils import verify_dns_record
+
+		errors = []
+		for record in self.get_dns_records():
+			if not verify_dns_record(record["host"], record["type"], record["value"]):
+				errors.append(
+					_("Could not verify {0}:{1} record.").format(
+						frappe.bold(record["type"]), frappe.bold(record["host"])
+					)
+				)
+
+		self.verification_errors = "\n".join(errors) if errors else None
+		self.is_verified = 0 if errors else 1
+		self.last_verified_at = now()
+
+		if save:
+			self.save()
 
 	def get_dkim_selector_and_private_key(self) -> tuple[str, str]:
 		"""Returns DKIM Selector and Private Key"""

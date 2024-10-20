@@ -111,6 +111,7 @@
    "fieldtype": "Int",
    "in_standard_filter": 1,
    "label": "Priority",
+   "mandatory_depends_on": "eval: doc.type == \"MX\"",
    "no_copy": 1,
    "non_negative": 1
   },
@@ -137,7 +138,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-18 18:15:37.188676",
+ "modified": "2024-10-20 12:54:48.673318",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "DNS Record",

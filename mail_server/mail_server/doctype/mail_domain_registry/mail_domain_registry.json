@@ -11,8 +11,11 @@
   "is_verified",
   "is_subdomain",
   "column_break_gjk4",
+  "last_verified_at",
   "domain_owner",
-  "dkim_key_size"
+  "dkim_key_size",
+  "section_break_jcxr",
+  "verification_errors"
  ],
  "fields": [
   {
@@ -72,6 +75,26 @@
    "no_copy": 1,
    "options": "User",
    "search_index": 1
+  },
+  {
+   "depends_on": "eval: !doc.__islocal",
+   "fieldname": "last_verified_at",
+   "fieldtype": "Datetime",
+   "in_standard_filter": 1,
+   "label": "Last Verified At",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_jcxr",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "verification_errors",
+   "fieldtype": "Code",
+   "label": "Verification Errors",
+   "no_copy": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -82,7 +105,7 @@
    "link_fieldname": "domain_name"
   }
  ],
- "modified": "2024-10-20 04:16:18.442468",
+ "modified": "2024-10-20 11:17:24.968652",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Domain Registry",
