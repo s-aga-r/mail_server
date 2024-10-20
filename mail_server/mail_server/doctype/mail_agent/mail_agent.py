@@ -31,8 +31,9 @@ class MailAgent(Document):
 		if frappe.session.user != "Administrator":
 			frappe.throw(_("Only Administrator can delete Mail Agent."))
 
-		self.db_set("enabled", 0)
-		create_or_update_spf_dns_record()
+		if self.type == "Outbound":
+			self.db_set("enabled", 0)
+			create_or_update_spf_dns_record()
 
 	def validate_agent(self) -> None:
 		"""Validates the agent and fetches the IP addresses."""

@@ -71,7 +71,6 @@
    "label": "Domain Owner",
    "no_copy": 1,
    "options": "User",
-   "reqd": 1,
    "search_index": 1
   }
  ],
@@ -83,7 +82,7 @@
    "link_fieldname": "domain_name"
   }
  ],
- "modified": "2024-10-19 17:53:00.878255",
+ "modified": "2024-10-20 04:16:18.442468",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Domain Registry",
