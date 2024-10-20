@@ -116,20 +116,20 @@ class MailDomainRegistry(Document):
 		)
 
 		# MX Record(s)
-		if inbound_agents := frappe.db.get_all(
-			"Mail Agent",
-			filters={"enabled": 1, "type": "Inbound"},
-			fields=["agent", "priority"],
+		if inbound_agent_groups := frappe.db.get_all(
+			"Mail Agent Group",
+			filters={"enabled": 1},
+			fields=["agent_group", "priority"],
 			order_by="priority asc",
 		):
-			for inbound_agent in inbound_agents:
+			for group in inbound_agent_groups:
 				records.append(
 					{
 						"category": "Receiving Record",
 						"type": "MX",
 						"host": self.domain_name,
-						"value": f"{inbound_agent.agent.split(':')[0]}.",
-						"priority": inbound_agent.priority,
+						"value": f"{group.agent_group.split(':')[0]}.",
+						"priority": group.priority,
 						"ttl": ms_settings.default_ttl,
 					}
 				)

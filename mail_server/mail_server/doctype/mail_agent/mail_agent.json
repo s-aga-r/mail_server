@@ -10,8 +10,8 @@
   "section_break_whcz",
   "type",
   "section_break_syxq",
+  "agent_group",
   "agent",
-  "priority",
   "section_break_3jtz",
   "ipv4",
   "column_break_mgw4",
@@ -67,15 +67,6 @@
    "set_only_once": 1
   },
   {
-   "depends_on": "eval: doc.type == \"Inbound\"",
-   "fieldname": "priority",
-   "fieldtype": "Int",
-   "in_list_view": 1,
-   "label": "Priority",
-   "mandatory_depends_on": "eval: doc.type == \"Inbound\"",
-   "non_negative": 1
-  },
-  {
    "fieldname": "section_break_excr",
    "fieldtype": "Section Break"
   },
@@ -90,11 +81,20 @@
   {
    "fieldname": "column_break_mgw4",
    "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval: doc.type == \"Inbound\"",
+   "fieldname": "agent_group",
+   "fieldtype": "Link",
+   "label": "Agent Group",
+   "mandatory_depends_on": "eval: doc.type == \"Inbound\"",
+   "options": "Mail Agent Group",
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-20 18:16:22.709504",
+ "modified": "2024-10-20 21:22:22.816768",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Agent",
