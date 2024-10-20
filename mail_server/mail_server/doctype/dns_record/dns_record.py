@@ -18,8 +18,18 @@ class DNSRecord(Document):
 
 	def on_update(self) -> None:
 		if self.has_value_changed("value") or self.has_value_changed("ttl"):
-			self.create_or_update_record_in_dns_provider()
-			self.reload()
+			if frappe.flags.enqueue_dns_record_update:
+				frappe.enqueue_doc(
+					self.doctype,
+					self.name,
+					"create_or_update_record_in_dns_provider",
+					queue="short",
+					enqueue_after_commit=True,
+					at_front=True,
+				)
+			else:
+				self.create_or_update_record_in_dns_provider()
+				self.reload()
 
 	def on_trash(self) -> None:
 		self.delete_record_from_dns_provider()
@@ -61,7 +71,8 @@ class DNSRecord(Document):
 				ttl=self.ttl,
 			)
 
-		frappe.db.set_value(self.doctype, self.name, {"is_verified": int(result), "last_checked_at": now()})
+		self.db_set("is_verified", int(result))
+		self.db_set("last_checked_at", now())
 
 	def delete_record_from_dns_provider(self) -> None:
 		"""Deletes the DNS Record from the DNS Provider"""

@@ -53,6 +53,7 @@ class DKIMKey(Document):
 	def create_or_update_dns_record(self) -> None:
 		"""Creates or Updates the DNS Record."""
 
+		frappe.flags.enqueue_dns_record_update = True
 		create_or_update_dns_record(
 			host=f"{self.name}._domainkey",
 			type="TXT",
