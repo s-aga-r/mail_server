@@ -38,6 +38,10 @@ class MailDomainRegistry(Document):
 			if previous_doc and previous_doc.get("domain_owner"):
 				delete_cache(f"user|{previous_doc.get('domain_owner')}")
 
+	def on_trash(self) -> None:
+		if frappe.session.user != "Administrator":
+			frappe.throw(_("Only Administrator can delete Mail Domain Registry."))
+
 	def validate_domain_name(self) -> None:
 		"""Validates Domain Name"""
 
