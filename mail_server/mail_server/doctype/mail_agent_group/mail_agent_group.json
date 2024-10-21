@@ -43,7 +43,7 @@
    "label": "Priority",
    "no_copy": 1,
    "reqd": 1,
-   "unique": 1
+   "search_index": 1
   },
   {
    "fieldname": "section_break_0q8l",
@@ -81,7 +81,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-20 21:28:23.538668",
+ "modified": "2024-10-21 10:09:50.083574",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Agent Group",
