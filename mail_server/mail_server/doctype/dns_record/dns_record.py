@@ -4,7 +4,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import now
+from frappe.utils import cint, now
 
 from mail_server.mail_server.doctype.dns_record.dns_provider import DNSProvider
 from mail_server.utils import enqueue_job
@@ -71,8 +71,7 @@ class DNSRecord(Document):
 				ttl=self.ttl,
 			)
 
-		self.db_set("is_verified", int(result))
-		self.db_set("last_checked_at", now())
+		frappe.db.set_value(self.doctype, self.name, {"is_verified": cint(result), "last_checked_at": now()})
 
 	def delete_record_from_dns_provider(self) -> None:
 		"""Deletes the DNS Record from the DNS Provider"""

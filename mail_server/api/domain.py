@@ -86,13 +86,9 @@ def is_domain_registry_exists(
 			frappe.throw(
 				_("Domain {0} does not exist or may be disabled in the Mail Domain Registry").format(
 					frappe.bold(domain_name)
-				),
-				frappe.DoesNotExistError,
+				)
 			)
 
-		frappe.throw(
-			_("Domain {0} not found in Mail Domain Registry").format(frappe.bold(domain_name)),
-			frappe.DoesNotExistError,
-		)
+		frappe.throw(_("Domain {0} not found in Mail Domain Registry").format(frappe.bold(domain_name)))
 
 	return False

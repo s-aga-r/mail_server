@@ -140,7 +140,7 @@ class MailDomainRegistry(Document):
 
 		return records
 
-	def verify_dns_records(self, save: bool = True) -> None:
+	def verify_dns_records(self) -> None:
 		"""Verifies DNS Records"""
 
 		from mail_server.utils import verify_dns_record
@@ -154,12 +154,16 @@ class MailDomainRegistry(Document):
 					)
 				)
 
-		self.verification_errors = "\n".join(errors) if errors else None
-		self.is_verified = 0 if errors else 1
-		self.last_verified_at = now()
-
-		if save:
-			self.save()
+		frappe.db.set_value(
+			self.doctype,
+			self.name,
+			{
+				"verification_errors": "\n".join(errors) if errors else None,
+				"is_verified": 0 if errors else 1,
+				"last_verified_at": now(),
+			},
+		)
+		self.reload()
 
 	def get_dkim_selector_and_private_key(self) -> tuple[str, str]:
 		"""Returns DKIM Selector and Private Key"""
@@ -169,7 +173,7 @@ class MailDomainRegistry(Document):
 
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
-def get_domain_owner(
+def get_users_with_domain_owner_role(
 	doctype: str | None = None,
 	txt: str | None = None,
 	searchfield: str | None = None,
@@ -177,7 +181,7 @@ def get_domain_owner(
 	page_len: int = 20,
 	filters: dict | None = None,
 ) -> list:
-	"""Returns Domain Owner"""
+	"""Returns a list of User(s) who have Domain Owner role."""
 
 	USER = frappe.qb.DocType("User")
 	HAS_ROLE = frappe.qb.DocType("Has Role")
