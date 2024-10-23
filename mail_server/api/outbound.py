@@ -32,11 +32,15 @@ def fetch_delivery_status(outgoing_mail: str, token: str) -> dict:
 
 		return doc.get_delivery_status()
 
-	frappe.throw(
-		_(
-			"No record found for the provided token ({0}) in the Outgoing Mail Log. Please check that the token is correct."
-		).format(token)
-	)
+	return {
+		"token": token,
+		"status": "Failed",
+		"error_message": _("No record found for the provided token ({0})in the Outgoing Mail Log.").format(
+			token
+		),
+		"outgoing_mail": outgoing_mail,
+		"recipients": [],
+	}
 
 
 @frappe.whitelist(methods=["GET"])
