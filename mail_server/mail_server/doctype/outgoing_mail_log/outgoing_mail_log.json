@@ -1,0 +1,212 @@
+{
+ "actions": [],
+ "creation": "2024-10-21 20:51:19.358041",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_hwi1",
+  "status",
+  "column_break_bvbh",
+  "outgoing_mail",
+  "section_break_tjoe",
+  "recipients",
+  "section_break_heps",
+  "error_log",
+  "error_message",
+  "more_info_tab",
+  "ip_address",
+  "spam_score",
+  "is_spam",
+  "column_break_w7ne",
+  "domain_name",
+  "section_break_nveh",
+  "message_id",
+  "column_break_kecu",
+  "message_size",
+  "section_break_bxyx",
+  "spam_check_response",
+  "message"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_hwi1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "message",
+   "fieldtype": "Code",
+   "label": "Message",
+   "no_copy": 1,
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "recipients",
+   "fieldtype": "Table",
+   "label": "Recipients",
+   "no_copy": 1,
+   "options": "Mail Log Recipient",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "no_copy": 1,
+   "options": "Draft\nBlocked\nAccepted\nTransferring\nFailed\nTransferred\nQueued\nDeferred\nBounced\nPartially Sent\nSent",
+   "read_only": 1,
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "section_break_tjoe",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_heps",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "more_info_tab",
+   "fieldtype": "Tab Break",
+   "label": "More Info"
+  },
+  {
+   "fieldname": "ip_address",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "IP Address",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_w7ne",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "domain_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Domain Name",
+   "no_copy": 1,
+   "options": "Mail Domain Registry",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "section_break_nveh",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "message_id",
+   "fieldtype": "Data",
+   "ignore_xss_filter": 1,
+   "in_list_view": 1,
+   "label": "Message ID",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_kecu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval: doc.message_size",
+   "fieldname": "message_size",
+   "fieldtype": "Int",
+   "label": "Message Size (Bytes)",
+   "no_copy": 1,
+   "non_negative": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_bxyx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_bvbh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "outgoing_mail",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Outgoing Mail",
+   "no_copy": 1,
+   "read_only": 1,
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "depends_on": "eval: doc.spam_check_response",
+   "fieldname": "spam_score",
+   "fieldtype": "Float",
+   "label": "Spam Score",
+   "no_copy": 1,
+   "precision": "1",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "depends_on": "eval: doc.is_spam",
+   "fieldname": "is_spam",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Is Spam",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "spam_check_response",
+   "fieldtype": "Code",
+   "label": "Spam Check Response",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "error_message",
+   "fieldtype": "Code",
+   "label": "Error Message",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "error_log",
+   "fieldtype": "Code",
+   "label": "Error Log",
+   "no_copy": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-10-23 15:23:29.504859",
+ "modified_by": "Administrator",
+ "module": "Mail Server",
+ "name": "Outgoing Mail Log",
+ "naming_rule": "Set by user",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

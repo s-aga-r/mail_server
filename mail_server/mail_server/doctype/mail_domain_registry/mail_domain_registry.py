@@ -154,21 +154,33 @@ class MailDomainRegistry(Document):
 					)
 				)
 
-		frappe.db.set_value(
-			self.doctype,
-			self.name,
-			{
-				"verification_errors": "\n".join(errors) if errors else None,
-				"is_verified": 0 if errors else 1,
-				"last_verified_at": now(),
-			},
+		is_verified = 0 if errors else 1
+		verification_errors = "\n".join(errors) if errors else None
+		self._db_set(
+			is_verified=is_verified,
+			last_verified_at=now(),
+			verification_errors=verification_errors,
+			notify_update=True,
 		)
-		self.reload()
 
 	def get_dkim_selector_and_private_key(self) -> tuple[str, str]:
 		"""Returns DKIM Selector and Private Key"""
 
 		return get_dkim_selector_and_private_key(self.domain_name, raise_exception=True)
+
+	def _db_set(
+		self,
+		update_modified: bool = True,
+		commit: bool = False,
+		notify_update: bool = False,
+		**kwargs,
+	) -> None:
+		"""Updates the document with the given key-value pairs."""
+
+		self.db_set(kwargs, update_modified=update_modified, commit=commit)
+
+		if notify_update:
+			self.notify_update()
 
 
 @frappe.whitelist()

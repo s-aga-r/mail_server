@@ -14,6 +14,7 @@
   "last_verified_at",
   "domain_owner",
   "dkim_key_size",
+  "mail_client_host",
   "section_break_jcxr",
   "verification_errors"
  ],
@@ -99,6 +100,11 @@
    "label": "Verification Errors",
    "no_copy": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "mail_client_host",
+   "fieldtype": "Data",
+   "label": "Mail Client Host"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -107,9 +113,14 @@
    "group": "Reference",
    "link_doctype": "DKIM Key",
    "link_fieldname": "domain_name"
+  },
+  {
+   "group": "Reference",
+   "link_doctype": "Outgoing Mail Log",
+   "link_fieldname": "domain_name"
   }
  ],
- "modified": "2024-10-20 18:27:23.117188",
+ "modified": "2024-10-22 14:16:18.250625",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Domain Registry",

@@ -6,7 +6,7 @@ from mail_server.utils.user import has_role, is_system_manager
 
 
 @frappe.whitelist(methods=["POST"])
-def add_or_update_domain(domain_name: str) -> dict:
+def add_or_update_domain(domain_name: str, mail_client_host: str = None) -> dict:
 	"""Add or update domain in Mail Domain Registry."""
 
 	user = frappe.session.user
@@ -15,10 +15,14 @@ def add_or_update_domain(domain_name: str) -> dict:
 	if is_domain_registry_exists(domain_name):
 		validate_user_is_domain_owner(user, domain_name)
 		doc = frappe.get_doc("Mail Domain Registry", domain_name)
+
+		if mail_client_host and doc.mail_client_host != mail_client_host:
+			doc.db_set("mail_client_host", mail_client_host)
 	else:
 		doc = frappe.new_doc("Mail Domain Registry")
-		doc.domain_name = domain_name
 		doc.domain_owner = user
+		doc.domain_name = domain_name
+		doc.mail_client_host = mail_client_host
 		doc.insert(ignore_permissions=True)
 
 	response = {
