@@ -6,6 +6,7 @@
  "field_order": [
   "section_break_hwi1",
   "status",
+  "priority",
   "column_break_bvbh",
   "outgoing_mail",
   "section_break_tjoe",
@@ -182,11 +183,20 @@
    "label": "Error Log",
    "no_copy": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Int",
+   "label": "Priority",
+   "no_copy": 1,
+   "non_negative": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-24 11:24:13.249476",
+ "modified": "2024-10-24 17:38:39.067377",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Outgoing Mail Log",

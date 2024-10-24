@@ -25,6 +25,7 @@ class OutgoingMailLog(Document):
 		self.set_ip_address()
 		self.validate_message()
 		self.validate_domain_name()
+		self.validate_priority()
 
 	def after_insert(self) -> None:
 		frappe.enqueue_doc(
@@ -48,6 +49,7 @@ class OutgoingMailLog(Document):
 		message = message_from_string(self.message)
 		self.domain_name = message["From"].split("@")[1].replace(">", "")
 		self.message_id = message["Message-ID"]
+		self.priority = message["X-Priority"]
 		self.message_size = len(self.message)
 
 		if not message["DKIM-Signature"]:
@@ -70,6 +72,11 @@ class OutgoingMailLog(Document):
 			_("You are not authorized to send emails from domain {0}.").format(self.domain_name),
 			frappe.PermissionError,
 		)
+
+	def validate_priority(self) -> None:
+		"""Validate priority and set it to a value between 0 and 3."""
+
+		self.priority = min(max(int(self.priority), 0), 3)
 
 	def check_for_spam(self) -> None:
 		"""Check if the email is spam and set status accordingly."""
