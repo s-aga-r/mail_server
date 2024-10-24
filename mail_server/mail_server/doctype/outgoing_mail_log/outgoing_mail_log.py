@@ -28,9 +28,7 @@ class OutgoingMailLog(Document):
 		self.validate_priority()
 
 	def after_insert(self) -> None:
-		frappe.enqueue_doc(
-			self.doctype, self.name, "check_for_spam", queue="short", enqueue_after_commit=True
-		)
+		self.enqueue_check_for_spam()
 
 	def validate_status(self) -> None:
 		"""Set status to `In Progress` if not set."""
@@ -78,13 +76,22 @@ class OutgoingMailLog(Document):
 
 		self.priority = min(max(int(self.priority), 0), 3)
 
+	def enqueue_check_for_spam(self) -> None:
+		"""Enqueue spam check if spam detection is enabled."""
+
+		if is_spam_detection_enabled_for_outbound():
+			frappe.enqueue_doc(
+				self.doctype, self.name, "check_for_spam", queue="short", enqueue_after_commit=True
+			)
+		else:
+			self._db_set(status="Accepted", notify_update=True)
+
 	def check_for_spam(self) -> None:
 		"""Check if the email is spam and set status accordingly."""
 
-		ms_settings = frappe.get_cached_doc("Mail Server Settings")
-
-		if ms_settings.enable_spam_detection and ms_settings.enable_spam_detection_for_outbound:
+		if is_spam_detection_enabled_for_outbound():
 			log = create_spam_check_log(self.message)
+			ms_settings = frappe.get_cached_doc("Mail Server Settings")
 			kwargs = {
 				"spam_score": log.spam_score,
 				"spam_check_response": log.spamd_response,
@@ -180,3 +187,10 @@ def create_outgoing_mail_log(
 	log.message = message
 	log.insert(ignore_permissions=True)
 	return log
+
+
+def is_spam_detection_enabled_for_outbound() -> bool:
+	"""Returns True if spam detection is enabled for outbound emails else False."""
+
+	ms_settings = frappe.get_cached_doc("Mail Server Settings")
+	return ms_settings.enable_spam_detection and ms_settings.enable_spam_detection_for_outbound
