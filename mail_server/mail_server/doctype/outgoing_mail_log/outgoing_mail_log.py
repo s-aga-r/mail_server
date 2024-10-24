@@ -65,7 +65,10 @@ class OutgoingMailLog(Document):
 
 			frappe.throw(_("Domain {0} is not verified.").format(self.domain_name))
 
-		frappe.throw(_("You are not authorized to send emails from domain {0}.").format(self.domain_name))
+		frappe.throw(
+			_("You are not authorized to send emails from domain {0}.").format(self.domain_name),
+			frappe.PermissionError,
+		)
 
 	def check_for_spam(self) -> None:
 		"""Check if the email is spam and set status accordingly."""

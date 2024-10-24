@@ -18,7 +18,7 @@ def fetch_delivery_status(outgoing_mail: str, token: str) -> dict:
 	"""Returns the delivery status of the outgoing mail."""
 
 	if not outgoing_mail or not token:
-		frappe.throw(_("Both outgoing mail and token are required."))
+		frappe.throw(_("Both outgoing mail and token are required."), frappe.MandatoryError)
 
 	if frappe.db.exists("Outgoing Mail Log", token):
 		doc = frappe.get_doc("Outgoing Mail Log", token)

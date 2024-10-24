@@ -67,14 +67,14 @@ def validate_user_has_domain_owner_role(user: str) -> None:
 	"""Validate if the user has Domain Owner role or System Manager role."""
 
 	if not has_role(user, "Domain Owner") and not is_system_manager(user):
-		frappe.throw("You are not authorized to perform this action.", frappe.PermissionError)
+		frappe.throw(_("You are not authorized to perform this action."), frappe.PermissionError)
 
 
 def validate_user_is_domain_owner(user: str, domain_name: str) -> None:
 	"""Validate if the user is the owner of the given domain."""
 
 	if domain_name not in get_user_owned_domains(user) and not is_system_manager(user):
-		frappe.throw("You are not authorized to perform this action.", frappe.PermissionError)
+		frappe.throw(_("You are not authorized to perform this action."), frappe.PermissionError)
 
 
 def is_domain_registry_exists(
@@ -94,9 +94,13 @@ def is_domain_registry_exists(
 			frappe.throw(
 				_("Domain {0} does not exist or may be disabled in the Mail Domain Registry").format(
 					frappe.bold(domain_name)
-				)
+				),
+				frappe.DoesNotExistError,
 			)
 
-		frappe.throw(_("Domain {0} not found in Mail Domain Registry").format(frappe.bold(domain_name)))
+		frappe.throw(
+			_("Domain {0} not found in Mail Domain Registry").format(frappe.bold(domain_name)),
+			frappe.DoesNotExistError,
+		)
 
 	return False
