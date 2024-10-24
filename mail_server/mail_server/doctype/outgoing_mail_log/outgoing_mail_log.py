@@ -32,10 +32,10 @@ class OutgoingMailLog(Document):
 		)
 
 	def validate_status(self) -> None:
-		"""Set status to Draft if not set."""
+		"""Set status to `In Progress` if not set."""
 
 		if not self.status:
-			self.status = "Draft"
+			self.status = "In Progress"
 
 	def set_ip_address(self) -> None:
 		"""Set IP Address to current request IP."""
@@ -119,9 +119,13 @@ class OutgoingMailLog(Document):
 	def get_delivery_status(self) -> dict:
 		"""Returns the delivery status of the outgoing mail."""
 
+		status = "Queued"
+		if self.status in ["Blocked", "Deferred", "Bounced", "Partially Sent", "Sent"]:
+			status = self.status
+
 		return {
+			"status": status,
 			"token": self.name,
-			"status": self.status,
 			"error_message": self.error_message,
 			"outgoing_mail": self.outgoing_mail,
 			"recipients": [

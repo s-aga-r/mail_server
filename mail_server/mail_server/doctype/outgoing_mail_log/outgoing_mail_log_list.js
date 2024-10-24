@@ -4,13 +4,13 @@
 frappe.listview_settings["Outgoing Mail Log"] = {
 	get_indicator: (doc) => {
 		const status_colors = {
-			Draft: "grey",
+			"In Progress": "grey",
 			Blocked: "red",
 			Accepted: "blue",
-			Transferring: "orange",
+			"Queuing (RMQ)": "orange",
 			Failed: "red",
-			Transferred: "blue",
-			Queued: "yellow",
+			"Queued (RMQ)": "yellow",
+			"Queued (Haraka)": "blue",
 			Deferred: "orange",
 			Bounced: "pink",
 			"Partially Sent": "purple",
