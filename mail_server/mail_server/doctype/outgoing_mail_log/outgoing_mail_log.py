@@ -11,6 +11,7 @@ from frappe.utils import cint
 from uuid_utils import uuid7
 
 from mail_server.mail_server.doctype.spam_check_log.spam_check_log import create_spam_check_log
+from mail_server.utils import convert_to_utc
 from mail_server.utils.cache import get_user_owned_domains
 from mail_server.utils.user import is_system_manager
 
@@ -127,8 +128,7 @@ class OutgoingMailLog(Document):
 				{
 					"email": rcpt.email,
 					"status": rcpt.status,
-					"action_at": rcpt.action_at,
-					"action_after": rcpt.action_after,
+					"action_at": str(convert_to_utc(rcpt.action_at)),
 					"retries": rcpt.retries,
 					"response": rcpt.response,
 				}

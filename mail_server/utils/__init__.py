@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from datetime import datetime
 
 import dns.resolver
 import frappe
@@ -76,3 +77,17 @@ def enqueue_job(method: str | Callable, **kwargs) -> None:
 	jobs = get_jobs(site=site)
 	if not jobs or method not in jobs[site]:
 		frappe.enqueue(method, **kwargs)
+
+
+def convert_to_utc(date_time: datetime | str, from_timezone: str | None = None) -> "datetime":
+	"""Converts the given datetime to UTC timezone."""
+
+	import pytz
+	from frappe.utils import get_datetime, get_system_timezone
+
+	dt = get_datetime(date_time)
+	if dt.tzinfo is None:
+		tz = pytz.timezone(from_timezone or get_system_timezone())
+		dt = tz.localize(dt)
+
+	return dt.astimezone(pytz.utc)
