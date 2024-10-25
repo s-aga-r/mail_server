@@ -18,6 +18,7 @@
   "ip_address",
   "spam_score",
   "is_spam",
+  "is_newsletter",
   "column_break_w7ne",
   "domain_name",
   "section_break_nveh",
@@ -25,6 +26,15 @@
   "column_break_kecu",
   "message_size",
   "section_break_bxyx",
+  "created_at",
+  "received_at",
+  "processed_at",
+  "queued_at",
+  "column_break_8jk2",
+  "received_after",
+  "processed_after",
+  "queued_after",
+  "section_break_rwda",
   "spam_check_response",
   "message"
  ],
@@ -192,11 +202,85 @@
    "non_negative": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "default": "0",
+   "depends_on": "eval: doc.is_newsletter",
+   "fieldname": "is_newsletter",
+   "fieldtype": "Check",
+   "label": "Newsletter",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "created_at",
+   "fieldtype": "Datetime",
+   "label": "Created At",
+   "no_copy": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "received_at",
+   "fieldtype": "Datetime",
+   "label": "Received At",
+   "no_copy": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "processed_at",
+   "fieldtype": "Datetime",
+   "label": "Processed At",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "queued_at",
+   "fieldtype": "Datetime",
+   "label": "Queued At",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_8jk2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Received At - Created At",
+   "fieldname": "received_after",
+   "fieldtype": "Float",
+   "label": "Received After (Seconds)",
+   "no_copy": 1,
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "description": "Processed At - Received At",
+   "fieldname": "processed_after",
+   "fieldtype": "Float",
+   "label": "Processed After (Seconds)",
+   "no_copy": 1,
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "description": "Queued At - Processed At",
+   "fieldname": "queued_after",
+   "fieldtype": "Float",
+   "label": "Queued After (Seconds)",
+   "no_copy": 1,
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_rwda",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-24 17:38:39.067377",
+ "modified": "2024-10-25 16:45:54.912642",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Outgoing Mail Log",

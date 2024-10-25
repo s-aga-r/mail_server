@@ -164,23 +164,28 @@ has_permission = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"mail_server.tasks.all"
-# 	],
-# 	"daily": [
-# 		"mail_server.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"mail_server.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"mail_server.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"mail_server.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	# "all": [
+	# 	"mail_server.tasks.all"
+	# ],
+	# "daily": [
+	# 	"mail_server.tasks.daily"
+	# ],
+	# "hourly": [
+	# 	"mail_server.tasks.hourly"
+	# ],
+	# "weekly": [
+	# 	"mail_server.tasks.weekly"
+	# ],
+	# "monthly": [
+	# 	"mail_server.tasks.monthly"
+	# ],
+	"cron": {
+		"* * * * *": [
+			"mail_server.mail_server.doctype.outgoing_mail_log.outgoing_mail_log.enqueue_push_emails_to_queue"
+		],
+	},
+}
 
 # Testing
 # -------

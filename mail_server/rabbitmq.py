@@ -12,6 +12,12 @@ if TYPE_CHECKING:
 	from pika.adapters.blocking_connection import BlockingChannel
 
 
+NEWSLETTER_QUEUE: str = "mail::newsletters"
+OUTGOING_MAIL_QUEUE: str = "mail::outgoing_mails"
+INCOMING_MAIL_QUEUE: str = "mail_agent::incoming_mails"
+OUTGOING_MAIL_STATUS_QUEUE: str = "mail_agent::outgoing_mails_status"
+
+
 class RabbitMQ:
 	def __init__(
 		self,

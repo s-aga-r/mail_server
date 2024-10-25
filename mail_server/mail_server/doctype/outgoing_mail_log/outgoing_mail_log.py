@@ -1,13 +1,14 @@
 # Copyright (c) 2024, Frappe Technologies Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
-from email import message_from_string
+
+import json
 
 import frappe
 import requests
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import cint
+from frappe.utils import cint, now, time_diff_in_seconds
 from uuid_utils import uuid7
 
 from mail_server.mail_server.doctype.spam_check_log.spam_check_log import create_spam_check_log
@@ -44,13 +45,19 @@ class OutgoingMailLog(Document):
 	def validate_message(self) -> None:
 		"""Validate message and extract domain name."""
 
-		message = message_from_string(self.message)
-		self.domain_name = message["From"].split("@")[1].replace(">", "")
-		self.message_id = message["Message-ID"]
-		self.priority = message["X-Priority"]
-		self.message_size = len(self.message)
+		from mail_server.utils.email_parser import EmailParser
 
-		if not message["DKIM-Signature"]:
+		parser = EmailParser(self.message)
+		self.priority = parser.get_header("X-Priority")
+		self.created_at = parser.get_date()
+		self.message_id = parser.get_message_id()
+		self.received_at = now()
+		self.domain_name = parser.get_sender()[1].split("@")[1]
+		self.message_size = parser.get_size()
+		self.is_newsletter = cint(parser.get_header("X-Newsletter"))
+		self.received_after = time_diff_in_seconds(self.received_at, self.created_at)
+
+		if not parser.get_header("DKIM-Signature"):
 			frappe.throw(_("Message does not contain DKIM Signature."))
 
 	def validate_domain_name(self) -> None:
@@ -84,7 +91,17 @@ class OutgoingMailLog(Document):
 				self.doctype, self.name, "check_for_spam", queue="short", enqueue_after_commit=True
 			)
 		else:
-			self._db_set(status="Accepted", notify_update=True)
+			processed_at = now()
+			processed_after = time_diff_in_seconds(processed_at, self.received_at)
+			self._db_set(
+				status="Accepted",
+				processed_at=processed_at,
+				processed_after=processed_after,
+				notify_update=True,
+			)
+
+			if self.priority == 3:
+				self.push_to_queue()
 
 	def check_for_spam(self) -> None:
 		"""Check if the email is spam and set status accordingly."""
@@ -111,12 +128,24 @@ class OutgoingMailLog(Document):
 			else:
 				kwargs["status"] = "Accepted"
 
+			kwargs["processed_at"] = now()
+			kwargs["processed_after"] = time_diff_in_seconds(kwargs["processed_at"], self.received_at)
 			self._db_set(notify_update=True, **kwargs)
 
 			if kwargs["status"] == "Blocked":
 				self.update_delivery_status_in_mail_client()
 		else:
-			self._db_set(status="Accepted", notify_update=True)
+			processed_at = now()
+			processed_after = time_diff_in_seconds(processed_at, self.received_at)
+			self._db_set(
+				status="Accepted",
+				processed_at=processed_at,
+				processed_after=processed_after,
+				notify_update=True,
+			)
+
+		if self.status == "Accepted" and self.priority == 3:
+			self.push_to_queue()
 
 	def update_delivery_status_in_mail_client(self) -> None:
 		"""Update delivery status in Mail Client."""
@@ -169,6 +198,69 @@ class OutgoingMailLog(Document):
 		if notify_update:
 			self.notify_update()
 
+	@frappe.whitelist()
+	def retry_failed(self) -> None:
+		"""Retries failed email."""
+
+		if self.status == "Failed":
+			self._db_set(status="Accepted", error_log=None, error_message=None, commit=True)
+			self.push_to_queue()
+
+	@frappe.whitelist()
+	def retry_bounced(self) -> None:
+		"""Retries bounced email."""
+
+		if not is_system_manager(frappe.session.user):
+			frappe.throw(_("Only System Manager can retry bounced mail."))
+
+		if self.status == "Bounced":
+			self._db_set(status="Accepted", error_log=None, error_message=None, commit=True)
+			self.push_to_queue()
+
+	@frappe.whitelist()
+	def push_to_queue(self) -> None:
+		"""Pushes the email to the queue for sending."""
+
+		if not frappe.flags.force_push_to_queue:
+			self.load_from_db()
+
+			# Ensure the document is "Accepted"
+			if self.status != "Accepted":
+				return
+
+		from mail_server.rabbitmq import OUTGOING_MAIL_QUEUE, rabbitmq_context
+
+		self._db_set(
+			status="Queuing (RMQ)",
+			notify_update=False,
+			commit=True,
+		)
+
+		recipients = [r.email for r in self.recipients]
+		data = {
+			"outgoing_mail": self.outgoing_mail,
+			"recipients": recipients,
+			"message": self.message,
+		}
+
+		try:
+			with rabbitmq_context() as rmq:
+				rmq.declare_queue(OUTGOING_MAIL_QUEUE, max_priority=3)
+				rmq.publish(OUTGOING_MAIL_QUEUE, json.dumps(data), priority=3)
+
+			queued_at = now()
+			queued_after = time_diff_in_seconds(queued_at, self.processed_at)
+			self._db_set(
+				status="Queued (RMQ)",
+				queued_at=queued_at,
+				queued_after=queued_after,
+				notify_update=False,
+				commit=True,
+			)
+		except Exception:
+			error_log = frappe.get_traceback(with_context=False)
+			self._db_set(status="Failed", error_log=error_log, commit=True)
+
 
 def create_outgoing_mail_log(
 	outgoing_mail: str, recipients: str | list[str], message: str
@@ -194,3 +286,101 @@ def is_spam_detection_enabled_for_outbound() -> bool:
 
 	ms_settings = frappe.get_cached_doc("Mail Server Settings")
 	return ms_settings.enable_spam_detection and ms_settings.enable_spam_detection_for_outbound
+
+
+def push_emails_to_queue() -> None:
+	"""Pushes emails to the queue for sending."""
+
+	import time
+
+	from frappe.query_builder.functions import GroupConcat
+	from pypika import Order
+
+	from mail_server.rabbitmq import OUTGOING_MAIL_QUEUE, rabbitmq_context
+	from mail_server.utils.cache import get_root_domain_name
+
+	batch_size = 1000
+	max_failures = 3
+	total_failures = 0
+	root_domain_name = get_root_domain_name()
+
+	while total_failures < max_failures:
+		OML = frappe.qb.DocType("Outgoing Mail Log")
+		MLR = frappe.qb.DocType("Mail Log Recipient")
+		mails = (
+			frappe.qb.from_(OML)
+			.join(MLR)
+			.on(OML.name == MLR.parent)
+			.select(
+				OML.name,
+				OML.message,
+				OML.priority,
+				OML.domain_name,
+				GroupConcat(MLR.email).as_("recipients"),
+			)
+			.where(OML.status == "Accepted")
+			.groupby(OML.name)
+			.orderby(OML.priority, order=Order.desc)
+			.orderby(OML.received_at)
+			.limit(batch_size)
+		).run(as_dict=True, as_iterator=False)
+
+		if not mails:
+			break
+
+		try:
+			mail_list = [mail["name"] for mail in mails]
+			(frappe.qb.update(OML).set(OML.status, "Queuing (RMQ)").where(OML.name.isin(mail_list))).run()
+			frappe.db.commit()
+
+			with rabbitmq_context() as rmq:
+				rmq.declare_queue(OUTGOING_MAIL_QUEUE, max_priority=3)
+
+				for mail in mails:
+					if mail["domain_name"] == root_domain_name:
+						mail["priority"] = max(mail["priority"], 2)
+
+					data = {
+						"outgoing_mail_log": mail["name"],
+						"recipients": mail["recipients"].split(","),
+						"message": mail["message"],
+					}
+					rmq.publish(OUTGOING_MAIL_QUEUE, json.dumps(data), priority=mail["priority"])
+
+			frappe.db.sql(
+				"""
+				UPDATE `tabOutgoing Mail Log`
+				SET
+					status = %s,
+					queued_at = %s,
+					queued_after = TIMESTAMPDIFF(SECOND, `processed_at`, `queued_at`)
+				WHERE
+					status = %s AND
+					name IN %s
+				""",
+				("Queued (RMQ)", now(), "Queuing (RMQ)", tuple(mail_list)),
+			)
+
+		except Exception:
+			total_failures += 1
+			error_log = frappe.get_traceback(with_context=False)
+			frappe.log_error(title="Push Emails to Queue", message=error_log)
+
+			(
+				frappe.qb.update(OML)
+				.set(OML.status, "Failed")
+				.set(OML.error_log, error_log)
+				.where((OML.name.isin(mail_list)) & (OML.status == "Queuing (RMQ)"))
+			).run()
+
+			if total_failures < max_failures:
+				time.sleep(2**total_failures)
+
+
+def enqueue_push_emails_to_queue() -> None:
+	"Called by the scheduler to enqueue the `push_emails_to_queue` job."
+
+	from mail_server.utils import enqueue_job
+
+	frappe.session.user = "Administrator"
+	enqueue_job(push_emails_to_queue, queue="long")

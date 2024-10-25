@@ -3,7 +3,9 @@ from datetime import datetime
 
 import dns.resolver
 import frappe
+import pytz
 from frappe import _
+from frappe.utils import get_datetime, get_system_timezone
 
 
 def get_dns_record(fqdn: str, type: str = "A", raise_exception: bool = False) -> dns.resolver.Answer | None:
@@ -82,12 +84,21 @@ def enqueue_job(method: str | Callable, **kwargs) -> None:
 def convert_to_utc(date_time: datetime | str, from_timezone: str | None = None) -> "datetime":
 	"""Converts the given datetime to UTC timezone."""
 
-	import pytz
-	from frappe.utils import get_datetime, get_system_timezone
-
 	dt = get_datetime(date_time)
 	if dt.tzinfo is None:
 		tz = pytz.timezone(from_timezone or get_system_timezone())
 		dt = tz.localize(dt)
 
 	return dt.astimezone(pytz.utc)
+
+
+def parsedate_to_datetime(date_header: str, to_timezone: str | None = None) -> "datetime":
+	"""Returns datetime object from parsed date header."""
+
+	from email.utils import parsedate_to_datetime as parsedate
+
+	dt = parsedate(date_header)
+	if not dt:
+		frappe.throw(_("Invalid date format: {0}").format(date_header))
+
+	return dt.astimezone(pytz.timezone(to_timezone or get_system_timezone()))
