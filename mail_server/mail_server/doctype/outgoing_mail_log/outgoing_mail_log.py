@@ -375,12 +375,3 @@ def push_emails_to_queue() -> None:
 
 			if total_failures < max_failures:
 				time.sleep(2**total_failures)
-
-
-def enqueue_push_emails_to_queue() -> None:
-	"Called by the scheduler to enqueue the `push_emails_to_queue` job."
-
-	from mail_server.utils import enqueue_job
-
-	frappe.session.user = "Administrator"
-	enqueue_job(push_emails_to_queue, queue="long")

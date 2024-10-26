@@ -181,9 +181,7 @@ scheduler_events = {
 	# 	"mail_server.tasks.monthly"
 	# ],
 	"cron": {
-		"* * * * *": [
-			"mail_server.mail_server.doctype.outgoing_mail_log.outgoing_mail_log.enqueue_push_emails_to_queue"
-		],
+		"* * * * *": ["mail_server.tasks.enqueue_push_emails_to_queue"],
 	},
 }
 
