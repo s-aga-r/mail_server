@@ -204,7 +204,7 @@ class OutgoingMailLog(Document):
 	def retry_failed(self) -> None:
 		"""Retries failed email."""
 
-		if self.status == "Failed":
+		if self.status == "Failed" and self.failed_count < 3:
 			self._db_set(status="Accepted", error_log=None, error_message=None, commit=True)
 			self.push_to_queue()
 
@@ -227,7 +227,7 @@ class OutgoingMailLog(Document):
 			self.load_from_db()
 
 			# Ensure the document is "Accepted"
-			if self.status != "Accepted":
+			if not (self.status == "Accepted" and self.failed_count < 3):
 				return
 
 		from mail_server.rabbitmq import OUTGOING_MAIL_QUEUE, rabbitmq_context
@@ -265,7 +265,9 @@ class OutgoingMailLog(Document):
 			)
 		except Exception:
 			error_log = frappe.get_traceback(with_context=False)
-			self._db_set(status="Failed", error_log=error_log, commit=True)
+			self._db_set(
+				status="Failed", error_log=error_log, failed_count=self.failed_count + 1, commit=True
+			)
 
 
 def create_outgoing_mail_log(
@@ -324,7 +326,7 @@ def push_emails_to_queue() -> None:
 				OML.domain_name,
 				GroupConcat(MLR.email).as_("recipients"),
 			)
-			.where(OML.status == "Accepted")
+			.where((OML.failed_count < 3) & (OML.status.isin(["Accepted", "Failed"])))
 			.groupby(OML.name)
 			.orderby(OML.priority, order=Order.desc)
 			.orderby(OML.received_at)
@@ -344,10 +346,10 @@ def push_emails_to_queue() -> None:
 					transfer_started_at = %s,
 					transfer_started_after = TIMESTAMPDIFF(SECOND, `processed_at`, `transfer_started_at`)
 				WHERE
-					status = %s AND
+					status IN %s AND
 					name IN %s
 				""",
-				("Queuing (RMQ)", now(), "Accepted", tuple(mail_list)),
+				("Queuing (RMQ)", now(), ("Accepted", "Failed"), tuple(mail_list)),
 			)
 			frappe.db.commit()
 
@@ -388,6 +390,7 @@ def push_emails_to_queue() -> None:
 				frappe.qb.update(OML)
 				.set(OML.status, "Failed")
 				.set(OML.error_log, error_log)
+				.set(OML.failed_count, OML.failed_count + 1)
 				.where((OML.name.isin(mail_list)) & (OML.status == "Queuing (RMQ)"))
 			).run()
 

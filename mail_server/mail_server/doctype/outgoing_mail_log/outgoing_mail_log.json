@@ -36,6 +36,7 @@
   "processed_after",
   "transfer_started_after",
   "transfer_completed_after",
+  "failed_count",
   "section_break_rwda",
   "spam_check_response",
   "message"
@@ -302,11 +303,22 @@
    "non_negative": 1,
    "precision": "2",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "depends_on": "eval: doc.failed_count",
+   "fieldname": "failed_count",
+   "fieldtype": "Int",
+   "label": "Failed Count",
+   "no_copy": 1,
+   "non_negative": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-26 13:13:29.554348",
+ "modified": "2024-10-26 13:36:06.779670",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Outgoing Mail Log",
