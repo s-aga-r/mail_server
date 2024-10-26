@@ -196,6 +196,11 @@ class EmailParser:
 
 		return result
 
+	def get_message(self) -> str:
+		"""Returns the email message as a string."""
+
+		return self.message.as_string()
+
 
 def remove_whitespace_characters(text: str) -> str:
 	"""Removes whitespace characters from the text."""

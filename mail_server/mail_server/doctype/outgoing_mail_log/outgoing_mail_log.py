@@ -48,7 +48,8 @@ class OutgoingMailLog(Document):
 		from mail_server.utils.email_parser import EmailParser
 
 		parser = EmailParser(self.message)
-		self.priority = parser.get_header("X-Priority")
+		parser.update_header("X-FM-OML", self.name)
+		self.priority = cint(parser.get_header("X-Priority"))
 		self.created_at = parser.get_date()
 		self.message_id = parser.get_message_id()
 		self.received_at = now()
@@ -56,6 +57,7 @@ class OutgoingMailLog(Document):
 		self.message_size = parser.get_size()
 		self.is_newsletter = cint(parser.get_header("X-Newsletter"))
 		self.received_after = time_diff_in_seconds(self.received_at, self.created_at)
+		self.message = parser.get_message()
 
 		if not parser.get_header("DKIM-Signature"):
 			frappe.throw(_("Message does not contain DKIM Signature."))
@@ -238,7 +240,7 @@ class OutgoingMailLog(Document):
 
 		recipients = [r.email for r in self.recipients]
 		data = {
-			"outgoing_mail": self.outgoing_mail,
+			"outgoing_mail_log": self.name,
 			"recipients": recipients,
 			"message": self.message,
 		}
