@@ -3,6 +3,8 @@
 
 
 import json
+import time
+from email.utils import parseaddr
 
 import frappe
 import requests
@@ -12,7 +14,7 @@ from frappe.utils import cint, now, time_diff_in_seconds
 from uuid_utils import uuid7
 
 from mail_server.mail_server.doctype.spam_check_log.spam_check_log import create_spam_check_log
-from mail_server.utils import convert_to_utc
+from mail_server.utils import convert_to_utc, parse_iso_datetime
 from mail_server.utils.cache import get_user_owned_domains
 from mail_server.utils.user import is_system_manager
 
@@ -186,6 +188,34 @@ class OutgoingMailLog(Document):
 			],
 		}
 
+	def update_status(self, status: str | None = None, db_set: bool = False) -> None:
+		"""Updates the status of the email based on the status of the recipients."""
+
+		if not status:
+			deferred_count = 0
+			sent_count = 0
+
+			for r in self.recipients:
+				if r.status == "Deferred":
+					deferred_count += 1
+				elif r.status == "Sent":
+					sent_count += 1
+
+			if deferred_count > 0:
+				status = "Deferred"
+			elif sent_count == len(self.recipients):
+				status = "Sent"
+			elif sent_count > 0:
+				status = "Partially Sent"
+			else:
+				status = "Bounced"
+
+		self.status = status
+
+		if db_set:
+			self._db_set(status=status)
+			self.update_delivery_status_in_mail_client()
+
 	def _db_set(
 		self,
 		update_modified: bool = True,
@@ -299,8 +329,6 @@ def is_spam_detection_enabled_for_outbound() -> bool:
 def push_emails_to_queue() -> None:
 	"""Pushes emails to the queue for sending."""
 
-	import time
-
 	from frappe.query_builder.functions import GroupConcat
 	from pypika import Order
 
@@ -393,6 +421,147 @@ def push_emails_to_queue() -> None:
 				.set(OML.failed_count, OML.failed_count + 1)
 				.where((OML.name.isin(mail_list)) & (OML.status == "Queuing (RMQ)"))
 			).run()
+
+			if total_failures < max_failures:
+				time.sleep(2**total_failures)
+
+
+def fetch_and_update_delivery_statuses() -> None:
+	"""Fetches and updates delivery statuses of the emails."""
+
+	def queue_ok(agent: str, data: dict) -> None:
+		frappe.db.set_value(
+			"Outgoing Mail Log",
+			data["outgoing_mail_log"],
+			{"status": "Queued (Haraka)", "agent": agent, "queue_id": data["queue_id"]},
+		)
+
+	def undelivered(data: dict) -> None:
+		try:
+			outgoing_mail_log = data.get("outgoing_mail_log")
+			queue_id = data["queue_id"]
+			hook = data["hook"]
+			rcpt_to = data["rcpt_to"]
+			retries = data["retries"]
+			action_at = parse_iso_datetime(data["action_at"])
+
+			if not outgoing_mail_log:
+				outgoing_mail_log = frappe.db.exists("Outgoing Mail Log", {"queue_id": queue_id})
+
+				if not outgoing_mail_log:
+					frappe.log_error(title="Outgoing Mail Log Not Found", message=str(data))
+					return
+
+			doc = frappe.get_doc("Outgoing Mail Log", outgoing_mail_log, for_update=True)
+			recipients = {parseaddr(recipient["original"])[1]: recipient for recipient in rcpt_to}
+			status = "Deferred" if hook == "deferred" else "Bounced"
+
+			for recipient in doc.recipients:
+				if recipient.email in recipients:
+					recipient.status = status
+					recipient.retries = retries
+					recipient.action_at = action_at
+					recipient.action_after = time_diff_in_seconds(
+						recipient.action_at, doc.transfer_completed_at
+					)
+					recipient.response = json.dumps(recipients[recipient.email], indent=4)
+					recipient.db_update()
+
+			doc.update_status(db_set=True)
+
+		except Exception:
+			frappe.log_error(title="Update Delivery Status - Undelivered", message=frappe.get_traceback())
+
+	def delivered(data: dict) -> None:
+		try:
+			outgoing_mail_log = data.get("outgoing_mail_log")
+			queue_id = data["queue_id"]
+			retries = data["retries"]
+			action_at = parse_iso_datetime(data["action_at"])
+			host, ip, response, delay, port, mode, ok_recips, secured, verified = data["params"]
+
+			if not outgoing_mail_log:
+				outgoing_mail_log = frappe.db.exists("Outgoing Mail Log", {"queue_id": queue_id})
+
+				if not outgoing_mail_log:
+					frappe.log_error(title="Outgoing Mail Log Not Found", message=str(data))
+					return
+
+			doc = frappe.get_doc("Outgoing Mail Log", outgoing_mail_log, for_update=True)
+			recipients = [parseaddr(recipient["original"])[1] for recipient in ok_recips]
+
+			for recipient in doc.recipients:
+				if recipient.email in recipients:
+					recipient.status = "Sent"
+					recipient.retries = retries
+					recipient.action_at = action_at
+					recipient.action_after = time_diff_in_seconds(
+						recipient.action_at, doc.transfer_completed_at
+					)
+					recipient.response = json.dumps(
+						{
+							"host": host,
+							"ip": ip,
+							"response": response,
+							"delay": delay,
+							"port": port,
+							"mode": mode,
+							"secured": secured,
+							"verified": verified,
+						},
+						indent=4,
+					)
+					recipient.db_update()
+
+				doc.update_status(db_set=True)
+
+		except Exception:
+			frappe.log_error(title="Update Delivery Status - Delivered", message=frappe.get_traceback())
+
+	from mail_server.rabbitmq import OUTGOING_MAIL_STATUS_QUEUE, rabbitmq_context
+
+	max_failures = 3
+	total_failures = 0
+
+	while total_failures < max_failures:
+		OML = frappe.qb.DocType("Outgoing Mail Log")
+		mails = (
+			frappe.qb.from_(OML)
+			.select(OML.name)
+			.where(OML.status.isin(["Queued (RMQ)", "Queued (Haraka)", "Deferred"]))
+			.limit(1)
+		).run(pluck="name")
+
+		if not mails:
+			break
+
+		try:
+			with rabbitmq_context() as rmq:
+				rmq.declare_queue(OUTGOING_MAIL_STATUS_QUEUE, max_priority=3)
+
+				while True:
+					result = rmq.basic_get(OUTGOING_MAIL_STATUS_QUEUE)
+
+					if not result:
+						break
+
+					method, properties, body = result
+					if body:
+						data = json.loads(body)
+						hook = data["hook"]
+
+						if hook == "queue_ok":
+							queue_ok(properties.app_id, data)
+						elif hook in ["bounce", "deferred"]:
+							undelivered(data)
+						elif hook == "delivered":
+							delivered(data)
+
+					rmq.channel.basic_ack(delivery_tag=method.delivery_tag)
+
+		except Exception:
+			error_log = frappe.get_traceback(with_context=False)
+			frappe.log_error(title="Fetch and Update Delivery Statuses", message=error_log)
 
 			if total_failures < max_failures:
 				time.sleep(2**total_failures)

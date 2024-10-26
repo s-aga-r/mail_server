@@ -21,6 +21,8 @@
   "is_newsletter",
   "column_break_w7ne",
   "domain_name",
+  "agent",
+  "queue_id",
   "section_break_nveh",
   "message_id",
   "column_break_kecu",
@@ -314,11 +316,28 @@
    "non_negative": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "agent",
+   "fieldtype": "Link",
+   "label": "Agent",
+   "no_copy": 1,
+   "options": "Mail Agent",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "queue_id",
+   "fieldtype": "Data",
+   "label": "Queue ID",
+   "no_copy": 1,
+   "read_only": 1,
+   "unique": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-26 13:36:06.779670",
+ "modified": "2024-10-26 15:57:48.133142",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Outgoing Mail Log",

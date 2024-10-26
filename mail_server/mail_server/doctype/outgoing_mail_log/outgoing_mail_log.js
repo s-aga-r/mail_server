@@ -23,6 +23,14 @@ frappe.ui.form.on("Outgoing Mail Log", {
 				},
 				__("Actions")
 			);
+		} else if (["Queued (RMQ)", "Queued (Haraka)", "Deferred"].includes(frm.doc.status)) {
+			frm.add_custom_button(
+				__("Fetch Delivery Status"),
+				() => {
+					frm.trigger("fetch_and_update_delivery_statuses");
+				},
+				__("Actions")
+			);
 		} else if (
 			frm.doc.status === "Bounced" &&
 			has_common(frappe.user_roles, ["Administrator", "System Manager"])
@@ -61,6 +69,22 @@ frappe.ui.form.on("Outgoing Mail Log", {
 				if (!r.exc) {
 					frm.refresh();
 				}
+			},
+		});
+	},
+
+	fetch_and_update_delivery_statuses(frm) {
+		frappe.call({
+			method: "mail_server.tasks.enqueue_fetch_and_update_delivery_statuses",
+			freeze: true,
+			freeze_message: __("Creating Job..."),
+			callback: () => {
+				frappe.show_alert({
+					message: __("{0} job has been created.", [
+						__("Fetch Delivery Statuses").bold(),
+					]),
+					indicator: "green",
+				});
 			},
 		});
 	},

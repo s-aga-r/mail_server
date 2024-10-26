@@ -102,3 +102,18 @@ def parsedate_to_datetime(date_header: str, to_timezone: str | None = None) -> "
 		frappe.throw(_("Invalid date format: {0}").format(date_header))
 
 	return dt.astimezone(pytz.timezone(to_timezone or get_system_timezone()))
+
+
+def parse_iso_datetime(
+	datetime_str: str, to_timezone: str | None = None, as_str: bool = True
+) -> str | datetime:
+	"""Converts ISO datetime string to datetime object in given timezone."""
+
+	from frappe.utils import get_datetime_str
+
+	if not to_timezone:
+		to_timezone = get_system_timezone()
+
+	dt = datetime.fromisoformat(datetime_str.replace("Z", "+00:00")).astimezone(pytz.timezone(to_timezone))
+
+	return get_datetime_str(dt) if as_str else dt
