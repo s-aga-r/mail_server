@@ -232,8 +232,12 @@ class OutgoingMailLog(Document):
 
 		from mail_server.rabbitmq import OUTGOING_MAIL_QUEUE, rabbitmq_context
 
+		transfer_started_at = now()
+		transfer_started_after = time_diff_in_seconds(transfer_started_at, self.processed_at)
 		self._db_set(
 			status="Queuing (RMQ)",
+			transfer_started_at=transfer_started_at,
+			transfer_started_after=transfer_started_after,
 			notify_update=False,
 			commit=True,
 		)
@@ -250,12 +254,12 @@ class OutgoingMailLog(Document):
 				rmq.declare_queue(OUTGOING_MAIL_QUEUE, max_priority=3)
 				rmq.publish(OUTGOING_MAIL_QUEUE, json.dumps(data), priority=3)
 
-			queued_at = now()
-			queued_after = time_diff_in_seconds(queued_at, self.processed_at)
+			transfer_completed_at = now()
+			transfer_completed_after = time_diff_in_seconds(transfer_completed_at, transfer_started_at)
 			self._db_set(
 				status="Queued (RMQ)",
-				queued_at=queued_at,
-				queued_after=queued_after,
+				transfer_completed_at=transfer_completed_at,
+				transfer_completed_after=transfer_completed_after,
 				notify_update=False,
 				commit=True,
 			)
@@ -332,7 +336,19 @@ def push_emails_to_queue() -> None:
 
 		try:
 			mail_list = [mail["name"] for mail in mails]
-			(frappe.qb.update(OML).set(OML.status, "Queuing (RMQ)").where(OML.name.isin(mail_list))).run()
+			frappe.db.sql(
+				"""
+				UPDATE `tabOutgoing Mail Log`
+				SET
+					status = %s,
+					transfer_started_at = %s,
+					transfer_started_after = TIMESTAMPDIFF(SECOND, `processed_at`, `transfer_started_at`)
+				WHERE
+					status = %s AND
+					name IN %s
+				""",
+				("Queuing (RMQ)", now(), "Accepted", tuple(mail_list)),
+			)
 			frappe.db.commit()
 
 			with rabbitmq_context() as rmq:
@@ -354,8 +370,8 @@ def push_emails_to_queue() -> None:
 				UPDATE `tabOutgoing Mail Log`
 				SET
 					status = %s,
-					queued_at = %s,
-					queued_after = TIMESTAMPDIFF(SECOND, `processed_at`, `queued_at`)
+					transfer_completed_at = %s,
+					transfer_completed_after = TIMESTAMPDIFF(SECOND, `transfer_started_at`, `transfer_completed_at`)
 				WHERE
 					status = %s AND
 					name IN %s
