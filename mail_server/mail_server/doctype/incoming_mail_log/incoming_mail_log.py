@@ -16,6 +16,7 @@ class IncomingMailLog(Document):
 
 	def validate(self) -> None:
 		self.validate_status()
+		self.validate_fetched_at()
 
 	def after_insert(self) -> None:
 		self.enqueue_process_message()
@@ -25,6 +26,12 @@ class IncomingMailLog(Document):
 
 		if not self.status:
 			self.status = "In Progress"
+
+	def validate_fetched_at(self) -> None:
+		"""Set `fetched_at` to current datetime if not set."""
+
+		if not self.fetched_at:
+			self.fetched_at = now()
 
 	def enqueue_process_message(self) -> None:
 		"""Enqueue `process_message` method to process the email message."""
@@ -52,6 +59,8 @@ class IncomingMailLog(Document):
 
 		if self.created_at:
 			self.received_after = time_diff_in_seconds(self.received_at, self.created_at)
+
+		self.fetched_after = time_diff_in_seconds(self.fetched_at, self.received_at)
 
 		for key, value in parser.get_authentication_results().items():
 			setattr(self, key, value)
@@ -82,7 +91,7 @@ class IncomingMailLog(Document):
 
 		self.status = "Rejected" if self.is_rejected else "Accepted"
 		self.processed_at = now()
-		self.processed_after = time_diff_in_seconds(self.processed_at, self.received_at)
+		self.processed_after = time_diff_in_seconds(self.processed_at, self.fetched_at)
 		self.db_update()
 
 	def _db_set(

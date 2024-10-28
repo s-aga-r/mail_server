@@ -3,7 +3,7 @@
 
 frappe.listview_settings["Incoming Mail Log"] = {
 	refresh: (listview) => {
-		listview.page.add_inner_button("Refresh", () => {
+		listview.page.add_inner_button("Fetch Emails", () => {
 			fetch_emails_from_queue(listview);
 		});
 	},
@@ -25,7 +25,7 @@ function fetch_emails_from_queue(listview) {
 		freeze_message: __("Creating Job..."),
 		callback: () => {
 			frappe.show_alert({
-				message: __("{0} job has been created.", [__("Fetch Mails").bold()]),
+				message: __("{0} job has been created.", [__("Fetch Emails").bold()]),
 				indicator: "green",
 			});
 		},

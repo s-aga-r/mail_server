@@ -29,9 +29,11 @@
   "section_break_zklh",
   "created_at",
   "received_at",
+  "fetched_at",
   "processed_at",
   "column_break_9aty",
   "received_after",
+  "fetched_after",
   "processed_after",
   "section_break_iryz",
   "spf_pass",
@@ -202,7 +204,7 @@
    "read_only": 1
   },
   {
-   "description": "Processed At - Received At",
+   "description": "Processed At - Fetched At",
    "fieldname": "processed_after",
    "fieldtype": "Float",
    "label": "Processed After (Seconds)",
@@ -323,12 +325,28 @@
    "label": "DMARC",
    "no_copy": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "fetched_at",
+   "fieldtype": "Datetime",
+   "label": "Fetched At",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "description": "Fetched At - Received At",
+   "fieldname": "fetched_after",
+   "fieldtype": "Float",
+   "label": "Fetched After (Seconds)",
+   "no_copy": 1,
+   "precision": "2",
+   "read_only": 1
   }
  ],
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-28 10:59:58.654058",
+ "modified": "2024-10-28 17:09:33.744060",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Incoming Mail Log",

@@ -1,9 +1,12 @@
 import frappe
 from frappe import _
 
-from mail_server.utils.cache import get_root_domain_name, get_user_owned_domains
-from mail_server.utils.user import has_role, is_system_manager
-from mail_server.utils.validation import is_domain_registry_exists
+from mail_server.utils.cache import get_root_domain_name
+from mail_server.utils.validation import (
+	is_domain_registry_exists,
+	validate_user_has_domain_owner_role,
+	validate_user_is_domain_owner,
+)
 
 
 @frappe.whitelist(methods=["POST"])
@@ -62,17 +65,3 @@ def verify_dns_records(domain_name: str) -> list[str] | None:
 		doc = frappe.get_doc("Mail Domain Registry", domain_name)
 		doc.verify_dns_records()
 		return doc.verification_errors.split("\n") if doc.verification_errors else None
-
-
-def validate_user_has_domain_owner_role(user: str) -> None:
-	"""Validate if the user has Domain Owner role or System Manager role."""
-
-	if not has_role(user, "Domain Owner") and not is_system_manager(user):
-		frappe.throw(_("You are not authorized to perform this action."), frappe.PermissionError)
-
-
-def validate_user_is_domain_owner(user: str, domain_name: str) -> None:
-	"""Validate if the user is the owner of the given domain."""
-
-	if domain_name not in get_user_owned_domains(user) and not is_system_manager(user):
-		frappe.throw(_("You are not authorized to perform this action."), frappe.PermissionError)
