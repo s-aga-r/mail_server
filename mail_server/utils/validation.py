@@ -1,4 +1,6 @@
+import ipaddress
 import re
+import socket
 
 import frappe
 from frappe import _
@@ -11,6 +13,33 @@ def is_valid_host(host: str) -> bool:
 	"""Returns True if the host is a valid hostname else False."""
 
 	return bool(re.compile(r"^[a-zA-Z0-9_-]+$").match(host))
+
+
+def is_valid_ip(ip: str, category: str | None = None) -> bool:
+	"""Returns True if the IP is valid else False."""
+
+	try:
+		ip_obj = ipaddress.ip_address(ip)
+
+		if category:
+			if category == "private":
+				return ip_obj.is_private
+			elif category == "public":
+				return not ip_obj.is_private
+
+		return True
+	except ValueError:
+		return False
+
+
+def is_port_open(fqdn: str, port: int) -> bool:
+	"""Returns True if the port is open else False."""
+
+	try:
+		with socket.create_connection((fqdn, port), timeout=10):
+			return True
+	except (TimeoutError, OSError):
+		return False
 
 
 def is_domain_registry_exists(

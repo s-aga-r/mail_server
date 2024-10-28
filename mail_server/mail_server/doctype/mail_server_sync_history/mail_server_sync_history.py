@@ -67,7 +67,7 @@ def get_mail_server_sync_history(source: str, user: str, domain_name: str) -> "M
 	return create_mail_server_sync_history(source, user, domain_name, commit=True)
 
 
-def on_doctype_update():
+def on_doctype_update() -> None:
 	frappe.db.add_unique(
 		"Mail Server Sync History",
 		["source", "user", "domain_name"],

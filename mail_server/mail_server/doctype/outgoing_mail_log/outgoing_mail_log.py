@@ -10,12 +10,16 @@ import frappe
 import requests
 from frappe import _
 from frappe.model.document import Document
+from frappe.query_builder.functions import GroupConcat
 from frappe.utils import cint, now, time_diff_in_seconds
+from pypika import Order
 from uuid_utils import uuid7
 
 from mail_server.mail_server.doctype.spam_check_log.spam_check_log import create_spam_check_log
+from mail_server.rabbitmq import OUTGOING_MAIL_QUEUE, OUTGOING_MAIL_STATUS_QUEUE, rabbitmq_context
 from mail_server.utils import convert_to_utc, parse_iso_datetime
-from mail_server.utils.cache import get_user_owned_domains
+from mail_server.utils.cache import get_root_domain_name, get_user_owned_domains
+from mail_server.utils.email_parser import EmailParser
 from mail_server.utils.user import is_system_manager
 
 
@@ -46,8 +50,6 @@ class OutgoingMailLog(Document):
 
 	def validate_message(self) -> None:
 		"""Validate message and extract domain name."""
-
-		from mail_server.utils.email_parser import EmailParser
 
 		parser = EmailParser(self.message)
 		parser.update_header("X-FM-OML", self.name)
@@ -260,8 +262,6 @@ class OutgoingMailLog(Document):
 			if not (self.status == "Accepted" and self.failed_count < 3):
 				return
 
-		from mail_server.rabbitmq import OUTGOING_MAIL_QUEUE, rabbitmq_context
-
 		transfer_started_at = now()
 		transfer_started_after = time_diff_in_seconds(transfer_started_at, self.processed_at)
 		self._db_set(
@@ -328,12 +328,6 @@ def is_spam_detection_enabled_for_outbound() -> bool:
 
 def push_emails_to_queue() -> None:
 	"""Pushes emails to the queue for sending."""
-
-	from frappe.query_builder.functions import GroupConcat
-	from pypika import Order
-
-	from mail_server.rabbitmq import OUTGOING_MAIL_QUEUE, rabbitmq_context
-	from mail_server.utils.cache import get_root_domain_name
 
 	batch_size = 1000
 	max_failures = 3
@@ -517,8 +511,6 @@ def fetch_and_update_delivery_statuses() -> None:
 
 		except Exception:
 			frappe.log_error(title="Update Delivery Status - Delivered", message=frappe.get_traceback())
-
-	from mail_server.rabbitmq import OUTGOING_MAIL_STATUS_QUEUE, rabbitmq_context
 
 	max_failures = 3
 	total_failures = 0

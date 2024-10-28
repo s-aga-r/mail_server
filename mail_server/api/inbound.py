@@ -21,8 +21,6 @@ if TYPE_CHECKING:
 	)
 
 
-from email.utils import formataddr
-
 from mail_server.utils import convert_to_utc
 
 

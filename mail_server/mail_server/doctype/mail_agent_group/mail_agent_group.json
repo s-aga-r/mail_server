@@ -80,8 +80,14 @@
   }
  ],
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2024-10-21 10:09:50.083574",
+ "links": [
+  {
+   "group": "Reference",
+   "link_doctype": "Mail Agent",
+   "link_fieldname": "agent_group"
+  }
+ ],
+ "modified": "2024-10-30 16:39:27.695709",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Agent Group",

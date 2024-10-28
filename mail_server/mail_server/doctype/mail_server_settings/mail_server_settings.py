@@ -1,11 +1,14 @@
 # Copyright (c) 2024, Frappe Technologies Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
+import socket
+
 import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint
 
+from mail_server.rabbitmq import rabbitmq_context
 from mail_server.utils.cache import delete_cache
 from mail_server.utils.validation import is_valid_host
 
@@ -49,6 +52,8 @@ class MailServerSettings(Document):
 		if not self.has_value_changed("spf_host"):
 			return
 
+		from mail_server.mail_server.doctype.mail_agent.mail_agent import create_or_update_spf_dns_record
+
 		self.spf_host = self.spf_host.lower()
 		if not is_valid_host(self.spf_host):
 			msg = _(
@@ -62,8 +67,6 @@ class MailServerSettings(Document):
 				"DNS Record", {"host": previous_doc.spf_host, "type": "TXT"}
 			):
 				frappe.delete_doc("DNS Record", spf_dns_record, ignore_permissions=True)
-
-		from mail_server.mail_server.doctype.mail_agent.mail_agent import create_or_update_spf_dns_record
 
 		create_or_update_spf_dns_record(self.spf_host)
 
@@ -82,10 +85,6 @@ class MailServerSettings(Document):
 	@frappe.whitelist()
 	def test_rabbitmq_connection(self) -> None:
 		"""Tests the connection to the RabbitMQ server."""
-
-		import socket
-
-		from mail_server.rabbitmq import rabbitmq_context
 
 		try:
 			with rabbitmq_context():

@@ -11,7 +11,7 @@ frappe.listview_settings["DNS Record"] = {
 
 function verify_all_dns_records(listview) {
 	frappe.call({
-		method: "mail_server.mail_server.doctype.dns_record.dns_record.enqueue_verify_all_dns_records",
+		method: "mail_server.tasks.enqueue_verify_all_dns_records",
 		freeze: true,
 		freeze_message: __("Creating Job..."),
 		callback: () => {

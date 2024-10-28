@@ -118,9 +118,14 @@
    "group": "Reference",
    "link_doctype": "Outgoing Mail Log",
    "link_fieldname": "domain_name"
+  },
+  {
+   "group": "Reference",
+   "link_doctype": "Incoming Mail Log",
+   "link_fieldname": "domain_name"
   }
  ],
- "modified": "2024-10-22 14:16:18.250625",
+ "modified": "2024-10-30 18:19:40.233197",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Domain Registry",

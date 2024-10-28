@@ -7,7 +7,8 @@ from frappe.model.document import Document
 from frappe.utils import cint, now
 
 from mail_server.mail_server.doctype.dns_record.dns_provider import DNSProvider
-from mail_server.utils import enqueue_job
+from mail_server.utils import enqueue_job, verify_dns_record
+from mail_server.utils.cache import get_root_domain_name
 
 
 class DNSRecord(Document):
@@ -92,15 +93,11 @@ class DNSRecord(Document):
 	def get_fqdn(self) -> str:
 		"""Returns the Fully Qualified Domain Name"""
 
-		from mail_server.utils.cache import get_root_domain_name
-
 		return f"{self.host}.{get_root_domain_name()}"
 
 	@frappe.whitelist()
 	def verify_dns_record(self, save: bool = False) -> None:
 		"""Verifies the DNS Record"""
-
-		from mail_server.utils import verify_dns_record
 
 		self.is_verified = 0
 		self.last_checked_at = now()
@@ -163,7 +160,7 @@ def create_or_update_dns_record(
 	dns_record.ttl = ttl
 	dns_record.priority = priority
 	dns_record.category = category
-	dns_record.insert(ignore_permissions=True)
+	dns_record.save(ignore_permissions=True)
 
 	return dns_record
 
@@ -175,13 +172,6 @@ def verify_all_dns_records() -> None:
 	for dns_record in dns_records:
 		dns_record = frappe.get_doc("DNS Record", dns_record)
 		dns_record.verify_dns_record(save=True)
-
-
-@frappe.whitelist()
-def enqueue_verify_all_dns_records() -> None:
-	"Called by the scheduler to enqueue the `verify_all_dns_records` job."
-
-	enqueue_job(verify_all_dns_records, queue="long")
 
 
 def after_doctype_insert() -> None:

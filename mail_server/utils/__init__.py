@@ -1,11 +1,14 @@
+import socket
 from collections.abc import Callable
 from datetime import datetime
+from email.utils import parsedate_to_datetime as parsedate
 
 import dns.resolver
 import frappe
 import pytz
 from frappe import _
-from frappe.utils import get_datetime, get_system_timezone
+from frappe.utils import get_datetime, get_datetime_str, get_system_timezone
+from frappe.utils.background_jobs import get_jobs
 
 
 def get_dns_record(fqdn: str, type: str = "A", raise_exception: bool = False) -> dns.resolver.Answer | None:
@@ -57,8 +60,6 @@ def verify_dns_record(fqdn: str, type: str, expected_value: str, debug: bool = F
 def get_host_by_ip(ip_address: str, raise_exception: bool = False) -> str | None:
 	"""Returns host for the given IP address."""
 
-	import socket
-
 	err_msg = None
 
 	try:
@@ -72,8 +73,6 @@ def get_host_by_ip(ip_address: str, raise_exception: bool = False) -> str | None
 
 def enqueue_job(method: str | Callable, **kwargs) -> None:
 	"""Enqueues a background job."""
-
-	from frappe.utils.background_jobs import get_jobs
 
 	site = frappe.local.site
 	jobs = get_jobs(site=site)
@@ -95,8 +94,6 @@ def convert_to_utc(date_time: datetime | str, from_timezone: str | None = None) 
 def parsedate_to_datetime(date_header: str, to_timezone: str | None = None) -> "datetime":
 	"""Returns datetime object from parsed date header."""
 
-	from email.utils import parsedate_to_datetime as parsedate
-
 	dt = parsedate(date_header)
 	if not dt:
 		frappe.throw(_("Invalid date format: {0}").format(date_header))
@@ -109,11 +106,23 @@ def parse_iso_datetime(
 ) -> str | datetime:
 	"""Converts ISO datetime string to datetime object in given timezone."""
 
-	from frappe.utils import get_datetime_str
-
 	if not to_timezone:
 		to_timezone = get_system_timezone()
 
 	dt = datetime.fromisoformat(datetime_str.replace("Z", "+00:00")).astimezone(pytz.timezone(to_timezone))
 
 	return get_datetime_str(dt) if as_str else dt
+
+
+def add_or_update_tzinfo(date_time: datetime | str, timezone: str | None = None) -> str:
+	"""Adds or updates timezone to the datetime."""
+
+	date_time = get_datetime(date_time)
+	target_tz = pytz.timezone(timezone or get_system_timezone())
+
+	if date_time.tzinfo is None:
+		date_time = target_tz.localize(date_time)
+	else:
+		date_time = date_time.astimezone(target_tz)
+
+	return str(date_time)

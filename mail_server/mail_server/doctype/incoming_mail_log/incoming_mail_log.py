@@ -9,6 +9,12 @@ from frappe.model.document import Document
 from frappe.utils import cint, now, time_diff_in_seconds, validate_email_address
 from uuid_utils import uuid7
 
+from mail_server.mail_server.doctype.spam_check_log.spam_check_log import create_spam_check_log
+from mail_server.rabbitmq import INCOMING_MAIL_QUEUE, rabbitmq_context
+from mail_server.utils import parse_iso_datetime
+from mail_server.utils.email_parser import EmailParser, extract_ip_and_host
+from mail_server.utils.validation import is_domain_registry_exists
+
 
 class IncomingMailLog(Document):
 	def autoname(self) -> None:
@@ -42,11 +48,6 @@ class IncomingMailLog(Document):
 
 	def process_message(self) -> None:
 		"""Process the email message and update the log."""
-
-		from mail_server.mail_server.doctype.spam_check_log.spam_check_log import create_spam_check_log
-		from mail_server.utils import parse_iso_datetime
-		from mail_server.utils.email_parser import EmailParser, extract_ip_and_host
-		from mail_server.utils.validation import is_domain_registry_exists
 
 		parser = EmailParser(self.message)
 		self.display_name, self.sender = parser.get_sender()
@@ -121,8 +122,6 @@ def create_incoming_mail_log(agent: str, message: str) -> "IncomingMailLog":
 
 def fetch_emails_from_queue() -> None:
 	"""Fetch emails from queue and create Incoming Mail Log."""
-
-	from mail_server.rabbitmq import INCOMING_MAIL_QUEUE, rabbitmq_context
 
 	max_failures = 3
 	total_failures = 0

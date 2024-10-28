@@ -19,7 +19,7 @@ from mail_server.utils import get_host_by_ip
 
 class SpamCheckLog(Document):
 	@staticmethod
-	def clear_old_logs(days=7):
+	def clear_old_logs(days=7) -> None:
 		log = frappe.qb.DocType("Spam Check Log")
 		frappe.db.delete(log, filters=(log.creation < (Now() - Interval(days=days))))
 

@@ -8,6 +8,8 @@ from mail_server.mail_server.doctype.outgoing_mail_log.outgoing_mail_log import 
 
 @frappe.whitelist(methods=["POST"])
 def send() -> str:
+	"""Sends the outgoing mail."""
+
 	data = json.loads(frappe.request.data.decode())
 	log = create_outgoing_mail_log(data["outgoing_mail"], data["recipients"], data["message"])
 	return log.name

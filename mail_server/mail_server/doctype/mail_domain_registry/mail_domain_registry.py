@@ -13,6 +13,7 @@ from mail_server.mail_server.doctype.dkim_key.dkim_key import (
 from mail_server.mail_server.doctype.mail_server_settings.mail_server_settings import (
 	validate_mail_server_settings,
 )
+from mail_server.utils import verify_dns_record
 from mail_server.utils.cache import delete_cache
 from mail_server.utils.user import has_role, is_system_manager
 
@@ -143,8 +144,6 @@ class MailDomainRegistry(Document):
 	def verify_dns_records(self) -> None:
 		"""Verifies DNS Records"""
 
-		from mail_server.utils import verify_dns_record
-
 		errors = []
 		for record in self.get_dns_records():
 			if not verify_dns_record(record["host"], record["type"], record["value"]):
@@ -181,34 +180,6 @@ class MailDomainRegistry(Document):
 
 		if notify_update:
 			self.notify_update()
-
-
-@frappe.whitelist()
-@frappe.validate_and_sanitize_search_inputs
-def get_users_with_domain_owner_role(
-	doctype: str | None = None,
-	txt: str | None = None,
-	searchfield: str | None = None,
-	start: int = 0,
-	page_len: int = 20,
-	filters: dict | None = None,
-) -> list:
-	"""Returns a list of User(s) who have Domain Owner role."""
-
-	USER = frappe.qb.DocType("User")
-	HAS_ROLE = frappe.qb.DocType("Has Role")
-	return (
-		frappe.qb.from_(USER)
-		.left_join(HAS_ROLE)
-		.on(USER.name == HAS_ROLE.parent)
-		.select(USER.name)
-		.where(
-			(USER.enabled == 1)
-			& (USER.name.like(f"%{txt}%"))
-			& (HAS_ROLE.role == "Domain Owner")
-			& (HAS_ROLE.parenttype == "User")
-		)
-	).run(as_dict=False)
 
 
 def get_permission_query_condition(user: str | None = None) -> str:
