@@ -3,6 +3,7 @@ from frappe import _
 
 from mail_server.utils.cache import get_root_domain_name, get_user_owned_domains
 from mail_server.utils.user import has_role, is_system_manager
+from mail_server.utils.validation import is_domain_registry_exists
 
 
 @frappe.whitelist(methods=["POST"])
@@ -75,32 +76,3 @@ def validate_user_is_domain_owner(user: str, domain_name: str) -> None:
 
 	if domain_name not in get_user_owned_domains(user) and not is_system_manager(user):
 		frappe.throw(_("You are not authorized to perform this action."), frappe.PermissionError)
-
-
-def is_domain_registry_exists(
-	domain_name: str, exclude_disabled: bool = True, raise_exception: bool = False
-) -> bool:
-	"""Validate if the domain exists in the Mail Domain Registry."""
-
-	filters = {"domain_name": domain_name}
-	if exclude_disabled:
-		filters["enabled"] = 1
-
-	if frappe.db.exists("Mail Domain Registry", filters):
-		return True
-
-	if raise_exception:
-		if exclude_disabled:
-			frappe.throw(
-				_("Domain {0} does not exist or may be disabled in the Mail Domain Registry").format(
-					frappe.bold(domain_name)
-				),
-				frappe.DoesNotExistError,
-			)
-
-		frappe.throw(
-			_("Domain {0} not found in Mail Domain Registry").format(frappe.bold(domain_name)),
-			frappe.DoesNotExistError,
-		)
-
-	return False

@@ -335,9 +335,10 @@
    "unique": 1
   }
  ],
+ "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-26 15:57:48.133142",
+ "modified": "2024-10-27 11:57:55.860626",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Outgoing Mail Log",

@@ -560,6 +560,7 @@ def fetch_and_update_delivery_statuses() -> None:
 					rmq.channel.basic_ack(delivery_tag=method.delivery_tag)
 
 		except Exception:
+			total_failures += 1
 			error_log = frappe.get_traceback(with_context=False)
 			frappe.log_error(title="Fetch and Update Delivery Statuses", message=error_log)
 
