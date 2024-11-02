@@ -10,17 +10,17 @@ app_license = "agpl-3.0"
 website_redirects = [
 	{
 		"source": "/spamd/scan",
-		"target": "/api/method/mail.api.spamd.scan",
+		"target": "/api/method/mail_server.api.spamd.scan",
 		"redirect_http_status": 307,
 	},
 	{
 		"source": "/spamd/is-spam",
-		"target": "/api/method/mail.api.spamd.is_spam",
+		"target": "/api/method/mail_server.api.spamd.is_spam",
 		"redirect_http_status": 307,
 	},
 	{
 		"source": "/spamd/score",
-		"target": "/api/method/mail.api.spamd.get_spam_score",
+		"target": "/api/method/mail_server.api.spamd.get_spam_score",
 		"redirect_http_status": 307,
 	},
 ]
