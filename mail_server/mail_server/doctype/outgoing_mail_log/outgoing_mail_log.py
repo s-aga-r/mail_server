@@ -423,6 +423,17 @@ def push_emails_to_queue() -> None:
 def fetch_and_update_delivery_statuses() -> None:
 	"""Fetches and updates delivery statuses of the emails."""
 
+	def has_unsynced_mails() -> bool:
+		OML = frappe.qb.DocType("Outgoing Mail Log")
+		mails = (
+			frappe.qb.from_(OML)
+			.select(OML.name)
+			.where(OML.status.isin(["Queued (RMQ)", "Queued (Haraka)", "Deferred"]))
+			.limit(1)
+		).run(pluck="name")
+
+		return bool(mails)
+
 	def queue_ok(agent: str, data: dict) -> None:
 		frappe.db.set_value(
 			"Outgoing Mail Log",
@@ -512,49 +523,33 @@ def fetch_and_update_delivery_statuses() -> None:
 		except Exception:
 			frappe.log_error(title="Update Delivery Status - Delivered", message=frappe.get_traceback())
 
-	max_failures = 3
-	total_failures = 0
+	if not has_unsynced_mails():
+		return
 
-	while total_failures < max_failures:
-		OML = frappe.qb.DocType("Outgoing Mail Log")
-		mails = (
-			frappe.qb.from_(OML)
-			.select(OML.name)
-			.where(OML.status.isin(["Queued (RMQ)", "Queued (Haraka)", "Deferred"]))
-			.limit(1)
-		).run(pluck="name")
+	try:
+		with rabbitmq_context() as rmq:
+			rmq.declare_queue(OUTGOING_MAIL_STATUS_QUEUE, max_priority=3)
 
-		if not mails:
-			break
+			while True:
+				result = rmq.basic_get(OUTGOING_MAIL_STATUS_QUEUE)
 
-		try:
-			with rabbitmq_context() as rmq:
-				rmq.declare_queue(OUTGOING_MAIL_STATUS_QUEUE, max_priority=3)
+				if not result:
+					break
 
-				while True:
-					result = rmq.basic_get(OUTGOING_MAIL_STATUS_QUEUE)
+				method, properties, body = result
+				if body:
+					data = json.loads(body)
+					hook = data["hook"]
 
-					if not result:
-						break
+					if hook == "queue_ok":
+						queue_ok(properties.app_id, data)
+					elif hook in ["bounce", "deferred"]:
+						undelivered(data)
+					elif hook == "delivered":
+						delivered(data)
 
-					method, properties, body = result
-					if body:
-						data = json.loads(body)
-						hook = data["hook"]
+				rmq.channel.basic_ack(delivery_tag=method.delivery_tag)
 
-						if hook == "queue_ok":
-							queue_ok(properties.app_id, data)
-						elif hook in ["bounce", "deferred"]:
-							undelivered(data)
-						elif hook == "delivered":
-							delivered(data)
-
-					rmq.channel.basic_ack(delivery_tag=method.delivery_tag)
-
-		except Exception:
-			total_failures += 1
-			error_log = frappe.get_traceback(with_context=False)
-			frappe.log_error(title="Fetch and Update Delivery Statuses", message=error_log)
-
-			if total_failures < max_failures:
-				time.sleep(2**total_failures)
+	except Exception:
+		error_log = frappe.get_traceback(with_context=False)
+		frappe.log_error(title="Fetch and Update Delivery Statuses", message=error_log)
