@@ -12,7 +12,7 @@ from uuid_utils import uuid7
 
 from mail_server.mail_server.doctype.spam_check_log.spam_check_log import create_spam_check_log
 from mail_server.rabbitmq import INCOMING_MAIL_QUEUE, rabbitmq_context
-from mail_server.utils import parse_iso_datetime
+from mail_server.utils import convert_to_utc, parse_iso_datetime
 from mail_server.utils.email_parser import EmailParser, extract_ip_and_host
 from mail_server.utils.validation import is_domain_registry_exists
 
@@ -109,10 +109,11 @@ class IncomingMailLog(Document):
 
 			host = domain_registry.mail_client_host
 			data = {
-				"oml": self.name,
+				"incoming_mail_log": self.name,
 				"is_spam": self.is_spam,
 				"message": self.message,
 				"domain_name": self.domain_name,
+				"processed_at": str(convert_to_utc(self.processed_at)),
 				"inbound_token": domain_registry.get_password("inbound_token"),
 			}
 
