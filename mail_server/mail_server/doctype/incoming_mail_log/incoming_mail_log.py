@@ -4,6 +4,7 @@
 import time
 
 import frappe
+import requests
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint, now, time_diff_in_seconds, validate_email_address
@@ -94,6 +95,31 @@ class IncomingMailLog(Document):
 		self.processed_at = now()
 		self.processed_after = time_diff_in_seconds(self.processed_at, self.fetched_at)
 		self.db_update()
+
+		if self.status == "Accepted":
+			self.deliver_email_to_mail_client()
+
+	def deliver_email_to_mail_client(self):
+		"""Deliver email to mail client."""
+
+		domain_registry = frappe.get_cached_doc("Mail Domain Registry", self.domain_name)
+		if domain_registry.mail_client_host:
+			if not domain_registry.inbound_token:
+				return
+
+			host = domain_registry.mail_client_host
+			data = {
+				"oml": self.name,
+				"is_spam": self.is_spam,
+				"message": self.message,
+				"domain_name": self.domain_name,
+				"inbound_token": domain_registry.get_password("inbound_token"),
+			}
+
+			try:
+				requests.post(f"{host}/api/method/mail.api.webhook.receive_email", json=data)
+			except Exception:
+				frappe.log_error(title="Mail Client Email Delivery Failed", message=frappe.get_traceback())
 
 	def _db_set(
 		self,

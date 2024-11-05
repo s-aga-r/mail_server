@@ -12,6 +12,7 @@
   "is_subdomain",
   "column_break_gjk4",
   "last_verified_at",
+  "inbound_token",
   "domain_owner",
   "dkim_key_size",
   "mail_client_host",
@@ -105,6 +106,13 @@
    "fieldname": "mail_client_host",
    "fieldtype": "Data",
    "label": "Mail Client Host"
+  },
+  {
+   "fieldname": "inbound_token",
+   "fieldtype": "Password",
+   "label": "Inbound Token",
+   "no_copy": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -125,7 +133,7 @@
    "link_fieldname": "domain_name"
   }
  ],
- "modified": "2024-10-30 18:19:40.233197",
+ "modified": "2024-11-05 12:23:43.351978",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Domain Registry",

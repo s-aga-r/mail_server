@@ -159,7 +159,7 @@ class OutgoingMailLog(Document):
 		if host := frappe.get_cached_value("Mail Domain Registry", self.domain_name, "mail_client_host"):
 			data = self.get_delivery_status()
 			try:
-				requests.post(f"{host}/api/method/mail.api.outbound.update_delivery_status", json=data)
+				requests.post(f"{host}/api/method/mail.api.webhook.update_delivery_status", json=data)
 			except Exception:
 				frappe.log_error(
 					title="Mail Client Delivery Status Update Failed", message=frappe.get_traceback()
@@ -256,7 +256,7 @@ class OutgoingMailLog(Document):
 		"""Pushes the email to the queue for sending."""
 
 		if not frappe.flags.force_push_to_queue:
-			self.load_from_db()
+			self.reload()
 
 			# Ensure the document is "Accepted"
 			if not (self.status == "Accepted" and self.failed_count < 3):

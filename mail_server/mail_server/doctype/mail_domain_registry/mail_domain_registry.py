@@ -26,6 +26,9 @@ class MailDomainRegistry(Document):
 		self.validate_domain_owner()
 		self.validate_dkim_key_size()
 
+		if self.is_new():
+			self.inbound_token = frappe.generate_hash(length=32)
+
 		if self.is_new() or self.has_value_changed("dkim_key_size"):
 			self.last_verified_at = now()
 			validate_mail_server_settings()
