@@ -118,7 +118,7 @@ def scan_message(host: str, port: int, message: str) -> str:
 
 	try:
 		with socket.create_connection((host, port), timeout=30) as sock:
-			sock.settimeout(10)
+			sock.settimeout(60)
 			command = "SYMBOLS SPAMC/1.5\r\n\r\n"
 			sock.sendall(command.encode("utf-8"))
 			sock.sendall(message.encode("utf-8"))
