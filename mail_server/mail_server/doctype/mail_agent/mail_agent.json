@@ -93,8 +93,19 @@
   }
  ],
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2024-10-20 21:22:22.816768",
+ "links": [
+  {
+   "group": "Reference",
+   "link_doctype": "Outgoing Mail Log",
+   "link_fieldname": "agent"
+  },
+  {
+   "group": "Reference",
+   "link_doctype": "Incoming Mail Log",
+   "link_fieldname": "agent"
+  }
+ ],
+ "modified": "2024-11-09 21:26:22.741309",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Agent",
