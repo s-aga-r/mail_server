@@ -1,7 +1,6 @@
 import frappe
 from frappe import _
 
-from mail_server.utils.cache import get_root_domain_name
 from mail_server.utils.validation import (
 	is_domain_registry_exists,
 	validate_user_has_domain_owner_role,
@@ -32,10 +31,9 @@ def add_or_update_domain(domain_name: str, mail_client_host: str = None) -> dict
 	response = {
 		"domain_name": doc.domain_name,
 		"dns_records": doc.get_dns_records(),
-		"dkim_domain": get_root_domain_name(),
 		"inbound_token": doc.get_password("inbound_token"),
+		"dkim_private_key": doc.get_dkim_private_key(),
 	}
-	response["dkim_selector"], response["dkim_private_key"] = doc.get_dkim_selector_and_private_key()
 
 	return response
 

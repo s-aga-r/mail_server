@@ -59,8 +59,7 @@
    "fieldname": "attached_to_doctype",
    "fieldtype": "Select",
    "label": "Attached To DocType",
-   "options": "\nDKIM Key",
-   "set_only_once": 1
+   "options": "\nDKIM Key"
   },
   {
    "fieldname": "column_break_topm",
@@ -70,8 +69,7 @@
    "fieldname": "attached_to_docname",
    "fieldtype": "Dynamic Link",
    "label": "Attached To DocName",
-   "options": "attached_to_doctype",
-   "set_only_once": 1
+   "options": "attached_to_doctype"
   },
   {
    "fieldname": "section_break_gd3y",
@@ -138,7 +136,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-20 12:54:48.673318",
+ "modified": "2024-11-09 19:04:27.118665",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "DNS Record",

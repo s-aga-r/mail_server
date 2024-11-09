@@ -15,7 +15,8 @@ class DNSRecord(Document):
 	def validate(self) -> None:
 		if self.is_new():
 			self.validate_duplicate_record()
-			self.validate_ttl()
+
+		self.validate_ttl()
 
 	def on_update(self) -> None:
 		if self.has_value_changed("value") or self.has_value_changed("ttl"):
@@ -153,13 +154,13 @@ def create_or_update_dns_record(
 		dns_record = frappe.new_doc("DNS Record")
 		dns_record.host = host
 		dns_record.type = type
-		dns_record.attached_to_doctype = attached_to_doctype
-		dns_record.attached_to_docname = attached_to_docname
 
 	dns_record.value = value
 	dns_record.ttl = ttl
 	dns_record.priority = priority
 	dns_record.category = category
+	dns_record.attached_to_doctype = attached_to_doctype
+	dns_record.attached_to_docname = attached_to_docname
 	dns_record.save(ignore_permissions=True)
 
 	return dns_record

@@ -8,7 +8,7 @@ from frappe.utils import cint, now
 
 from mail_server.mail_server.doctype.dkim_key.dkim_key import (
 	create_dkim_key,
-	get_dkim_selector_and_private_key,
+	get_dkim_private_key,
 )
 from mail_server.mail_server.doctype.mail_server_settings.mail_server_settings import (
 	validate_mail_server_settings,
@@ -106,6 +106,17 @@ class MailDomainRegistry(Document):
 			},
 		)
 
+		# DKIM Record
+		records.append(
+			{
+				"category": "Sending Record",
+				"type": "CNAME",
+				"host": f"frappemail._domainkey.{self.domain_name}",
+				"value": f"{self.domain_name.replace('.', '-')}._domainkey.{ms_settings.root_domain_name}.",
+				"ttl": ms_settings.default_ttl,
+			}
+		)
+
 		# DMARC Record
 		dmarc_mailbox = f"dmarc@{ms_settings.root_domain_name}"
 		dmarc_value = (
@@ -165,10 +176,10 @@ class MailDomainRegistry(Document):
 			notify_update=True,
 		)
 
-	def get_dkim_selector_and_private_key(self) -> tuple[str, str]:
-		"""Returns DKIM Selector and Private Key"""
+	def get_dkim_private_key(self) -> str:
+		"""Returns DKIM Private Key"""
 
-		return get_dkim_selector_and_private_key(self.domain_name, raise_exception=True)
+		return get_dkim_private_key(self.domain_name, raise_exception=True)
 
 	def _db_set(
 		self,
