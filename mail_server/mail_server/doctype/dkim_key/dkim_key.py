@@ -22,7 +22,6 @@ class DKIMKey(Document):
 	def after_insert(self) -> None:
 		self.create_or_update_dns_record()
 		self.disable_existing_dkim_keys()
-		self.delete_existing_dns_records()
 
 	def on_trash(self) -> None:
 		if frappe.session.user != "Administrator":
@@ -55,7 +54,7 @@ class DKIMKey(Document):
 
 		frappe.flags.enqueue_dns_record_update = True
 		create_or_update_dns_record(
-			host=f"{self.name}._domainkey",
+			host=f"{self.domain_name.replace('.', '-')}._domainkey",
 			type="TXT",
 			value=f"v=DKIM1; k=rsa; p={self.public_key}",
 			category="Sending Record",
@@ -77,26 +76,6 @@ class DKIMKey(Document):
 			)
 		).run()
 
-	def delete_existing_dns_records(self) -> None:
-		"""Deletes the existing DNS Records."""
-
-		existing_dkim_keys = frappe.db.get_all(
-			"DKIM Key",
-			filters={"enabled": 0, "name": ["!=", self.name], "domain_name": self.domain_name},
-			pluck="name",
-		)
-		existing_dns_records = frappe.db.get_all(
-			"DNS Record",
-			filters={
-				"attached_to_doctype": "DKIM Key",
-				"attached_to_docname": ["in", existing_dkim_keys],
-			},
-			pluck="name",
-		)
-
-		for dns_record in existing_dns_records:
-			frappe.delete_doc("DNS Record", dns_record, ignore_permissions=True)
-
 
 def create_dkim_key(domain_name: str, key_size: int | None = None) -> "DKIMKey":
 	"""Creates a DKIM Key document."""
@@ -112,19 +91,15 @@ def create_dkim_key(domain_name: str, key_size: int | None = None) -> "DKIMKey":
 
 
 @request_cache
-def get_dkim_selector_and_private_key(
-	domain_name: str, raise_exception: bool = True
-) -> tuple[str | None, str | None]:
-	"""Returns the DKIM selector and private key for the given domain."""
+def get_dkim_private_key(domain_name: str, raise_exception: bool = True) -> str | None:
+	"""Returns the DKIM private key for the given domain."""
 
-	selector, private_key = frappe.db.get_value(
-		"DKIM Key", {"enabled": 1, "domain_name": domain_name}, ["name", "private_key"]
-	)
+	private_key = frappe.db.get_value("DKIM Key", {"enabled": 1, "domain_name": domain_name}, "private_key")
 
-	if raise_exception and (not selector or not private_key):
+	if not private_key and raise_exception:
 		frappe.throw(_("DKIM Key not found for the domain {0}").format(frappe.bold(domain_name)))
 
-	return selector, private_key
+	return private_key
 
 
 def generate_dkim_keys(key_size: int = 1024) -> tuple[str, str]:
