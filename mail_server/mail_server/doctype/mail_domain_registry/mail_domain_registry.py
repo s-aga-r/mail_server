@@ -119,17 +119,12 @@ class MailDomainRegistry(Document):
 
 		# DMARC Record
 		dmarc_mailbox = f"dmarc@{ms_settings.root_domain_name}"
-		dmarc_value = (
-			f"v=DMARC1; p=reject; rua=mailto:{dmarc_mailbox}; ruf=mailto:{dmarc_mailbox}; fo=1; adkim=s; aspf=s; pct=100;"
-			if self.domain_name == ms_settings.root_domain_name
-			else f"v=DMARC1; p=reject; rua=mailto:{dmarc_mailbox}; ruf=mailto:{dmarc_mailbox}; fo=1; adkim=r; aspf=r; pct=100;"
-		)
 		records.append(
 			{
 				"category": "Sending Record",
 				"type": "TXT",
 				"host": f"_dmarc.{self.domain_name}",
-				"value": dmarc_value,
+				"value": f"v=DMARC1; p=reject; rua=mailto:{dmarc_mailbox}; ruf=mailto:{dmarc_mailbox}; fo=1; aspf=s; adkim=s; pct=100;",
 				"ttl": ms_settings.default_ttl,
 			}
 		)
