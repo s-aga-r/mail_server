@@ -1,0 +1,1192 @@
+# Translations template for Mail Server.
+# Copyright (C) 2024 Frappe Technologies Pvt. Ltd.
+# This file is distributed under the same license as the Mail Server project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Mail Server VERSION\n"
+"Report-Msgid-Bugs-To: developers@frappe.io\n"
+"POT-Creation-Date: 2024-11-09 21:40+0553\n"
+"PO-Revision-Date: 2024-11-09 21:40+0553\n"
+"Last-Translator: developers@frappe.io\n"
+"Language-Team: developers@frappe.io\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.13.1\n"
+
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.py:150
+msgid "1. Ensure the correct IP address is allowed to connect to SpamAssassin."
+msgstr ""
+
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.py:151
+msgid "2. Verify that the SpamAssassin service is running and accepting connections on port {0}."
+msgstr ""
+
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.py:154
+msgid "3. Review SpamAssassin logs for any unauthorized connection attempts or permission errors."
+msgstr ""
+
+#. Option for the 'Type' (Select) field in DocType 'DNS Record'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "A"
+msgstr ""
+
+#. Option for the 'Type' (Select) field in DocType 'DNS Record'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "AAAA"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'Incoming Mail Log'
+#. Option for the 'Status' (Select) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Accepted"
+msgstr ""
+
+#. Label of the action_after (Float) field in DocType 'Mail Log Recipient'
+#: mail_server/mail_server/doctype/mail_log_recipient/mail_log_recipient.json
+msgid "Action After (Seconds)"
+msgstr ""
+
+#. Label of the action_at (Datetime) field in DocType 'Mail Log Recipient'
+#: mail_server/mail_server/doctype/mail_log_recipient/mail_log_recipient.json
+msgid "Action At"
+msgstr ""
+
+#: mail_server/mail_server/doctype/dns_record/dns_record.js:16
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.js:16
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.js:24
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.js:32
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.js:43
+msgid "Actions"
+msgstr ""
+
+#. Label of the agent (Link) field in DocType 'Incoming Mail Log'
+#. Label of the agent (Data) field in DocType 'Mail Agent'
+#. Label of the agent (Link) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/mail_agent/mail_agent.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Agent"
+msgstr ""
+
+#. Label of the agent_group (Link) field in DocType 'Mail Agent'
+#. Label of the agent_group (Data) field in DocType 'Mail Agent Group'
+#: mail_server/mail_server/doctype/mail_agent/mail_agent.json
+#: mail_server/mail_server/doctype/mail_agent_group/mail_agent_group.json
+msgid "Agent Group"
+msgstr ""
+
+#. Label of the attached_to_docname (Dynamic Link) field in DocType 'DNS
+#. Record'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "Attached To DocName"
+msgstr ""
+
+#. Label of the attached_to_doctype (Select) field in DocType 'DNS Record'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "Attached To DocType"
+msgstr ""
+
+#. Label of the blacklist_reason (Small Text) field in DocType 'IP Blacklist'
+#: mail_server/mail_server/doctype/ip_blacklist/ip_blacklist.json
+msgid "Blacklist Reason"
+msgstr ""
+
+#. Label of the is_blacklisted (Check) field in DocType 'IP Blacklist'
+#: mail_server/mail_server/doctype/ip_blacklist/ip_blacklist.json
+msgid "Blacklisted"
+msgstr ""
+
+#. Label of the block_outbound_spam (Check) field in DocType 'Mail Server
+#. Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Block Spam"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Blocked"
+msgstr ""
+
+#: mail_server/api/outbound.py:23
+msgid "Both outgoing mail and token are required."
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'Mail Log Recipient'
+#. Option for the 'Status' (Select) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/mail_log_recipient/mail_log_recipient.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Bounced"
+msgstr ""
+
+#. Option for the 'Type' (Select) field in DocType 'DNS Record'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "CNAME"
+msgstr ""
+
+#. Label of the category (Select) field in DocType 'DNS Record'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "Category"
+msgstr ""
+
+#. Label of the completed_at (Datetime) field in DocType 'Spam Check Log'
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.json
+msgid "Completed At"
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:93
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:107
+msgid "Connection Failed"
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:91
+msgid "Connection Successful"
+msgstr ""
+
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.py:142
+msgid "Could not connect to SpamAssassin (spamd). Please ensure it's running on {0}:{1}"
+msgstr ""
+
+#: mail_server/mail_server/doctype/dns_record/dns_record.py:113
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:154
+msgid "Could not verify {0}:{1} record."
+msgstr ""
+
+#. Label of the created_at (Datetime) field in DocType 'Incoming Mail Log'
+#. Label of the created_at (Datetime) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Created At"
+msgstr ""
+
+#: mail_server/mail_server/doctype/dns_record/dns_record_list.js:16
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log_list.js:25
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.js:80
+msgid "Creating Job..."
+msgstr ""
+
+#. Label of the dkim_pass (Check) field in DocType 'Incoming Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "DKIM"
+msgstr ""
+
+#. Label of the dkim_description (Small Text) field in DocType 'Incoming Mail
+#. Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "DKIM Description"
+msgstr ""
+
+#. Name of a DocType
+#. Option for the 'Attached To DocType' (Select) field in DocType 'DNS Record'
+#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "DKIM Key"
+msgstr ""
+
+#. Label of the dkim_key_size (Select) field in DocType 'Mail Domain Registry'
+#. Label of the default_dkim_key_size (Select) field in DocType 'Mail Server
+#. Settings'
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "DKIM Key Size (Bits)"
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:86
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:77
+msgid "DKIM Key Size must be greater than 1024."
+msgstr ""
+
+#: mail_server/mail_server/doctype/dkim_key/dkim_key.py:125
+msgid "DKIM Key not found for the domain {0}"
+msgstr ""
+
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.py:133
+msgid "DKIM Signature is invalid."
+msgstr ""
+
+#. Label of the dmarc_pass (Check) field in DocType 'Incoming Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "DMARC"
+msgstr ""
+
+#. Label of the dmarc_description (Small Text) field in DocType 'Incoming Mail
+#. Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "DMARC Description"
+msgstr ""
+
+#. Label of the dns_provider (Select) field in DocType 'Mail Server Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "DNS Provider"
+msgstr ""
+
+#. Label of the dns_provider_token (Password) field in DocType 'Mail Server
+#. Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "DNS Provider Token"
+msgstr ""
+
+#. Name of a DocType
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "DNS Record"
+msgstr ""
+
+#: mail_server/mail_server/doctype/dns_record/dns_record.py:46
+msgid "DNS Record with the same host and type already exists."
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.js:21
+msgid "DNS Records"
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.js:22
+msgid "DNS provider or token not configured. Please manually add the {0} to the DNS provider for the domain {1} to ensure proper email authentication."
+msgstr ""
+
+#. Label of the defaults_section (Section Break) field in DocType 'Mail Server
+#. Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Defaults"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'Mail Log Recipient'
+#. Option for the 'Status' (Select) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/mail_log_recipient/mail_log_recipient.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Deferred"
+msgstr ""
+
+#. Option for the 'DNS Provider' (Select) field in DocType 'Mail Server
+#. Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "DigitalOcean"
+msgstr ""
+
+#. Label of the domain_name (Link) field in DocType 'DKIM Key'
+#. Label of the domain_name (Link) field in DocType 'Incoming Mail Log'
+#. Label of the domain_name (Data) field in DocType 'Mail Domain Registry'
+#. Label of the domain_name (Link) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Domain Name"
+msgstr ""
+
+#: mail_server/mail_server/doctype/dkim_key/dkim_key.py:35
+msgid "Domain Name is mandatory"
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:53
+msgid "Domain Name is mandatory."
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:56
+msgid "Domain Name should be in lowercase."
+msgstr ""
+
+#. Label of the domain_owner (Link) field in DocType 'Mail Domain Registry'
+#. Name of a role
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
+msgid "Domain Owner"
+msgstr ""
+
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.py:88
+msgid "Domain is not registered."
+msgstr ""
+
+#: mail_server/utils/validation.py:60
+msgid "Domain {0} does not exist or may be disabled in the Mail Domain Registry"
+msgstr ""
+
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.py:80
+msgid "Domain {0} is not verified."
+msgstr ""
+
+#: mail_server/utils/validation.py:67
+msgid "Domain {0} not found in Mail Domain Registry"
+msgstr ""
+
+#: mail_server/mail_server/doctype/dns_record/dns_record.py:47
+msgid "Duplicate Record"
+msgstr ""
+
+#. Label of the duration (Float) field in DocType 'Spam Check Log'
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.json
+msgid "Duration (Seconds)"
+msgstr ""
+
+#. Label of the email (Data) field in DocType 'Mail Log Recipient'
+#: mail_server/mail_server/doctype/mail_log_recipient/mail_log_recipient.json
+msgid "Email"
+msgstr ""
+
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.py:84
+msgid "Email is marked as spam."
+msgstr ""
+
+#. Label of the enable_spam_detection_for_outbound (Check) field in DocType
+#. 'Mail Server Settings'
+#. Label of the enable_spam_detection_for_inbound (Check) field in DocType
+#. 'Mail Server Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Enable"
+msgstr ""
+
+#. Label of the enable_spam_detection (Check) field in DocType 'Mail Server
+#. Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Enable Spam Detection"
+msgstr ""
+
+#. Label of the enabled (Check) field in DocType 'DKIM Key'
+#. Label of the enabled (Check) field in DocType 'Mail Agent'
+#. Label of the enabled (Check) field in DocType 'Mail Agent Group'
+#. Label of the enabled (Check) field in DocType 'Mail Domain Registry'
+#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
+#: mail_server/mail_server/doctype/mail_agent/mail_agent.json
+#: mail_server/mail_server/doctype/mail_agent_group/mail_agent_group.json
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
+msgid "Enabled"
+msgstr ""
+
+#. Label of the error_log (Code) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Error Log"
+msgstr ""
+
+#. Label of the error_message (Code) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Error Message"
+msgstr ""
+
+#. Option for the 'Scanning Mode' (Select) field in DocType 'Mail Server
+#. Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Exclude Attachments"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Failed"
+msgstr ""
+
+#. Label of the failed_count (Int) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Failed Count"
+msgstr ""
+
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.js:28
+msgid "Fetch Delivery Status"
+msgstr ""
+
+#. Label of the fetched_after (Float) field in DocType 'Incoming Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "Fetched After (Seconds)"
+msgstr ""
+
+#. Label of the fetched_at (Datetime) field in DocType 'Incoming Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "Fetched At"
+msgstr ""
+
+#. Description of the 'Fetched After (Seconds)' (Float) field in DocType
+#. 'Incoming Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "Fetched At - Received At"
+msgstr ""
+
+#. Label of the from_host (Data) field in DocType 'Incoming Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "From Host"
+msgstr ""
+
+#. Label of the from_ip (Data) field in DocType 'Incoming Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "From IP"
+msgstr ""
+
+#. Label of the host (Data) field in DocType 'DNS Record'
+#. Label of the host (Data) field in DocType 'IP Blacklist'
+#. Label of the rmq_host (Data) field in DocType 'Mail Server Settings'
+#. Label of the spamd_host (Data) field in DocType 'Mail Server Settings'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+#: mail_server/mail_server/doctype/ip_blacklist/ip_blacklist.json
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Host"
+msgstr ""
+
+#. Option for the 'Scanning Mode' (Select) field in DocType 'Mail Server
+#. Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Hybrid Approach"
+msgstr ""
+
+#. Label of the hybrid_scanning_threshold (Float) field in DocType 'Mail Server
+#. Settings'
+#. Label of the hybrid_scanning_threshold (Float) field in DocType 'Spam Check
+#. Log'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.json
+msgid "Hybrid Scanning Threshold"
+msgstr ""
+
+#. Label of the ip_address (Data) field in DocType 'IP Blacklist'
+#. Label of the ip_address (Data) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/ip_blacklist/ip_blacklist.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "IP Address"
+msgstr ""
+
+#. Label of the ip_address_expanded (Data) field in DocType 'IP Blacklist'
+#: mail_server/mail_server/doctype/ip_blacklist/ip_blacklist.json
+msgid "IP Address Expanded"
+msgstr ""
+
+#. Name of a DocType
+#: mail_server/mail_server/doctype/ip_blacklist/ip_blacklist.json
+msgid "IP Blacklist"
+msgstr ""
+
+#. Label of the ip_group (Data) field in DocType 'IP Blacklist'
+#: mail_server/mail_server/doctype/ip_blacklist/ip_blacklist.json
+msgid "IP Group"
+msgstr ""
+
+#. Label of the ip_version (Select) field in DocType 'IP Blacklist'
+#: mail_server/mail_server/doctype/ip_blacklist/ip_blacklist.json
+msgid "IP Version"
+msgstr ""
+
+#. Option for the 'IP Version' (Select) field in DocType 'IP Blacklist'
+#. Label of the ipv4 (Data) field in DocType 'Mail Agent'
+#. Label of the ipv4 (Data) field in DocType 'Mail Agent Group'
+#: mail_server/mail_server/doctype/ip_blacklist/ip_blacklist.json
+#: mail_server/mail_server/doctype/mail_agent/mail_agent.json
+#: mail_server/mail_server/doctype/mail_agent_group/mail_agent_group.json
+msgid "IPv4"
+msgstr ""
+
+#. Option for the 'IP Version' (Select) field in DocType 'IP Blacklist'
+#. Label of the ipv6 (Data) field in DocType 'Mail Agent'
+#. Label of the ipv6 (Data) field in DocType 'Mail Agent Group'
+#: mail_server/mail_server/doctype/ip_blacklist/ip_blacklist.json
+#: mail_server/mail_server/doctype/mail_agent/mail_agent.json
+#: mail_server/mail_server/doctype/mail_agent_group/mail_agent_group.json
+msgid "IPv6"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'Incoming Mail Log'
+#. Option for the 'Status' (Select) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "In Progress"
+msgstr ""
+
+#. Option for the 'Type' (Select) field in DocType 'Mail Agent'
+#. Label of the section_break_viyu (Section Break) field in DocType 'Mail
+#. Server Settings'
+#: mail_server/mail_server/doctype/mail_agent/mail_agent.json
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Inbound"
+msgstr ""
+
+#. Label of the inbound_token (Password) field in DocType 'Mail Domain
+#. Registry'
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
+msgid "Inbound Token"
+msgstr ""
+
+#. Option for the 'Scanning Mode' (Select) field in DocType 'Mail Server
+#. Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Include Attachments"
+msgstr ""
+
+#. Name of a DocType
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "Incoming Mail Log"
+msgstr ""
+
+#: mail_server/utils/__init__.py:99
+msgid "Invalid date format: {0}"
+msgstr ""
+
+#: mail_server/api/outbound.py:55
+msgid "Invalid input. A list of dictionaries with 'outgoing_mail' and 'token' is required."
+msgstr ""
+
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.py:92
+msgid "Invalid sender or receiver email address."
+msgstr ""
+
+#. Label of the is_rejected (Check) field in DocType 'Incoming Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "Is Rejected"
+msgstr ""
+
+#. Label of the is_spam (Check) field in DocType 'Incoming Mail Log'
+#. Label of the is_spam (Check) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Is Spam"
+msgstr ""
+
+#: mail_server/mail_server/doctype/dns_record/dns_record.js:26
+msgid "It seems that the DNS provider or token is not configured in the {0}. Please manually add this DNS record to your provider for the root domain to ensure proper email authentication."
+msgstr ""
+
+#. Label of the key_size (Select) field in DocType 'DKIM Key'
+#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
+msgid "Key Size (Bits)"
+msgstr ""
+
+#: mail_server/mail_server/doctype/dkim_key/dkim_key.py:42
+msgid "Key Size must be greater than 1024."
+msgstr ""
+
+#. Label of the last_checked_at (Datetime) field in DocType 'DNS Record'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "Last Checked At"
+msgstr ""
+
+#. Label of the last_verified_at (Datetime) field in DocType 'Mail Domain
+#. Registry'
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
+msgid "Last Verified At"
+msgstr ""
+
+#. Option for the 'Type' (Select) field in DocType 'DNS Record'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "MX"
+msgstr ""
+
+#. Name of a DocType
+#: mail_server/mail_server/doctype/mail_agent/mail_agent.json
+msgid "Mail Agent"
+msgstr ""
+
+#. Name of a DocType
+#: mail_server/mail_server/doctype/mail_agent_group/mail_agent_group.json
+msgid "Mail Agent Group"
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_agent_group/mail_agent_group.py:39
+msgid "Mail Agent Group with priority {0} already exists."
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_agent_group/mail_agent_group.py:24
+msgid "Mail Agent Group {0} already exists."
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_agent/mail_agent.py:42
+msgid "Mail Agent {0} already exists."
+msgstr ""
+
+#. Label of the mail_client_host (Data) field in DocType 'Mail Domain Registry'
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
+msgid "Mail Client Host"
+msgstr ""
+
+#. Name of a DocType
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
+msgid "Mail Domain Registry"
+msgstr ""
+
+#. Name of a DocType
+#: mail_server/mail_server/doctype/mail_log_recipient/mail_log_recipient.json
+msgid "Mail Log Recipient"
+msgstr ""
+
+#. Name of a DocType
+#: mail_server/mail_server/doctype/dns_record/dns_record.js:23
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Mail Server Settings"
+msgstr ""
+
+#. Label of the message (Code) field in DocType 'Incoming Mail Log'
+#. Label of the message (Code) field in DocType 'Outgoing Mail Log'
+#. Label of the message (Code) field in DocType 'Spam Check Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.json
+msgid "Message"
+msgstr ""
+
+#. Label of the message_id (Data) field in DocType 'Incoming Mail Log'
+#. Label of the message_id (Data) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Message ID"
+msgstr ""
+
+#. Label of the message_size (Int) field in DocType 'Incoming Mail Log'
+#. Label of the message_size (Int) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Message Size (Bytes)"
+msgstr ""
+
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.py:67
+msgid "Message does not contain DKIM Signature."
+msgstr ""
+
+#. Label of the more_info_tab (Tab Break) field in DocType 'Incoming Mail Log'
+#. Label of the more_info_tab (Tab Break) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "More Info"
+msgstr ""
+
+#. Label of the is_newsletter (Check) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Newsletter"
+msgstr ""
+
+#: mail_server/utils/__init__.py:33
+msgid "No answer for {0}."
+msgstr ""
+
+#: mail_server/api/outbound.py:40
+msgid "No record found for the provided token ({0}) in the Outgoing Mail Log."
+msgstr ""
+
+#: mail_server/mail_server/doctype/dkim_key/dkim_key.py:29
+msgid "Only Administrator can delete DKIM Key."
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_agent/mail_agent.py:32
+msgid "Only Administrator can delete Mail Agent."
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:47
+msgid "Only Administrator can delete Mail Domain Registry."
+msgstr ""
+
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.py:248
+msgid "Only System Manager can retry bounced mail."
+msgstr ""
+
+#. Option for the 'Type' (Select) field in DocType 'Mail Agent'
+#. Label of the section_break_f89w (Section Break) field in DocType 'Mail
+#. Server Settings'
+#: mail_server/mail_server/doctype/mail_agent/mail_agent.json
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Outbound"
+msgstr ""
+
+#. Label of the outgoing_mail (Data) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Outgoing Mail"
+msgstr ""
+
+#. Name of a DocType
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Outgoing Mail Log"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Partially Sent"
+msgstr ""
+
+#. Label of the rmq_password (Password) field in DocType 'Mail Server Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Password"
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:47
+msgid "Please set the DNS Provider Token."
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:125
+msgid "Please set the {0} in the Mail Server Settings."
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:38
+msgid "Please verify the {0} for the new {1} to ensure proper email authentication."
+msgstr ""
+
+#. Label of the rmq_port (Int) field in DocType 'Mail Server Settings'
+#. Label of the spamd_port (Int) field in DocType 'Mail Server Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Port"
+msgstr ""
+
+#. Label of the priority (Int) field in DocType 'DNS Record'
+#. Label of the priority (Int) field in DocType 'Mail Agent Group'
+#. Label of the priority (Int) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+#: mail_server/mail_server/doctype/mail_agent_group/mail_agent_group.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Priority"
+msgstr ""
+
+#. Label of the private_key (Text) field in DocType 'DKIM Key'
+#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
+msgid "Private Key"
+msgstr ""
+
+#. Label of the processed_after (Float) field in DocType 'Incoming Mail Log'
+#. Label of the processed_after (Float) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Processed After (Seconds)"
+msgstr ""
+
+#. Label of the processed_at (Datetime) field in DocType 'Incoming Mail Log'
+#. Label of the processed_at (Datetime) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Processed At"
+msgstr ""
+
+#. Description of the 'Processed After (Seconds)' (Float) field in DocType
+#. 'Incoming Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "Processed At - Fetched At"
+msgstr ""
+
+#. Description of the 'Processed After (Seconds)' (Float) field in DocType
+#. 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Processed At - Received At"
+msgstr ""
+
+#. Label of the public_key (Text) field in DocType 'DKIM Key'
+#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
+msgid "Public Key"
+msgstr ""
+
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.js:12
+msgid "Push to Queue"
+msgstr ""
+
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.js:53
+msgid "Pushing to Queue..."
+msgstr ""
+
+#. Label of the queue_id (Data) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Queue ID"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Queued (Haraka)"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Queued (RMQ)"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Queuing (RMQ)"
+msgstr ""
+
+#. Label of the rabbitmq_amqp_tab (Tab Break) field in DocType 'Mail Server
+#. Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "RabbitMQ (AMQP)"
+msgstr ""
+
+#. Label of the received_after (Float) field in DocType 'Incoming Mail Log'
+#. Label of the received_after (Float) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Received After (Seconds)"
+msgstr ""
+
+#. Label of the received_at (Datetime) field in DocType 'Incoming Mail Log'
+#. Label of the received_at (Datetime) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Received At"
+msgstr ""
+
+#. Description of the 'Received After (Seconds)' (Float) field in DocType
+#. 'Incoming Mail Log'
+#. Description of the 'Received After (Seconds)' (Float) field in DocType
+#. 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Received At - Created At"
+msgstr ""
+
+#. Label of the receiver (Data) field in DocType 'Incoming Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "Receiver"
+msgstr ""
+
+#. Option for the 'Category' (Select) field in DocType 'DNS Record'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "Receiving Record"
+msgstr ""
+
+#. Label of the recipients (Table) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Recipients"
+msgstr ""
+
+#. Group in DKIM Key's connections
+#. Group in Mail Agent's connections
+#. Group in Mail Agent Group's connections
+#. Group in Mail Domain Registry's connections
+#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
+#: mail_server/mail_server/doctype/mail_agent/mail_agent.json
+#: mail_server/mail_server/doctype/mail_agent_group/mail_agent_group.json
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
+msgid "Reference"
+msgstr ""
+
+#. Label of the reject_inbound_spam (Check) field in DocType 'Mail Server
+#. Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Reject Spam"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'Incoming Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "Rejected"
+msgstr ""
+
+#. Label of the rejection_message (Small Text) field in DocType 'Incoming Mail
+#. Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "Rejection Message"
+msgstr ""
+
+#. Label of the response (Code) field in DocType 'Mail Log Recipient'
+#. Label of the spamd_response (Code) field in DocType 'Spam Check Log'
+#: mail_server/mail_server/doctype/mail_log_recipient/mail_log_recipient.json
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.json
+msgid "Response"
+msgstr ""
+
+#. Label of the retries (Int) field in DocType 'Mail Log Recipient'
+#: mail_server/mail_server/doctype/mail_log_recipient/mail_log_recipient.json
+msgid "Retries"
+msgstr ""
+
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.js:20
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.js:39
+msgid "Retry"
+msgstr ""
+
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.js:67
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.js:97
+msgid "Retrying..."
+msgstr ""
+
+#. Label of the root_domain_name (Data) field in DocType 'Mail Server Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Root Domain Name"
+msgstr ""
+
+#. Label of the spf_pass (Check) field in DocType 'Incoming Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "SPF"
+msgstr ""
+
+#. Label of the spf_description (Small Text) field in DocType 'Incoming Mail
+#. Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "SPF Description"
+msgstr ""
+
+#. Label of the spf_host (Data) field in DocType 'Mail Server Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "SPF Host"
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:59
+msgid "SPF Host {0} is invalid. It can be alphanumeric but should not contain spaces or special characters, excluding underscores."
+msgstr ""
+
+#. Label of the scanning_mode (Select) field in DocType 'Mail Server Settings'
+#. Label of the scanning_mode (Data) field in DocType 'Spam Check Log'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.json
+msgid "Scanning Mode"
+msgstr ""
+
+#. Label of the sender (Data) field in DocType 'Incoming Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+msgid "Sender"
+msgstr ""
+
+#. Option for the 'Category' (Select) field in DocType 'DNS Record'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "Sending Record"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'Mail Log Recipient'
+#. Option for the 'Status' (Select) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/mail_log_recipient/mail_log_recipient.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Sent"
+msgstr ""
+
+#. Option for the 'Category' (Select) field in DocType 'DNS Record'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "Server Record"
+msgstr ""
+
+#. Label of the source_host (Data) field in DocType 'IP Blacklist'
+#. Label of the source_host (Data) field in DocType 'Spam Check Log'
+#: mail_server/mail_server/doctype/ip_blacklist/ip_blacklist.json
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.json
+msgid "Source Host"
+msgstr ""
+
+#. Label of the source_ip_address (Data) field in DocType 'IP Blacklist'
+#. Label of the source_ip_address (Data) field in DocType 'Spam Check Log'
+#: mail_server/mail_server/doctype/ip_blacklist/ip_blacklist.json
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.json
+msgid "Source IP Address"
+msgstr ""
+
+#. Name of a DocType
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.json
+msgid "Spam Check Log"
+msgstr ""
+
+#. Label of the spam_check_response (Code) field in DocType 'Incoming Mail Log'
+#. Label of the spam_check_response (Code) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Spam Check Response"
+msgstr ""
+
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.py:137
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.py:145
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.py:161
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.py:174
+msgid "Spam Detection Failed"
+msgstr ""
+
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.py:48
+msgid "Spam Detection is disabled"
+msgstr ""
+
+#. Label of the spam_score (Float) field in DocType 'Incoming Mail Log'
+#. Label of the spam_score (Float) field in DocType 'Outgoing Mail Log'
+#. Label of the spam_score (Float) field in DocType 'Spam Check Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.json
+msgid "Spam Score"
+msgstr ""
+
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.py:174
+msgid "Spam score not found in output."
+msgstr ""
+
+#. Label of the spamassassin_tab (Tab Break) field in DocType 'Mail Server
+#. Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "SpamAssassin"
+msgstr ""
+
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.py:158
+msgid "SpamAssassin did not return the expected response. This may indicate a permission issue or an unauthorized connection. Please check the following: {0}"
+msgstr ""
+
+#. Label of the started_at (Datetime) field in DocType 'Spam Check Log'
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.json
+msgid "Started At"
+msgstr ""
+
+#. Label of the status (Select) field in DocType 'Incoming Mail Log'
+#. Label of the status (Select) field in DocType 'Mail Log Recipient'
+#. Label of the status (Select) field in DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/mail_log_recipient/mail_log_recipient.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Status"
+msgstr ""
+
+#. Label of the is_subdomain (Check) field in DocType 'Mail Domain Registry'
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
+msgid "Subdomain"
+msgstr ""
+
+#. Name of a role
+#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
+#: mail_server/mail_server/doctype/ip_blacklist/ip_blacklist.json
+#: mail_server/mail_server/doctype/mail_agent/mail_agent.json
+#: mail_server/mail_server/doctype/mail_agent_group/mail_agent_group.json
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.json
+msgid "System Manager"
+msgstr ""
+
+#. Label of the ttl (Int) field in DocType 'DNS Record'
+#. Label of the default_ttl (Int) field in DocType 'Mail Server Settings'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "TTL"
+msgstr ""
+
+#. Option for the 'Type' (Select) field in DocType 'DNS Record'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "TXT"
+msgstr ""
+
+#. Label of the test_rabbitmq_connection (Button) field in DocType 'Mail Server
+#. Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Test Connection"
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.js:14
+msgid "Testing RabbitMQ Connection..."
+msgstr ""
+
+#: mail_server/api/outbound.py:58
+msgid "The maximum number of delivery statuses that can be fetched at a time is 500."
+msgstr ""
+
+#: mail_server/api/outbound.py:30
+msgid "The provided outgoing mail ({0}) does not match the specified token ({1}). Please verify your outgoing mail ID and token."
+msgstr ""
+
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.py:127
+msgid "This email was blocked because it was flagged as spam by our system. The spam score exceeded the allowed threshold. Please review the content of your email and try removing any suspicious links or attachments, or contact support for further assistance."
+msgstr ""
+
+#. Label of the outbound_spam_threshold (Float) field in DocType 'Mail Server
+#. Settings'
+#. Label of the inbound_spam_threshold (Float) field in DocType 'Mail Server
+#. Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Threshold"
+msgstr ""
+
+#: mail_server/mail_server/doctype/spam_check_log/spam_check_log.py:136
+msgid "Timed out waiting for response from SpamAssassin."
+msgstr ""
+
+#. Option for the 'Category' (Select) field in DocType 'DNS Record'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "Tracking Record"
+msgstr ""
+
+#. Label of the transfer_completed_after (Float) field in DocType 'Outgoing
+#. Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Transfer Completed After (Seconds)"
+msgstr ""
+
+#. Label of the transfer_completed_at (Datetime) field in DocType 'Outgoing
+#. Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Transfer Completed At"
+msgstr ""
+
+#. Description of the 'Transfer Completed After (Seconds)' (Float) field in
+#. DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Transfer Completed At - Transfer Started At"
+msgstr ""
+
+#. Label of the transfer_started_after (Float) field in DocType 'Outgoing Mail
+#. Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Transfer Started After (Seconds)"
+msgstr ""
+
+#. Label of the transfer_started_at (Datetime) field in DocType 'Outgoing Mail
+#. Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Transfer Started At"
+msgstr ""
+
+#. Description of the 'Transfer Started After (Seconds)' (Float) field in
+#. DocType 'Outgoing Mail Log'
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
+msgid "Transfer Started At - Processed At"
+msgstr ""
+
+#. Label of the type (Select) field in DocType 'DNS Record'
+#. Label of the type (Select) field in DocType 'Mail Agent'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+#: mail_server/mail_server/doctype/mail_agent/mail_agent.json
+msgid "Type"
+msgstr ""
+
+#: mail_server/api/inbound.py:22
+msgid "User {0} does not associated with any domain."
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:78
+msgid "User {0} does not have Domain Owner role."
+msgstr ""
+
+#. Label of the rmq_username (Data) field in DocType 'Mail Server Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Username"
+msgstr ""
+
+#. Label of the value (Text) field in DocType 'DNS Record'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+msgid "Value"
+msgstr ""
+
+#. Label of the verification_errors (Code) field in DocType 'Mail Domain
+#. Registry'
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
+msgid "Verification Errors"
+msgstr ""
+
+#. Label of the is_verified (Check) field in DocType 'DNS Record'
+#. Label of the is_verified (Check) field in DocType 'Mail Domain Registry'
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
+msgid "Verified"
+msgstr ""
+
+#: mail_server/mail_server/doctype/dns_record/dns_record.py:107
+msgid "Verified {0}:{1} record."
+msgstr ""
+
+#: mail_server/mail_server/doctype/dns_record/dns_record.js:12
+msgid "Verify DNS Record"
+msgstr ""
+
+#: mail_server/mail_server/doctype/dns_record/dns_record.js:42
+msgid "Verifying DNS Record..."
+msgstr ""
+
+#. Label of the rmq_virtual_host (Data) field in DocType 'Mail Server Settings'
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
+msgid "Virtual Host"
+msgstr ""
+
+#: mail_server/utils/validation.py:78 mail_server/utils/validation.py:85
+msgid "You are not authorized to perform this action."
+msgstr ""
+
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.py:83
+msgid "You are not authorized to send emails from domain {0}."
+msgstr ""
+
+#: mail_server/utils/__init__.py:31
+msgid "{0} does not exist."
+msgstr ""
+
+#: mail_server/mail_server/doctype/dns_record/dns_record_list.js:19
+#: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log_list.js:28
+#: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.js:84
+msgid "{0} job has been created."
+msgstr ""
+
