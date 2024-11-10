@@ -31,6 +31,7 @@ class MailServerSettings(Document):
 
 		if self.has_value_changed("root_domain_name"):
 			frappe.db.set_value("DNS Record", {"is_verified": 1}, "is_verified", 0)
+			create_dmarc_dns_record_for_external_domains()
 
 			if self.get_doc_before_save().get("root_domain_name"):
 				dns_record_list_link = f'<a href="/app/dns-record">{_("DNS Records")}</a>'
@@ -105,6 +106,19 @@ class MailServerSettings(Document):
 				as_list = False
 
 			frappe.msgprint(messages, _("Connection Failed"), as_list=as_list, indicator="red")
+
+
+def create_dmarc_dns_record_for_external_domains() -> None:
+	"""Creates the DMARC DNS Record for external domains."""
+
+	from mail_server.mail_server.doctype.dns_record.dns_record import create_or_update_dns_record
+
+	create_or_update_dns_record(
+		host="*._report._dmarc",
+		type="TXT",
+		value="v=DMARC1",
+		category="Server Record",
+	)
 
 
 def validate_mail_server_settings() -> None:
