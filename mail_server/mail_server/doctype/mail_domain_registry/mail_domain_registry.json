@@ -105,7 +105,8 @@
   },
   {
    "fieldname": "dkim_public_key",
-   "fieldtype": "Text"
+   "fieldtype": "Text",
+   "no_copy": 1
   },
   {
    "collapsible": 1,
@@ -138,7 +139,7 @@
    "link_fieldname": "domain_name"
   }
  ],
- "modified": "2024-11-14 18:31:05.801998",
+ "modified": "2024-11-14 19:27:31.302028",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Domain Registry",

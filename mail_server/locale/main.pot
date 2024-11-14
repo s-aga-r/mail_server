@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mail Server VERSION\n"
 "Report-Msgid-Bugs-To: developers@frappe.io\n"
-"POT-Creation-Date: 2024-11-14 19:02+0553\n"
-"PO-Revision-Date: 2024-11-14 19:02+0553\n"
+"POT-Creation-Date: 2024-11-14 19:25+0553\n"
+"PO-Revision-Date: 2024-11-14 19:25+0553\n"
 "Last-Translator: developers@frappe.io\n"
 "Language-Team: developers@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -188,11 +188,6 @@ msgstr ""
 msgid "DKIM Description"
 msgstr ""
 
-#. Name of a DocType
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
-msgid "DKIM Key"
-msgstr ""
-
 #. Label of the section_break_jcxr (Section Break) field in DocType 'Mail
 #. Domain Registry'
 #: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
@@ -267,19 +262,13 @@ msgstr ""
 msgid "DigitalOcean"
 msgstr ""
 
-#. Label of the domain_name (Link) field in DocType 'DKIM Key'
 #. Label of the domain_name (Link) field in DocType 'Incoming Mail Log'
 #. Label of the domain_name (Data) field in DocType 'Mail Domain Registry'
 #. Label of the domain_name (Link) field in DocType 'Outgoing Mail Log'
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
 #: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
 #: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
 #: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
 msgid "Domain Name"
-msgstr ""
-
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.py:34
-msgid "Domain Name is mandatory"
 msgstr ""
 
 #: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:47
@@ -349,11 +338,9 @@ msgstr ""
 msgid "Enable Spam Detection"
 msgstr ""
 
-#. Label of the enabled (Check) field in DocType 'DKIM Key'
 #. Label of the enabled (Check) field in DocType 'Mail Agent'
 #. Label of the enabled (Check) field in DocType 'Mail Agent Group'
 #. Label of the enabled (Check) field in DocType 'Mail Domain Registry'
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
 #: mail_server/mail_server/doctype/mail_agent/mail_agent.json
 #: mail_server/mail_server/doctype/mail_agent_group/mail_agent_group.json
 #: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
@@ -544,15 +531,6 @@ msgstr ""
 msgid "It seems that the DNS provider or token is not configured in the {0}. Please manually add this DNS record to your provider for the root domain to ensure proper email authentication."
 msgstr ""
 
-#. Label of the key_size (Select) field in DocType 'DKIM Key'
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
-msgid "Key Size (Bits)"
-msgstr ""
-
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.py:41
-msgid "Key Size must be greater than 1024."
-msgstr ""
-
 #. Label of the last_checked_at (Datetime) field in DocType 'DNS Record'
 #: mail_server/mail_server/doctype/dns_record/dns_record.json
 msgid "Last Checked At"
@@ -661,10 +639,6 @@ msgstr ""
 msgid "No record found for the provided token ({0}) in the Outgoing Mail Log."
 msgstr ""
 
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.py:28
-msgid "Only Administrator can delete DKIM Key."
-msgstr ""
-
 #: mail_server/mail_server/doctype/mail_agent/mail_agent.py:32
 msgid "Only Administrator can delete Mail Agent."
 msgstr ""
@@ -732,11 +706,6 @@ msgstr ""
 msgid "Priority"
 msgstr ""
 
-#. Label of the private_key (Text) field in DocType 'DKIM Key'
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
-msgid "Private Key"
-msgstr ""
-
 #. Label of the processed_after (Float) field in DocType 'Incoming Mail Log'
 #. Label of the processed_after (Float) field in DocType 'Outgoing Mail Log'
 #: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
@@ -761,11 +730,6 @@ msgstr ""
 #. 'Outgoing Mail Log'
 #: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
 msgid "Processed At - Received At"
-msgstr ""
-
-#. Label of the public_key (Text) field in DocType 'DKIM Key'
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
-msgid "Public Key"
 msgstr ""
 
 #: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.js:12
@@ -840,11 +804,9 @@ msgstr ""
 msgid "Recipients"
 msgstr ""
 
-#. Group in DKIM Key's connections
 #. Group in Mail Agent's connections
 #. Group in Mail Agent Group's connections
 #. Group in Mail Domain Registry's connections
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
 #: mail_server/mail_server/doctype/mail_agent/mail_agent.json
 #: mail_server/mail_server/doctype/mail_agent_group/mail_agent_group.json
 #: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
@@ -1024,7 +986,6 @@ msgid "Subdomain"
 msgstr ""
 
 #. Name of a role
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
 #: mail_server/mail_server/doctype/dns_record/dns_record.json
 #: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
 #: mail_server/mail_server/doctype/ip_blacklist/ip_blacklist.json
