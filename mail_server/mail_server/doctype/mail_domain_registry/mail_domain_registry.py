@@ -4,12 +4,9 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import cint, now
+from frappe.utils import now
 
-from mail_server.mail_server.doctype.dkim_key.dkim_key import (
-	create_dkim_key,
-	get_dkim_private_key,
-)
+from mail_server.mail_server.doctype.dns_record.dns_record import create_or_update_dns_record
 from mail_server.mail_server.doctype.mail_server_settings.mail_server_settings import (
 	validate_mail_server_settings,
 )
@@ -20,19 +17,14 @@ from mail_server.utils.user import has_role, is_system_manager
 
 class MailDomainRegistry(Document):
 	def validate(self) -> None:
+		if self.is_new():
+			validate_mail_server_settings()
+			self.last_verified_at = now()
+
 		self.validate_domain_name()
 		self.validate_is_verified()
 		self.validate_is_subdomain()
 		self.validate_domain_owner()
-		self.validate_dkim_key_size()
-
-		if self.is_new():
-			self.inbound_token = frappe.generate_hash(length=32)
-
-		if self.is_new() or self.has_value_changed("dkim_key_size"):
-			self.last_verified_at = now()
-			validate_mail_server_settings()
-			create_dkim_key(self.domain_name, cint(self.dkim_key_size))
 
 	def on_update(self) -> None:
 		delete_cache(f"user|{self.domain_owner}")
@@ -41,6 +33,8 @@ class MailDomainRegistry(Document):
 			previous_doc = self.get_doc_before_save()
 			if previous_doc and previous_doc.get("domain_owner"):
 				delete_cache(f"user|{previous_doc.get('domain_owner')}")
+
+		self.create_or_update_dkim_dns_record()
 
 	def on_trash(self) -> None:
 		if frappe.session.user != "Administrator":
@@ -78,16 +72,18 @@ class MailDomainRegistry(Document):
 				_("User {0} does not have Domain Owner role.").format(frappe.bold(self.domain_owner))
 			)
 
-	def validate_dkim_key_size(self) -> None:
-		"""Validates DKIM Key Size"""
+	def create_or_update_dkim_dns_record(self) -> None:
+		"""Creates or Updates DKIM DNS Record"""
 
-		if self.dkim_key_size:
-			if cint(self.dkim_key_size) < 1024:
-				frappe.throw(_("DKIM Key Size must be greater than 1024."))
-		else:
-			self.dkim_key_size = frappe.db.get_single_value(
-				"Mail Server Settings", "default_dkim_key_size", cache=True
-			)
+		frappe.flags.enqueue_dns_record_update = True
+		create_or_update_dns_record(
+			host=self.get_dkim_host(),
+			type="TXT",
+			value=f"v=DKIM1; k=rsa; p={self.dkim_public_key}",
+			category="Sending Record",
+			attached_to_doctype=self.doctype,
+			attached_to_docname=self.name,
+		)
 
 	def get_dns_records(self) -> list[dict]:
 		"""Returns DNS Records"""
@@ -112,7 +108,7 @@ class MailDomainRegistry(Document):
 				"category": "Sending Record",
 				"type": "CNAME",
 				"host": f"frappemail._domainkey.{self.domain_name}",
-				"value": f"{self.domain_name.replace('.', '-')}._domainkey.{ms_settings.root_domain_name}.",
+				"value": f"{self.get_dkim_host()}.{ms_settings.root_domain_name}.",
 				"ttl": ms_settings.default_ttl,
 			}
 		)
@@ -163,18 +159,18 @@ class MailDomainRegistry(Document):
 				)
 
 		is_verified = 0 if errors else 1
-		verification_errors = "\n".join(errors) if errors else None
+		dns_verification_errors = "\n".join(errors) if errors else None
 		self._db_set(
 			is_verified=is_verified,
 			last_verified_at=now(),
-			verification_errors=verification_errors,
+			dns_verification_errors=dns_verification_errors,
 			notify_update=True,
 		)
 
-	def get_dkim_private_key(self) -> str:
-		"""Returns DKIM Private Key"""
+	def get_dkim_host(self) -> str:
+		"""Returns DKIM Host"""
 
-		return get_dkim_private_key(self.domain_name, raise_exception=True)
+		return f"{self.domain_name.replace('.', '-')}._domainkey"
 
 	def _db_set(
 		self,

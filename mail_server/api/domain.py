@@ -9,7 +9,9 @@ from mail_server.utils.validation import (
 
 
 @frappe.whitelist(methods=["POST"])
-def add_or_update_domain(domain_name: str, mail_client_host: str | None = None) -> dict:
+def add_or_update_domain(
+	domain_name: str, access_token: str, dkim_public_key: str, mail_client_host: str | None = None
+) -> None:
 	"""Add or update domain in Mail Domain Registry."""
 
 	if not domain_name:
@@ -21,24 +23,15 @@ def add_or_update_domain(domain_name: str, mail_client_host: str | None = None) 
 	if is_domain_registry_exists(domain_name):
 		validate_user_is_domain_owner(user, domain_name)
 		doc = frappe.get_doc("Mail Domain Registry", domain_name)
-
-		if doc.mail_client_host != mail_client_host:
-			doc.db_set("mail_client_host", mail_client_host)
 	else:
 		doc = frappe.new_doc("Mail Domain Registry")
 		doc.domain_owner = user
 		doc.domain_name = domain_name
-		doc.mail_client_host = mail_client_host
-		doc.insert(ignore_permissions=True)
 
-	response = {
-		"domain_name": doc.domain_name,
-		"dns_records": doc.get_dns_records(),
-		"inbound_token": doc.get_password("inbound_token"),
-		"dkim_private_key": doc.get_dkim_private_key(),
-	}
-
-	return response
+	doc.access_token = access_token
+	doc.dkim_public_key = dkim_public_key
+	doc.mail_client_host = mail_client_host
+	doc.save(ignore_permissions=True)
 
 
 @frappe.whitelist(methods=["GET"])
@@ -73,5 +66,5 @@ def verify_dns_records(domain_name: str) -> list[str] | None:
 		doc = frappe.get_doc("Mail Domain Registry", domain_name)
 		doc.verify_dns_records()
 
-		if doc.verification_errors:
-			return doc.verification_errors.split("\n")
+		if doc.dns_verification_errors:
+			return doc.dns_verification_errors.split("\n")

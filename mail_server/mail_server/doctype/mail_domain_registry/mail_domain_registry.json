@@ -12,12 +12,13 @@
   "is_subdomain",
   "column_break_gjk4",
   "last_verified_at",
-  "inbound_token",
+  "access_token",
   "domain_owner",
-  "dkim_key_size",
   "mail_client_host",
   "section_break_jcxr",
-  "verification_errors"
+  "dkim_public_key",
+  "section_break_uyww",
+  "dns_verification_errors"
  ],
  "fields": [
   {
@@ -58,13 +59,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "dkim_key_size",
-   "fieldtype": "Select",
-   "label": "DKIM Key Size (Bits)",
-   "options": "\n1024\n2048\n4096",
-   "permlevel": 1
-  },
-  {
    "default": "0",
    "depends_on": "eval: !doc.__islocal",
    "fieldname": "is_subdomain",
@@ -92,15 +86,10 @@
    "read_only": 1
   },
   {
+   "collapsible": 1,
    "fieldname": "section_break_jcxr",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "verification_errors",
-   "fieldtype": "Code",
-   "label": "Verification Errors",
-   "no_copy": 1,
-   "read_only": 1
+   "fieldtype": "Section Break",
+   "label": "DKIM Public Key"
   },
   {
    "fieldname": "mail_client_host",
@@ -108,9 +97,25 @@
    "label": "Mail Client Host"
   },
   {
-   "fieldname": "inbound_token",
+   "fieldname": "access_token",
    "fieldtype": "Password",
-   "label": "Inbound Token",
+   "label": "Access Token",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "dkim_public_key",
+   "fieldtype": "Text"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_uyww",
+   "fieldtype": "Section Break",
+   "label": "DNS Verification Errors"
+  },
+  {
+   "fieldname": "dns_verification_errors",
+   "fieldtype": "Code",
    "no_copy": 1,
    "read_only": 1
   }
@@ -119,8 +124,8 @@
  "links": [
   {
    "group": "Reference",
-   "link_doctype": "DKIM Key",
-   "link_fieldname": "domain_name"
+   "link_doctype": "DNS Record",
+   "link_fieldname": "attached_to_docname"
   },
   {
    "group": "Reference",
@@ -133,7 +138,7 @@
    "link_fieldname": "domain_name"
   }
  ],
- "modified": "2024-11-05 12:23:43.351978",
+ "modified": "2024-11-14 18:31:05.801998",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Domain Registry",

@@ -90,18 +90,6 @@ def create_dkim_key(domain_name: str, key_size: int | None = None) -> "DKIMKey":
 	return doc
 
 
-@request_cache
-def get_dkim_private_key(domain_name: str, raise_exception: bool = True) -> str | None:
-	"""Returns the DKIM private key for the given domain."""
-
-	private_key = frappe.db.get_value("DKIM Key", {"enabled": 1, "domain_name": domain_name}, "private_key")
-
-	if not private_key and raise_exception:
-		frappe.throw(_("DKIM Key not found for the domain {0}").format(frappe.bold(domain_name)))
-
-	return private_key
-
-
 def generate_dkim_keys(key_size: int = 1024) -> tuple[str, str]:
 	"""Generates the DKIM Keys."""
 
