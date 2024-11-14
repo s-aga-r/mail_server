@@ -11,9 +11,10 @@ from mail_server.utils.validation import validate_user_has_domain_owner_role
 
 
 @frappe.whitelist(methods=["GET"])
-def fetch(limit: int = 100, last_synced_at: str | None = None) -> dict[str, list[dict] | str]:
-	"""Returns the incoming mails for the given domains."""
+def fetch(limit: int = 100, last_synced_at: str | None = None) -> dict[str, str | list[dict]]:
+	"""Returns the incoming mails for the user's domains."""
 
+	limit = min(max(limit, 1), 100)
 	user = frappe.session.user
 	validate_user_has_domain_owner_role(user)
 	mail_domains = get_user_owned_domains(user)
@@ -41,7 +42,7 @@ def get_incoming_mails(
 	mail_domains: list[str],
 	limit: int,
 	last_synced_at: str | datetime | None = None,
-) -> dict[str, list[dict] | str]:
+) -> dict[str, str | list[dict]]:
 	"""Returns the incoming mails for the given domains."""
 
 	IML = frappe.qb.DocType("Incoming Mail Log")

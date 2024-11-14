@@ -7,11 +7,19 @@ from mail_server.mail_server.doctype.outgoing_mail_log.outgoing_mail_log import 
 
 
 @frappe.whitelist(methods=["POST"])
-def send() -> str:
+def send(outgoing_mail: str, recipients: str | list) -> str:
 	"""Sends the outgoing mail."""
 
-	data = json.loads(frappe.request.data.decode())
-	log = create_outgoing_mail_log(data["outgoing_mail"], data["recipients"], data["message"])
+	if not outgoing_mail or not recipients:
+		frappe.throw(_("Both outgoing mail and recipients are required."), frappe.MandatoryError)
+
+	files = frappe._dict(frappe.request.files)
+
+	if not files or not files.get("message"):
+		frappe.throw(_("The message file is required."), frappe.MandatoryError)
+
+	message = files["message"].read().decode("utf-8")
+	log = create_outgoing_mail_log(outgoing_mail, recipients, message)
 	return log.name
 
 
@@ -45,24 +53,23 @@ def fetch_delivery_status(outgoing_mail: str, token: str) -> dict:
 	}
 
 
-@frappe.whitelist(methods=["GET"])
+@frappe.whitelist(methods=["POST"])
 def fetch_delivery_statuses() -> list[dict]:
 	"""Returns the delivery statuses of the outgoing mails."""
 
-	data = json.loads(frappe.request.data.decode()).get("data")
+	data = json.loads(frappe.request.data.decode())
 
-	if not data or not isinstance(data, list):
+	if not data:
+		frappe.throw(_("The data parameter is required."), frappe.MandatoryError)
+	elif not isinstance(data, list):
 		frappe.throw(_("Invalid input. A list of dictionaries with 'outgoing_mail' and 'token' is required."))
-
-	if len(data) > 500:
+	elif len(data) > 500:
 		frappe.throw(_("The maximum number of delivery statuses that can be fetched at a time is 500."))
 
 	response = []
 
-	for item in data:
-		outgoing_mail = item["outgoing_mail"]
-		token = item["token"]
-		delivery_status = fetch_delivery_status(outgoing_mail, token)
+	for d in data:
+		delivery_status = fetch_delivery_status(d.get("outgoing_mail"), d.get("token"))
 		response.append(delivery_status)
 
 	return response

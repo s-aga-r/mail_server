@@ -9,8 +9,11 @@ from mail_server.utils.validation import (
 
 
 @frappe.whitelist(methods=["POST"])
-def add_or_update_domain(domain_name: str, mail_client_host: str = None) -> dict:
+def add_or_update_domain(domain_name: str, mail_client_host: str | None = None) -> dict:
 	"""Add or update domain in Mail Domain Registry."""
+
+	if not domain_name:
+		frappe.throw(_("Domain Name is required."), frappe.MandatoryError)
 
 	user = frappe.session.user
 	validate_user_has_domain_owner_role(user)
@@ -19,7 +22,7 @@ def add_or_update_domain(domain_name: str, mail_client_host: str = None) -> dict
 		validate_user_is_domain_owner(user, domain_name)
 		doc = frappe.get_doc("Mail Domain Registry", domain_name)
 
-		if mail_client_host and doc.mail_client_host != mail_client_host:
+		if doc.mail_client_host != mail_client_host:
 			doc.db_set("mail_client_host", mail_client_host)
 	else:
 		doc = frappe.new_doc("Mail Domain Registry")
@@ -42,6 +45,9 @@ def add_or_update_domain(domain_name: str, mail_client_host: str = None) -> dict
 def get_dns_records(domain_name: str) -> list[dict] | None:
 	"""Returns DNS records for the given domain."""
 
+	if not domain_name:
+		frappe.throw(_("Domain Name is required."), frappe.MandatoryError)
+
 	user = frappe.session.user
 	validate_user_has_domain_owner_role(user)
 
@@ -56,6 +62,9 @@ def get_dns_records(domain_name: str) -> list[dict] | None:
 def verify_dns_records(domain_name: str) -> list[str] | None:
 	"""Verify DNS records for the given domain."""
 
+	if not domain_name:
+		frappe.throw(_("Domain Name is required."), frappe.MandatoryError)
+
 	user = frappe.session.user
 	validate_user_has_domain_owner_role(user)
 
@@ -63,4 +72,6 @@ def verify_dns_records(domain_name: str) -> list[str] | None:
 		validate_user_is_domain_owner(user, domain_name)
 		doc = frappe.get_doc("Mail Domain Registry", domain_name)
 		doc.verify_dns_records()
-		return doc.verification_errors.split("\n") if doc.verification_errors else None
+
+		if doc.verification_errors:
+			return doc.verification_errors.split("\n")
