@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mail Server VERSION\n"
 "Report-Msgid-Bugs-To: developers@frappe.io\n"
-"POT-Creation-Date: 2024-11-14 19:25+0553\n"
-"PO-Revision-Date: 2024-11-14 19:25+0553\n"
+"POT-Creation-Date: 2024-11-14 20:47+0553\n"
+"PO-Revision-Date: 2024-11-14 20:47+0553\n"
 "Last-Translator: developers@frappe.io\n"
 "Language-Team: developers@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -1024,6 +1024,10 @@ msgstr ""
 msgid "The data parameter is required."
 msgstr ""
 
+#: mail_server/utils/validation.py:86
+msgid "The domain {0} does not belong to user {1}."
+msgstr ""
+
 #: mail_server/api/outbound.py:67
 msgid "The maximum number of delivery statuses that can be fetched at a time is 500."
 msgstr ""
@@ -1147,7 +1151,7 @@ msgstr ""
 msgid "Virtual Host"
 msgstr ""
 
-#: mail_server/utils/validation.py:78 mail_server/utils/validation.py:85
+#: mail_server/utils/validation.py:78
 msgid "You are not authorized to perform this action."
 msgstr ""
 
