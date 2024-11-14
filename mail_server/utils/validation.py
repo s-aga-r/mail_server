@@ -82,4 +82,9 @@ def validate_user_is_domain_owner(user: str, domain_name: str) -> None:
 	"""Validate if the user is the owner of the given domain."""
 
 	if domain_name not in get_user_owned_domains(user) and not is_system_manager(user):
-		frappe.throw(_("You are not authorized to perform this action."), frappe.PermissionError)
+		frappe.throw(
+			_("The domain {0} does not belong to user {1}.").format(
+				frappe.bold(domain_name), frappe.bold(user)
+			),
+			frappe.PermissionError,
+		)

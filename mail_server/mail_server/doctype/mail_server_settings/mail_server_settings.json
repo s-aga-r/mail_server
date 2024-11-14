@@ -12,7 +12,6 @@
   "dns_provider_token",
   "section_break_71vy",
   "defaults_section",
-  "default_dkim_key_size",
   "default_ttl",
   "column_break_xlun",
   "rabbitmq_amqp_tab",
@@ -81,15 +80,6 @@
    "fieldname": "defaults_section",
    "fieldtype": "Section Break",
    "label": "Defaults"
-  },
-  {
-   "default": "2048",
-   "fieldname": "default_dkim_key_size",
-   "fieldtype": "Select",
-   "label": "DKIM Key Size (Bits)",
-   "non_negative": 1,
-   "options": "1024\n2048\n4096",
-   "reqd": 1
   },
   {
    "default": "3600",
@@ -267,7 +257,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-10-18 19:27:30.550462",
+ "modified": "2024-11-14 16:27:00.742468",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Server Settings",

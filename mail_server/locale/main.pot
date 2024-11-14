@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mail Server VERSION\n"
 "Report-Msgid-Bugs-To: developers@frappe.io\n"
-"POT-Creation-Date: 2024-11-09 21:40+0553\n"
-"PO-Revision-Date: 2024-11-09 21:40+0553\n"
+"POT-Creation-Date: 2024-11-14 20:47+0553\n"
+"PO-Revision-Date: 2024-11-14 20:47+0553\n"
 "Last-Translator: developers@frappe.io\n"
 "Language-Team: developers@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -43,6 +43,11 @@ msgstr ""
 #: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
 #: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
 msgid "Accepted"
+msgstr ""
+
+#. Label of the access_token (Password) field in DocType 'Mail Domain Registry'
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
+msgid "Access Token"
 msgstr ""
 
 #. Label of the action_after (Float) field in DocType 'Mail Log Recipient'
@@ -111,7 +116,11 @@ msgstr ""
 msgid "Blocked"
 msgstr ""
 
-#: mail_server/api/outbound.py:23
+#: mail_server/api/outbound.py:14
+msgid "Both outgoing mail and recipients are required."
+msgstr ""
+
+#: mail_server/api/outbound.py:31
 msgid "Both outgoing mail and token are required."
 msgstr ""
 
@@ -137,12 +146,12 @@ msgstr ""
 msgid "Completed At"
 msgstr ""
 
-#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:93
-#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:107
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:87
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:101
 msgid "Connection Failed"
 msgstr ""
 
-#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:91
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:85
 msgid "Connection Successful"
 msgstr ""
 
@@ -150,8 +159,8 @@ msgstr ""
 msgid "Could not connect to SpamAssassin (spamd). Please ensure it's running on {0}:{1}"
 msgstr ""
 
-#: mail_server/mail_server/doctype/dns_record/dns_record.py:113
-#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:154
+#: mail_server/mail_server/doctype/dns_record/dns_record.py:114
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:156
 msgid "Could not verify {0}:{1} record."
 msgstr ""
 
@@ -179,28 +188,10 @@ msgstr ""
 msgid "DKIM Description"
 msgstr ""
 
-#. Name of a DocType
-#. Option for the 'Attached To DocType' (Select) field in DocType 'DNS Record'
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
-#: mail_server/mail_server/doctype/dns_record/dns_record.json
-msgid "DKIM Key"
-msgstr ""
-
-#. Label of the dkim_key_size (Select) field in DocType 'Mail Domain Registry'
-#. Label of the default_dkim_key_size (Select) field in DocType 'Mail Server
-#. Settings'
+#. Label of the section_break_jcxr (Section Break) field in DocType 'Mail
+#. Domain Registry'
 #: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
-#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
-msgid "DKIM Key Size (Bits)"
-msgstr ""
-
-#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:86
-#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:77
-msgid "DKIM Key Size must be greater than 1024."
-msgstr ""
-
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.py:125
-msgid "DKIM Key not found for the domain {0}"
+msgid "DKIM Public Key"
 msgstr ""
 
 #: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.py:133
@@ -234,12 +225,18 @@ msgstr ""
 msgid "DNS Record"
 msgstr ""
 
-#: mail_server/mail_server/doctype/dns_record/dns_record.py:46
+#: mail_server/mail_server/doctype/dns_record/dns_record.py:47
 msgid "DNS Record with the same host and type already exists."
 msgstr ""
 
 #: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.js:21
 msgid "DNS Records"
+msgstr ""
+
+#. Label of the section_break_uyww (Section Break) field in DocType 'Mail
+#. Domain Registry'
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
+msgid "DNS Verification Errors"
 msgstr ""
 
 #: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.js:22
@@ -265,26 +262,25 @@ msgstr ""
 msgid "DigitalOcean"
 msgstr ""
 
-#. Label of the domain_name (Link) field in DocType 'DKIM Key'
 #. Label of the domain_name (Link) field in DocType 'Incoming Mail Log'
 #. Label of the domain_name (Data) field in DocType 'Mail Domain Registry'
 #. Label of the domain_name (Link) field in DocType 'Outgoing Mail Log'
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
 #: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
 #: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
 #: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
 msgid "Domain Name"
 msgstr ""
 
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.py:35
-msgid "Domain Name is mandatory"
-msgstr ""
-
-#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:53
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:47
 msgid "Domain Name is mandatory."
 msgstr ""
 
-#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:56
+#: mail_server/api/domain.py:18 mail_server/api/domain.py:42
+#: mail_server/api/domain.py:59
+msgid "Domain Name is required."
+msgstr ""
+
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:50
 msgid "Domain Name should be in lowercase."
 msgstr ""
 
@@ -310,7 +306,7 @@ msgstr ""
 msgid "Domain {0} not found in Mail Domain Registry"
 msgstr ""
 
-#: mail_server/mail_server/doctype/dns_record/dns_record.py:47
+#: mail_server/mail_server/doctype/dns_record/dns_record.py:48
 msgid "Duplicate Record"
 msgstr ""
 
@@ -342,11 +338,9 @@ msgstr ""
 msgid "Enable Spam Detection"
 msgstr ""
 
-#. Label of the enabled (Check) field in DocType 'DKIM Key'
 #. Label of the enabled (Check) field in DocType 'Mail Agent'
 #. Label of the enabled (Check) field in DocType 'Mail Agent Group'
 #. Label of the enabled (Check) field in DocType 'Mail Domain Registry'
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
 #: mail_server/mail_server/doctype/mail_agent/mail_agent.json
 #: mail_server/mail_server/doctype/mail_agent_group/mail_agent_group.json
 #: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
@@ -461,6 +455,10 @@ msgstr ""
 msgid "IP Version"
 msgstr ""
 
+#: mail_server/api/blacklist.py:12
+msgid "IP address is required."
+msgstr ""
+
 #. Option for the 'IP Version' (Select) field in DocType 'IP Blacklist'
 #. Label of the ipv4 (Data) field in DocType 'Mail Agent'
 #. Label of the ipv4 (Data) field in DocType 'Mail Agent Group'
@@ -494,12 +492,6 @@ msgstr ""
 msgid "Inbound"
 msgstr ""
 
-#. Label of the inbound_token (Password) field in DocType 'Mail Domain
-#. Registry'
-#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
-msgid "Inbound Token"
-msgstr ""
-
 #. Option for the 'Scanning Mode' (Select) field in DocType 'Mail Server
 #. Settings'
 #: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.json
@@ -515,7 +507,7 @@ msgstr ""
 msgid "Invalid date format: {0}"
 msgstr ""
 
-#: mail_server/api/outbound.py:55
+#: mail_server/api/outbound.py:65
 msgid "Invalid input. A list of dictionaries with 'outgoing_mail' and 'token' is required."
 msgstr ""
 
@@ -537,15 +529,6 @@ msgstr ""
 
 #: mail_server/mail_server/doctype/dns_record/dns_record.js:26
 msgid "It seems that the DNS provider or token is not configured in the {0}. Please manually add this DNS record to your provider for the root domain to ensure proper email authentication."
-msgstr ""
-
-#. Label of the key_size (Select) field in DocType 'DKIM Key'
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
-msgid "Key Size (Bits)"
-msgstr ""
-
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.py:42
-msgid "Key Size must be greater than 1024."
 msgstr ""
 
 #. Label of the last_checked_at (Datetime) field in DocType 'DNS Record'
@@ -591,7 +574,9 @@ msgstr ""
 msgid "Mail Client Host"
 msgstr ""
 
+#. Option for the 'Attached To DocType' (Select) field in DocType 'DNS Record'
 #. Name of a DocType
+#: mail_server/mail_server/doctype/dns_record/dns_record.json
 #: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
 msgid "Mail Domain Registry"
 msgstr ""
@@ -650,19 +635,15 @@ msgstr ""
 msgid "No answer for {0}."
 msgstr ""
 
-#: mail_server/api/outbound.py:40
+#: mail_server/api/outbound.py:48
 msgid "No record found for the provided token ({0}) in the Outgoing Mail Log."
-msgstr ""
-
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.py:29
-msgid "Only Administrator can delete DKIM Key."
 msgstr ""
 
 #: mail_server/mail_server/doctype/mail_agent/mail_agent.py:32
 msgid "Only Administrator can delete Mail Agent."
 msgstr ""
 
-#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:47
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:41
 msgid "Only Administrator can delete Mail Domain Registry."
 msgstr ""
 
@@ -702,7 +683,7 @@ msgstr ""
 msgid "Please set the DNS Provider Token."
 msgstr ""
 
-#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:125
+#: mail_server/mail_server/doctype/mail_server_settings/mail_server_settings.py:131
 msgid "Please set the {0} in the Mail Server Settings."
 msgstr ""
 
@@ -723,11 +704,6 @@ msgstr ""
 #: mail_server/mail_server/doctype/mail_agent_group/mail_agent_group.json
 #: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
 msgid "Priority"
-msgstr ""
-
-#. Label of the private_key (Text) field in DocType 'DKIM Key'
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
-msgid "Private Key"
 msgstr ""
 
 #. Label of the processed_after (Float) field in DocType 'Incoming Mail Log'
@@ -754,11 +730,6 @@ msgstr ""
 #. 'Outgoing Mail Log'
 #: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.json
 msgid "Processed At - Received At"
-msgstr ""
-
-#. Label of the public_key (Text) field in DocType 'DKIM Key'
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
-msgid "Public Key"
 msgstr ""
 
 #: mail_server/mail_server/doctype/outgoing_mail_log/outgoing_mail_log.js:12
@@ -833,11 +804,9 @@ msgstr ""
 msgid "Recipients"
 msgstr ""
 
-#. Group in DKIM Key's connections
 #. Group in Mail Agent's connections
 #. Group in Mail Agent Group's connections
 #. Group in Mail Domain Registry's connections
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
 #: mail_server/mail_server/doctype/mail_agent/mail_agent.json
 #: mail_server/mail_server/doctype/mail_agent_group/mail_agent_group.json
 #: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
@@ -1017,7 +986,6 @@ msgid "Subdomain"
 msgstr ""
 
 #. Name of a role
-#: mail_server/mail_server/doctype/dkim_key/dkim_key.json
 #: mail_server/mail_server/doctype/dns_record/dns_record.json
 #: mail_server/mail_server/doctype/incoming_mail_log/incoming_mail_log.json
 #: mail_server/mail_server/doctype/ip_blacklist/ip_blacklist.json
@@ -1052,11 +1020,28 @@ msgstr ""
 msgid "Testing RabbitMQ Connection..."
 msgstr ""
 
-#: mail_server/api/outbound.py:58
+#: mail_server/api/outbound.py:63
+msgid "The data parameter is required."
+msgstr ""
+
+#: mail_server/utils/validation.py:86
+msgid "The domain {0} does not belong to user {1}."
+msgstr ""
+
+#: mail_server/api/outbound.py:67
 msgid "The maximum number of delivery statuses that can be fetched at a time is 500."
 msgstr ""
 
-#: mail_server/api/outbound.py:30
+#: mail_server/api/outbound.py:19
+msgid "The message file is required."
+msgstr ""
+
+#: mail_server/api/spamd.py:16 mail_server/api/spamd.py:33
+#: mail_server/api/spamd.py:46
+msgid "The message is required."
+msgstr ""
+
+#: mail_server/api/outbound.py:38
 msgid "The provided outgoing mail ({0}) does not match the specified token ({1}). Please verify your outgoing mail ID and token."
 msgstr ""
 
@@ -1124,11 +1109,11 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: mail_server/api/inbound.py:22
+#: mail_server/api/inbound.py:23
 msgid "User {0} does not associated with any domain."
 msgstr ""
 
-#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:78
+#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.py:72
 msgid "User {0} does not have Domain Owner role."
 msgstr ""
 
@@ -1142,12 +1127,6 @@ msgstr ""
 msgid "Value"
 msgstr ""
 
-#. Label of the verification_errors (Code) field in DocType 'Mail Domain
-#. Registry'
-#: mail_server/mail_server/doctype/mail_domain_registry/mail_domain_registry.json
-msgid "Verification Errors"
-msgstr ""
-
 #. Label of the is_verified (Check) field in DocType 'DNS Record'
 #. Label of the is_verified (Check) field in DocType 'Mail Domain Registry'
 #: mail_server/mail_server/doctype/dns_record/dns_record.json
@@ -1155,7 +1134,7 @@ msgstr ""
 msgid "Verified"
 msgstr ""
 
-#: mail_server/mail_server/doctype/dns_record/dns_record.py:107
+#: mail_server/mail_server/doctype/dns_record/dns_record.py:108
 msgid "Verified {0}:{1} record."
 msgstr ""
 
@@ -1172,7 +1151,7 @@ msgstr ""
 msgid "Virtual Host"
 msgstr ""
 
-#: mail_server/utils/validation.py:78 mail_server/utils/validation.py:85
+#: mail_server/utils/validation.py:78
 msgid "You are not authorized to perform this action."
 msgstr ""
 

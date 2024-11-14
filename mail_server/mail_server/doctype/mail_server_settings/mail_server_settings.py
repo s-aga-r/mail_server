@@ -18,7 +18,6 @@ class MailServerSettings(Document):
 		self.validate_root_domain_name()
 		self.validate_dns_provider()
 		self.validate_spf_host()
-		self.validate_default_dkim_key_size()
 		self.validate_rmq_host()
 
 	def on_update(self) -> None:
@@ -71,12 +70,6 @@ class MailServerSettings(Document):
 
 		create_or_update_spf_dns_record(self.spf_host)
 
-	def validate_default_dkim_key_size(self) -> None:
-		"""Validates the DKIM Key Size."""
-
-		if cint(self.default_dkim_key_size) < 1024:
-			frappe.throw(_("DKIM Key Size must be greater than 1024."))
-
 	def validate_rmq_host(self) -> None:
 		"""Validates the rmq_host and converts it to lowercase."""
 
@@ -128,7 +121,6 @@ def validate_mail_server_settings() -> None:
 	mandatory_fields = [
 		"root_domain_name",
 		"spf_host",
-		"default_dkim_key_size",
 		"default_ttl",
 	]
 

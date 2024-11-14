@@ -104,7 +104,7 @@ class IncomingMailLog(Document):
 
 		domain_registry = frappe.get_cached_doc("Mail Domain Registry", self.domain_name)
 		if domain_registry.mail_client_host:
-			if not domain_registry.inbound_token:
+			if not domain_registry.access_token:
 				return
 
 			host = domain_registry.mail_client_host
@@ -114,7 +114,7 @@ class IncomingMailLog(Document):
 				"message": self.message,
 				"domain_name": self.domain_name,
 				"processed_at": str(convert_to_utc(self.processed_at)),
-				"inbound_token": domain_registry.get_password("inbound_token"),
+				"access_token": domain_registry.get_password("access_token"),
 			}
 
 			try:
