@@ -80,6 +80,7 @@ class MailDomainRegistry(Document):
 			host=self.get_dkim_host(),
 			type="TXT",
 			value=f"v=DKIM1; k=rsa; p={self.dkim_public_key}",
+			ttl=300,
 			category="Sending Record",
 			attached_to_doctype=self.doctype,
 			attached_to_docname=self.name,
