@@ -105,7 +105,7 @@
    "link_fieldname": "agent"
   }
  ],
- "modified": "2024-11-09 21:26:22.741309",
+ "modified": "2024-11-16 15:39:09.432773",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Agent",
@@ -123,7 +123,7 @@
    "write": 1
   }
  ],
- "sort_field": "modified",
+ "sort_field": "creation",
  "sort_order": "DESC",
  "states": [],
  "track_changes": 1

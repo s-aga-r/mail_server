@@ -136,7 +136,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-14 18:10:07.721949",
+ "modified": "2024-11-16 15:38:59.571132",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "DNS Record",
@@ -156,7 +156,7 @@
    "write": 1
   }
  ],
- "sort_field": "modified",
+ "sort_field": "creation",
  "sort_order": "DESC",
  "states": [],
  "track_changes": 1
