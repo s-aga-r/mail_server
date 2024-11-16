@@ -93,8 +93,18 @@ class OutgoingMailLog(Document):
 		"""Enqueue spam check if spam detection is enabled."""
 
 		if is_spam_detection_enabled_for_outbound():
+			# Emails with priority 3 are considered high-priority and should be enqueued at the front.
+			# Note: Existing jobs with priority 3 in the queue may lead to concurrent processing,
+			# which is acceptable (for now) as multiple workers can handle jobs in parallel.
+			at_front = self.priority == 3
+
 			frappe.enqueue_doc(
-				self.doctype, self.name, "check_for_spam", queue="short", enqueue_after_commit=True
+				self.doctype,
+				self.name,
+				"check_for_spam",
+				queue="short",
+				enqueue_after_commit=True,
+				at_front=at_front,
 			)
 		else:
 			processed_at = now()
@@ -107,6 +117,7 @@ class OutgoingMailLog(Document):
 			)
 
 			if self.priority == 3:
+				frappe.flags.force_push_to_queue = True
 				self.push_to_queue()
 
 	def check_for_spam(self) -> None:
@@ -151,6 +162,7 @@ class OutgoingMailLog(Document):
 			)
 
 		if self.status == "Accepted" and self.priority == 3:
+			frappe.flags.force_push_to_queue = True
 			self.push_to_queue()
 
 	def update_delivery_status_in_mail_client(self) -> None:
