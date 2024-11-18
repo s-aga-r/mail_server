@@ -42,6 +42,20 @@ frappe.query_reports["Outgoing Mail Log Summary"] = {
 			options: "Mail Domain Registry",
 		},
 		{
+			fieldname: "agent",
+			label: __("Agent"),
+			fieldtype: "Link",
+			options: "Mail Agent",
+			get_query: () => {
+				return {
+					filters: {
+						enabled: 1,
+						type: "Outbound",
+					},
+				};
+			},
+		},
+		{
 			fieldname: "priority",
 			label: __("Priority"),
 			fieldtype: "Int",
