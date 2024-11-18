@@ -66,7 +66,7 @@ def get_columns() -> list[dict]:
 			"label": _("Receiving Delay"),
 			"fieldname": "receiving_delay",
 			"fieldtype": "Float",
-			"width": 120,
+			"width": 140,
 		},
 		{
 			"label": _("Transfer Delay"),
@@ -91,6 +91,13 @@ def get_columns() -> list[dict]:
 			"fieldname": "domain_name",
 			"fieldtype": "Link",
 			"options": "Mail Domain Registry",
+			"width": 150,
+		},
+		{
+			"label": _("Agent"),
+			"fieldname": "agent",
+			"fieldtype": "Link",
+			"options": "Mail Agent",
 			"width": 150,
 		},
 		{
@@ -149,6 +156,7 @@ def get_data(filters: dict | None = None) -> list[list]:
 				+ MLR.action_after
 			).as_("total_delay"),
 			OML.domain_name,
+			OML.agent,
 			OML.ip_address,
 			MLR.email.as_("recipient"),
 			OML.outgoing_mail,
@@ -172,6 +180,7 @@ def get_data(filters: dict | None = None) -> list[list]:
 		"name",
 		"outgoing_mail",
 		"domain_name",
+		"agent",
 		"priority",
 		"ip_address",
 		"message_id",
