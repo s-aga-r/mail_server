@@ -6,7 +6,7 @@ import frappe
 from frappe import _
 
 from mail_server.utils.cache import get_user_owned_domains
-from mail_server.utils.user import has_role, is_system_manager
+from mail_server.utils.user import has_role
 
 
 def is_valid_host(host: str) -> bool:
@@ -74,14 +74,14 @@ def is_domain_registry_exists(
 def validate_user_has_domain_owner_role(user: str) -> None:
 	"""Validate if the user has Domain Owner role or System Manager role."""
 
-	if not has_role(user, "Domain Owner") and not is_system_manager(user):
+	if not has_role(user, "Domain Owner"):
 		frappe.throw(_("You are not authorized to perform this action."), frappe.PermissionError)
 
 
 def validate_user_is_domain_owner(user: str, domain_name: str) -> None:
 	"""Validate if the user is the owner of the given domain."""
 
-	if domain_name not in get_user_owned_domains(user) and not is_system_manager(user):
+	if domain_name not in get_user_owned_domains(user):
 		frappe.throw(
 			_("The domain {0} does not belong to user {1}.").format(
 				frappe.bold(domain_name), frappe.bold(user)

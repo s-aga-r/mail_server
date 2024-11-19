@@ -69,11 +69,7 @@ class OutgoingMailLog(Document):
 	def validate_domain_name(self) -> None:
 		"""Validate domain name and check if it is verified."""
 
-		user = frappe.session.user
-		if is_system_manager(user):
-			return
-
-		if self.domain_name in get_user_owned_domains(user):
+		if self.domain_name in get_user_owned_domains(frappe.session.user):
 			if frappe.get_cached_value("Mail Domain Registry", self.domain_name, "is_verified"):
 				return
 

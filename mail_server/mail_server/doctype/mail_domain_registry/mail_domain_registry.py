@@ -64,10 +64,7 @@ class MailDomainRegistry(Document):
 	def validate_domain_owner(self) -> None:
 		"""Validates Domain Owner"""
 
-		if not self.domain_owner:
-			self.domain_owner = frappe.session.user
-
-		if not has_role(self.domain_owner, "Domain Owner") and not is_system_manager(self.domain_owner):
+		if self.domain_owner and not has_role(self.domain_owner, "Domain Owner"):
 			frappe.throw(
 				_("User {0} does not have Domain Owner role.").format(frappe.bold(self.domain_owner))
 			)
