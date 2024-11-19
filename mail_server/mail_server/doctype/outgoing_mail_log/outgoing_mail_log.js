@@ -7,7 +7,15 @@ frappe.ui.form.on("Outgoing Mail Log", {
 	},
 
 	add_actions(frm) {
-		if (frm.doc.status === "Accepted") {
+		if (["In Progress", "Blocked"].includes(frm.doc.status)) {
+			frm.add_custom_button(
+				__("Force Accept"),
+				() => {
+					frm.trigger("force_accept");
+				},
+				__("Actions")
+			);
+		} else if (frm.doc.status === "Accepted") {
 			frm.add_custom_button(
 				__("Push to Queue"),
 				() => {
@@ -15,7 +23,7 @@ frappe.ui.form.on("Outgoing Mail Log", {
 				},
 				__("Actions")
 			);
-		} else if (frm.doc.status === "Failed") {
+		} else if (frm.doc.status === "Failed" && frm.doc.failed_count < 3) {
 			frm.add_custom_button(
 				__("Retry"),
 				() => {
@@ -43,6 +51,20 @@ frappe.ui.form.on("Outgoing Mail Log", {
 				__("Actions")
 			);
 		}
+	},
+
+	force_accept(frm) {
+		frappe.call({
+			doc: frm.doc,
+			method: "force_accept",
+			freeze: true,
+			freeze_message: __("Force Accepting..."),
+			callback: (r) => {
+				if (!r.exc) {
+					frm.refresh();
+				}
+			},
+		});
 	},
 
 	push_to_queue(frm) {

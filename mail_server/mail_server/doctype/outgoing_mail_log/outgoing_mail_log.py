@@ -123,6 +123,12 @@ class OutgoingMailLog(Document):
 	def check_for_spam(self) -> None:
 		"""Check if the email is spam and set status accordingly."""
 
+		# Reload the doc to ensure it reflects the latest status.
+		# This handles cases where the email's status might have been manually updated (e.g., Accepted) after the job was created.
+		self.reload()
+		if self.status != "In Progress":
+			return
+
 		if is_spam_detection_enabled_for_outbound():
 			log = create_spam_check_log(self.message)
 			ms_settings = frappe.get_cached_doc("Mail Server Settings")
@@ -152,18 +158,23 @@ class OutgoingMailLog(Document):
 			if kwargs["status"] == "Blocked":
 				self.update_delivery_status_in_mail_client()
 		else:
-			processed_at = now()
-			processed_after = time_diff_in_seconds(processed_at, self.received_at)
-			self._db_set(
-				status="Accepted",
-				processed_at=processed_at,
-				processed_after=processed_after,
-				notify_update=True,
-			)
+			self.accept()
 
 		if self.status == "Accepted" and self.priority == 3:
 			frappe.flags.force_push_to_queue = True
 			self.push_to_queue()
+
+	def accept(self) -> None:
+		"""Accept the email and set status to `Accepted`."""
+
+		processed_at = now()
+		processed_after = time_diff_in_seconds(processed_at, self.received_at)
+		self._db_set(
+			status="Accepted",
+			processed_at=processed_at,
+			processed_after=processed_after,
+			notify_update=True,
+		)
 
 	def update_delivery_status_in_mail_client(self) -> None:
 		"""Update delivery status in Mail Client."""
@@ -243,6 +254,26 @@ class OutgoingMailLog(Document):
 
 		if notify_update:
 			self.notify_update()
+
+	@frappe.whitelist()
+	def force_accept(self) -> None:
+		"""Forces accept the email."""
+
+		if not is_system_manager(frappe.session.user):
+			frappe.throw(_("Only System Manager can force accept mail."))
+
+		if self.status in ["In Progress", "Blocked"]:
+			prev_status = self.status
+			self.accept()
+
+			if prev_status == "Blocked":
+				self.update_delivery_status_in_mail_client()
+
+			self.add_comment("Comment", _("Mail accepted by System Manager {0}.").format(frappe.session.user))
+
+			if self.priority == 3:
+				frappe.flags.force_push_to_queue = True
+				self.push_to_queue()
 
 	@frappe.whitelist()
 	def retry_failed(self) -> None:
