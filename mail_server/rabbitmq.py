@@ -2,7 +2,6 @@ import threading
 import time
 from collections.abc import Generator
 from contextlib import contextmanager
-from queue import Queue
 from typing import TYPE_CHECKING, Any
 
 import frappe
@@ -150,98 +149,42 @@ class RabbitMQ:
 			self._connection.close()
 
 
-class RabbitMQConnectionPool:
-	def __init__(
-		self,
-		host: str = "localhost",
-		port: int = 5672,
-		virtual_host: str = "/",
-		username: str | None = None,
-		password: str | None = None,
-		pool_size: int = 5,
-	) -> None:
-		"""Initializes the RabbitMQ connection pool."""
-
-		if not hasattr(self, "_initialized"):
-			self.__host = host
-			self.__port = port
-			self.__virtual_host = virtual_host
-			self.__username = username
-			self.__password = password
-
-			self._lock = threading.Lock()
-			self._condition = threading.Condition(self._lock)
-			self._pool_size = pool_size
-			self._pool = Queue(maxsize=pool_size)
-			self._connections = []
-			self._initialized = True
-
-	def _create_new_connection(self) -> RabbitMQ:
-		"""Creates a new RabbitMQ connection."""
-
-		connection = RabbitMQ(
-			host=self.__host,
-			port=self.__port,
-			virtual_host=self.__virtual_host,
-			username=self.__username,
-			password=self.__password,
-		)
-		self._connections.append(connection)
-		return connection
+class RabbitMQThreadLocal:
+	def __init__(self, **kwargs) -> None:
+		self._local = threading.local()
+		self._kwargs = kwargs
 
 	def get_connection(self) -> RabbitMQ:
-		"""Returns a RabbitMQ connection from the pool."""
+		"""Returns a thread-local RabbitMQ connection."""
 
-		with self._condition:
-			while self._pool.empty() and len(self._connections) >= self._pool_size:
-				if not self._condition.wait(timeout=5):
-					raise RuntimeError("No connections available in the pool.")
+		if not hasattr(self._local, "connection"):
+			self._local.connection = RabbitMQ(**self._kwargs)
+		elif not self._local.connection.connection.is_open:
+			self._local.connection._connect()
 
-			return self._pool.get() if not self._pool.empty() else self._create_new_connection()
+		return self._local.connection
 
-	def return_connection(self, connection: RabbitMQ) -> None:
-		"""Return an RabbitMQ connection to the pool."""
+	def close_connection(self) -> None:
+		"""Closes the thread-local RabbitMQ connection."""
 
-		with self._condition:
-			if connection not in self._connections:
-				connection._disconnect()
-			elif self._pool.full():
-				connection._disconnect()
-			else:
-				self._pool.put(connection)
-				self._condition.notify()
-
-	def close_connections(self) -> None:
-		"""Close all RabbitMQ connections in the pool."""
-
-		with self._condition:
-			while not self._pool.empty():
-				connection: RabbitMQ = self._pool.get()
-				connection._disconnect()
-			for connection in self._connections:
-				connection._disconnect()
-
-			self._connections.clear()
-			self._condition.notify_all()
+		if hasattr(self._local, "connection"):
+			self._local.connection._disconnect()
+			del self._local.connection
 
 
 @contextmanager
 def rabbitmq_context() -> Generator[RabbitMQ, None, None]:
-	"""Context manager to get a RabbitMQ connection from the pool."""
+	"""Context manager for RabbitMQ thread-local connections."""
 
 	ms_settings = frappe.get_cached_doc("Mail Server Settings")
-	pool = RabbitMQConnectionPool(
+	rmq_local = RabbitMQThreadLocal(
 		host=ms_settings.rmq_host,
 		port=ms_settings.rmq_port,
 		virtual_host=ms_settings.rmq_virtual_host,
 		username=ms_settings.rmq_username,
 		password=ms_settings.get_password("rmq_password") if ms_settings.rmq_password else None,
 	)
-	connection: RabbitMQ | None = None
-
 	try:
-		connection = pool.get_connection()
-		yield connection
+		yield rmq_local.get_connection()
 	finally:
-		if connection:
-			pool.return_connection(connection)
+		rmq_local.close_connection()
