@@ -1,4 +1,5 @@
 import threading
+import time
 from collections.abc import Generator
 from contextlib import contextmanager
 from queue import Queue
@@ -12,7 +13,6 @@ if TYPE_CHECKING:
 	from pika.adapters.blocking_connection import BlockingChannel
 
 
-NEWSLETTER_QUEUE: str = "mail::newsletters"
 OUTGOING_MAIL_QUEUE: str = "mail::outgoing_mails"
 INCOMING_MAIL_QUEUE: str = "mail_agent::incoming_mails"
 OUTGOING_MAIL_STATUS_QUEUE: str = "mail_agent::outgoing_mails_status"
@@ -42,21 +42,30 @@ class RabbitMQ:
 	def _connect(self) -> None:
 		"""Connects to the RabbitMQ server."""
 
-		if self.__username and self.__password:
-			credentials = pika.PlainCredentials(self.__username, self.__password)
-			parameters = pika.ConnectionParameters(
-				host=self.__host,
-				port=self.__port,
-				virtual_host=self.__virtual_host,
-				credentials=credentials,
-			)
-		else:
-			parameters = pika.ConnectionParameters(
-				host=self.__host, port=self.__port, virtual_host=self.__virtual_host
-			)
+		max_retries = 3
 
-		self._connection = pika.BlockingConnection(parameters)
-		self._channel = self._connection.channel()
+		for attempt in range(max_retries):
+			try:
+				credentials = (
+					pika.PlainCredentials(self.__username, self.__password)
+					if self.__username and self.__password
+					else None
+				)
+				parameters = pika.ConnectionParameters(
+					host=self.__host,
+					port=self.__port,
+					virtual_host=self.__virtual_host,
+					credentials=credentials,
+					heartbeat=30,
+					blocked_connection_timeout=60,
+				)
+				self._connection = pika.BlockingConnection(parameters)
+				self._channel = self._connection.channel()
+			except pika.exceptions.AMQPConnectionError:
+				if attempt < (max_retries - 1):
+					time.sleep(2**attempt)
+				else:
+					raise
 
 	@property
 	def connection(self) -> "BlockingConnection":
