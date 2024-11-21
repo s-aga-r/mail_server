@@ -151,16 +151,6 @@ class RabbitMQ:
 
 
 class RabbitMQConnectionPool:
-	_instance = None
-
-	def __new__(cls, *args, **kwargs) -> "RabbitMQConnectionPool":
-		"""Singleton pattern to ensure only one instance of the class is created."""
-
-		if not cls._instance:
-			cls._instance = super().__new__(cls)
-
-		return cls._instance
-
 	def __init__(
 		self,
 		host: str = "localhost",
@@ -172,7 +162,7 @@ class RabbitMQConnectionPool:
 	) -> None:
 		"""Initializes the RabbitMQ connection pool."""
 
-		if not hasattr(self, "_initialized"):  # Ensure __init__ is run only once
+		if not hasattr(self, "_initialized"):
 			self.__host = host
 			self.__port = port
 			self.__virtual_host = virtual_host
@@ -183,36 +173,39 @@ class RabbitMQConnectionPool:
 			self._condition = threading.Condition(self._lock)
 			self._pool_size = pool_size
 			self._pool = Queue(maxsize=pool_size)
+			self._connections = []
 			self._initialized = True
 
 	def _create_new_connection(self) -> RabbitMQ:
 		"""Creates a new RabbitMQ connection."""
 
-		return RabbitMQ(
+		connection = RabbitMQ(
 			host=self.__host,
 			port=self.__port,
 			virtual_host=self.__virtual_host,
 			username=self.__username,
 			password=self.__password,
 		)
+		self._connections.append(connection)
+		return connection
 
 	def get_connection(self) -> RabbitMQ:
 		"""Returns a RabbitMQ connection from the pool."""
 
 		with self._condition:
-			while self._pool.empty():
-				if self._pool.qsize() < self._pool_size:
-					return self._create_new_connection()
+			while self._pool.empty() and len(self._connections) >= self._pool_size:
 				if not self._condition.wait(timeout=5):
 					raise RuntimeError("No connections available in the pool.")
 
-			return self._pool.get()
+			return self._pool.get() if not self._pool.empty() else self._create_new_connection()
 
 	def return_connection(self, connection: RabbitMQ) -> None:
 		"""Return an RabbitMQ connection to the pool."""
 
 		with self._condition:
-			if self._pool.full():
+			if connection not in self._connections:
+				connection._disconnect()
+			elif self._pool.full():
 				connection._disconnect()
 			else:
 				self._pool.put(connection)
@@ -225,7 +218,10 @@ class RabbitMQConnectionPool:
 			while not self._pool.empty():
 				connection: RabbitMQ = self._pool.get()
 				connection._disconnect()
+			for connection in self._connections:
+				connection._disconnect()
 
+			self._connections.clear()
 			self._condition.notify_all()
 
 
