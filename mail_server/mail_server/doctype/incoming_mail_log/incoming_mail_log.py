@@ -10,9 +10,10 @@ from frappe.model.document import Document
 from frappe.utils import cint, now, time_diff_in_seconds, validate_email_address
 from uuid_utils import uuid7
 
+from mail_server.mail_server.doctype.dmarc_report.dmarc_report import create_dmarc_report
 from mail_server.mail_server.doctype.spam_check_log.spam_check_log import create_spam_check_log
 from mail_server.rabbitmq import INCOMING_MAIL_QUEUE, rabbitmq_context
-from mail_server.utils import convert_to_utc, parse_iso_datetime
+from mail_server.utils import convert_to_utc, get_dmarc_address, load_compressed_file, parse_iso_datetime
 from mail_server.utils.email_parser import EmailParser, extract_ip_and_host
 from mail_server.utils.validation import is_domain_registry_exists
 
@@ -97,7 +98,25 @@ class IncomingMailLog(Document):
 		self.db_update()
 
 		if self.status == "Accepted":
-			self.deliver_email_to_mail_client()
+			if self.receiver == get_dmarc_address():
+				try:
+					parser.save_attachments(self.doctype, self.name, is_private=True)
+					attachments = frappe.db.get_all(
+						"File",
+						filters={"attached_to_doctype": self.doctype, "attached_to_name": self.name},
+						pluck="name",
+					)
+					for attachment in attachments:
+						file = frappe.get_doc("File", attachment)
+						xml_content = load_compressed_file(file_data=file.get_content())
+						create_dmarc_report(xml_content, incoming_mail_log=self.name)
+				except Exception:
+					frappe.log_error(
+						title=_("DMARC Report Creation Failed"),
+						message=frappe.get_traceback(with_context=True),
+					)
+			else:
+				self.deliver_email_to_mail_client()
 
 	def deliver_email_to_mail_client(self):
 		"""Deliver email to mail client."""
@@ -120,7 +139,7 @@ class IncomingMailLog(Document):
 			try:
 				requests.post(f"{host}/api/method/mail_client.api.webhook.receive_email", json=data)
 			except Exception:
-				frappe.log_error(title="Mail Client Email Delivery Failed", message=frappe.get_traceback())
+				frappe.log_error(title=_("Mail Client Email Delivery Failed"), message=frappe.get_traceback())
 
 	def _db_set(
 		self,
@@ -173,7 +192,7 @@ def fetch_emails_from_queue() -> None:
 	except Exception:
 		total_failures += 1
 		error_log = frappe.get_traceback(with_context=False)
-		frappe.log_error(title="Fetch Emails from Queue", message=error_log)
+		frappe.log_error(title=_("Fetch Emails from Queue"), message=error_log)
 
 		if total_failures < max_failures:
 			time.sleep(2**total_failures)

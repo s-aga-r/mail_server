@@ -5,7 +5,7 @@ import pytz
 from frappe import _
 from frappe.utils import convert_utc_to_system_timezone, now
 
-from mail_server.utils import convert_to_utc
+from mail_server.utils import convert_to_utc, get_dmarc_address
 from mail_server.utils.cache import get_user_owned_domains
 from mail_server.utils.validation import validate_user_has_domain_owner_role
 
@@ -54,7 +54,12 @@ def get_incoming_mails(
 			IML.is_spam,
 			IML.message,
 		)
-		.where((IML.is_rejected == 0) & (IML.status == "Accepted") & (IML.domain_name.isin(mail_domains)))
+		.where(
+			(IML.is_rejected == 0)
+			& (IML.status == "Accepted")
+			& (IML.receiver != get_dmarc_address())
+			& (IML.domain_name.isin(mail_domains))
+		)
 		.orderby(IML.processed_at)
 		.limit(limit)
 	)

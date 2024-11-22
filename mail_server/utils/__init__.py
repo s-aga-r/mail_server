@@ -1,7 +1,10 @@
+import gzip
 import socket
+import zipfile
 from collections.abc import Callable
 from datetime import datetime
 from email.utils import parsedate_to_datetime as parsedate
+from io import BytesIO
 
 import dns.resolver
 import frappe
@@ -9,6 +12,8 @@ import pytz
 from frappe import _
 from frappe.utils import convert_utc_to_system_timezone, get_datetime, get_datetime_str, get_system_timezone
 from frappe.utils.background_jobs import get_jobs
+
+from mail_server.utils.cache import get_root_domain_name
 
 
 def get_dns_record(fqdn: str, type: str = "A", raise_exception: bool = False) -> dns.resolver.Answer | None:
@@ -126,3 +131,44 @@ def add_or_update_tzinfo(date_time: datetime | str, timezone: str | None = None)
 		date_time = date_time.astimezone(target_tz)
 
 	return str(date_time)
+
+
+def load_compressed_file(file_path: str | None = None, file_data: bytes | None = None) -> str:
+	"""Load content from a compressed file or bytes object."""
+
+	if not file_path and not file_data:
+		frappe.throw(_("Either file path or file data is required."))
+
+	if file_path:
+		if zipfile.is_zipfile(file_path):
+			with zipfile.ZipFile(file_path, "r") as zip_file:
+				file_name = zip_file.namelist()[0]
+				with zip_file.open(file_name) as file:
+					content = file.read().decode()
+					return content
+		else:
+			with gzip.open(file_path, "rt") as gz_file:
+				return gz_file.read()
+
+	elif file_data:
+		try:
+			with zipfile.ZipFile(BytesIO(file_data), "r") as zip_file:
+				file_name = zip_file.namelist()[0]
+				with zip_file.open(file_name) as file:
+					return file.read().decode()
+		except zipfile.BadZipFile:
+			pass
+
+		try:
+			with gzip.open(BytesIO(file_data), "rt") as gz_file:
+				return gz_file.read()
+		except OSError:
+			pass
+
+		frappe.throw(_("Failed to load content from the compressed file."))
+
+
+def get_dmarc_address() -> str:
+	"""Returns DMARC address."""
+
+	return f"dmarc@{get_root_domain_name()}"
