@@ -116,6 +116,7 @@
    "fieldtype": "Data",
    "label": "Report ID",
    "length": 255,
+   "read_only": 1,
    "unique": 1
   },
   {
@@ -131,7 +132,7 @@
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-22 16:58:22.429393",
+ "modified": "2024-11-22 21:17:36.836042",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "DMARC Report",
