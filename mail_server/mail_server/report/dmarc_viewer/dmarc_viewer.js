@@ -11,6 +11,10 @@ frappe.query_reports["DMARC Viewer"] = {
 			} else {
 				value = "<span style='color:red'>" + value + "</span>";
 			}
+		} else if (column.fieldname == "source_ip" && data[column.fieldname]) {
+			value = data["is_local_ip"]
+				? "<span style='color:green'>" + value + "</span>"
+				: "<span style='color:red'>" + value + "</span>";
 		}
 
 		return value;

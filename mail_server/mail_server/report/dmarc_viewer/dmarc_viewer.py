@@ -153,6 +153,7 @@ def get_data(filters: dict | None = None) -> list[list]:
 			query = query.where(DR[field] == filters.get(field))
 
 	data = query.run(as_dict=True)
+	local_ips = get_local_ips()
 
 	formated_data = []
 	for d in data:
@@ -174,6 +175,7 @@ def get_data(filters: dict | None = None) -> list[list]:
 		formated_data.append(d)
 		for record in records:
 			record["indent"] = 1
+			record["is_local_ip"] = record["source_ip"] in local_ips
 			formated_data.append(record)
 
 			auth_results = json.loads(record.auth_results)
@@ -188,3 +190,15 @@ def get_data(filters: dict | None = None) -> list[list]:
 				formated_data.append(auth_result)
 
 	return formated_data
+
+
+def get_local_ips() -> list[str]:
+	"""Returns list of local IPs (Mail Agents IPs)."""
+
+	ips = []
+	for ip in frappe.db.get_all("Mail Agent", {"type": "Outbound"}, ["ipv4", "ipv6"]):
+		for field in ["ipv4", "ipv6"]:
+			if ip.get(field):
+				ips.append(ip[field])
+
+	return ips
