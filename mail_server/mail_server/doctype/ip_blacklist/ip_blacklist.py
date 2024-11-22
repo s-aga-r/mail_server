@@ -5,6 +5,7 @@ import ipaddress
 from typing import Literal
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 
 from mail_server.utils import get_host_by_ip
@@ -97,7 +98,7 @@ def create_ip_blacklist(
 		)
 		return doc
 	except Exception:
-		frappe.log_error(title="Error creating IP Blacklist", message=frappe.get_traceback())
+		frappe.log_error(title=_("Error creating IP Blacklist"), message=frappe.get_traceback())
 
 
 def get_blacklist_for_ip_address(

@@ -112,7 +112,8 @@ class IncomingMailLog(Document):
 						create_dmarc_report(xml_content)
 				except Exception:
 					frappe.log_error(
-						title="DMARC Report Creation Failed", message=frappe.get_traceback(with_context=True)
+						title=_("DMARC Report Creation Failed"),
+						message=frappe.get_traceback(with_context=True),
 					)
 			else:
 				self.deliver_email_to_mail_client()
@@ -138,7 +139,7 @@ class IncomingMailLog(Document):
 			try:
 				requests.post(f"{host}/api/method/mail_client.api.webhook.receive_email", json=data)
 			except Exception:
-				frappe.log_error(title="Mail Client Email Delivery Failed", message=frappe.get_traceback())
+				frappe.log_error(title=_("Mail Client Email Delivery Failed"), message=frappe.get_traceback())
 
 	def _db_set(
 		self,
@@ -191,7 +192,7 @@ def fetch_emails_from_queue() -> None:
 	except Exception:
 		total_failures += 1
 		error_log = frappe.get_traceback(with_context=False)
-		frappe.log_error(title="Fetch Emails from Queue", message=error_log)
+		frappe.log_error(title=_("Fetch Emails from Queue"), message=error_log)
 
 		if total_failures < max_failures:
 			time.sleep(2**total_failures)

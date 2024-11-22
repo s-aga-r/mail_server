@@ -181,7 +181,7 @@ class OutgoingMailLog(Document):
 				requests.post(f"{host}/api/method/mail_client.api.webhook.update_delivery_status", json=data)
 			except Exception:
 				frappe.log_error(
-					title="Mail Client Delivery Status Update Failed", message=frappe.get_traceback()
+					title=_("Mail Client Delivery Status Update Failed"), message=frappe.get_traceback()
 				)
 
 	def get_delivery_status(self) -> dict:
@@ -445,7 +445,7 @@ def push_emails_to_queue() -> None:
 		except Exception:
 			total_failures += 1
 			error_log = frappe.get_traceback(with_context=False)
-			frappe.log_error(title="Push Emails to Queue", message=error_log)
+			frappe.log_error(title=_("Push Emails to Queue"), message=error_log)
 
 			(
 				frappe.qb.update(OML)
@@ -493,7 +493,7 @@ def fetch_and_update_delivery_statuses() -> None:
 				outgoing_mail_log = frappe.db.exists("Outgoing Mail Log", {"queue_id": queue_id})
 
 				if not outgoing_mail_log:
-					frappe.log_error(title="Outgoing Mail Log Not Found", message=str(data))
+					frappe.log_error(title=_("Outgoing Mail Log Not Found"), message=str(data))
 					return
 
 			doc = frappe.get_doc("Outgoing Mail Log", outgoing_mail_log, for_update=True)
@@ -514,7 +514,7 @@ def fetch_and_update_delivery_statuses() -> None:
 			doc.update_status(db_set=True)
 
 		except Exception:
-			frappe.log_error(title="Update Delivery Status - Undelivered", message=frappe.get_traceback())
+			frappe.log_error(title=_("Update Delivery Status - Undelivered"), message=frappe.get_traceback())
 
 	def delivered(data: dict) -> None:
 		try:
@@ -528,7 +528,7 @@ def fetch_and_update_delivery_statuses() -> None:
 				outgoing_mail_log = frappe.db.exists("Outgoing Mail Log", {"queue_id": queue_id})
 
 				if not outgoing_mail_log:
-					frappe.log_error(title="Outgoing Mail Log Not Found", message=str(data))
+					frappe.log_error(title=_("Outgoing Mail Log Not Found"), message=str(data))
 					return
 
 			doc = frappe.get_doc("Outgoing Mail Log", outgoing_mail_log, for_update=True)
@@ -560,7 +560,7 @@ def fetch_and_update_delivery_statuses() -> None:
 				doc.update_status(db_set=True)
 
 		except Exception:
-			frappe.log_error(title="Update Delivery Status - Delivered", message=frappe.get_traceback())
+			frappe.log_error(title=_("Update Delivery Status - Delivered"), message=frappe.get_traceback())
 
 	if not has_unsynced_mails():
 		return
@@ -591,4 +591,4 @@ def fetch_and_update_delivery_statuses() -> None:
 
 	except Exception:
 		error_log = frappe.get_traceback(with_context=False)
-		frappe.log_error(title="Fetch and Update Delivery Statuses", message=error_log)
+		frappe.log_error(title=_("Fetch and Update Delivery Statuses"), message=error_log)

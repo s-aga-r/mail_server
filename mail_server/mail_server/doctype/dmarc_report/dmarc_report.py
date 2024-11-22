@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 
 import frappe
 import xmltodict
+from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint, convert_utc_to_system_timezone, get_datetime_str
 
@@ -98,7 +99,7 @@ def create_dmarc_report(xml_content: str) -> "DMARCReport":
 		return doc
 	except frappe.UniqueValidationError:
 		frappe.log_error(
-			title="Duplicate DMARC Report",
+			title=_("Duplicate DMARC Report"),
 			message=frappe.get_traceback(with_context=True),
 		)
 		return frappe.get_doc("DMARC Report", {"report_id": doc.report_id})
