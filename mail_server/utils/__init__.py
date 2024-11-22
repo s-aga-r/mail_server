@@ -13,6 +13,8 @@ from frappe import _
 from frappe.utils import convert_utc_to_system_timezone, get_datetime, get_datetime_str, get_system_timezone
 from frappe.utils.background_jobs import get_jobs
 
+from mail_server.utils.cache import get_root_domain_name
+
 
 def get_dns_record(fqdn: str, type: str = "A", raise_exception: bool = False) -> dns.resolver.Answer | None:
 	"""Returns DNS record for the given FQDN and type."""
@@ -131,7 +133,7 @@ def add_or_update_tzinfo(date_time: datetime | str, timezone: str | None = None)
 	return str(date_time)
 
 
-def load_compressed_file(file_path: str | None = None, file_data: bytes | None = None) -> str | None:
+def load_compressed_file(file_path: str | None = None, file_data: bytes | None = None) -> str:
 	"""Load content from a compressed file or bytes object."""
 
 	if not file_path and not file_data:
@@ -164,3 +166,9 @@ def load_compressed_file(file_path: str | None = None, file_data: bytes | None =
 			pass
 
 		frappe.throw(_("Failed to load content from the compressed file."))
+
+
+def get_dmarc_address() -> str:
+	"""Returns DMARC address."""
+
+	return f"dmarc@{get_root_domain_name()}"

@@ -10,7 +10,7 @@ from mail_server.mail_server.doctype.dns_record.dns_record import create_or_upda
 from mail_server.mail_server.doctype.mail_server_settings.mail_server_settings import (
 	validate_mail_server_settings,
 )
-from mail_server.utils import verify_dns_record
+from mail_server.utils import get_dmarc_address, verify_dns_record
 from mail_server.utils.cache import delete_cache
 from mail_server.utils.user import has_role, is_system_manager
 
@@ -112,13 +112,13 @@ class MailDomainRegistry(Document):
 		)
 
 		# DMARC Record
-		dmarc_mailbox = f"dmarc@{ms_settings.root_domain_name}"
+		dmarc_address = get_dmarc_address()
 		records.append(
 			{
 				"category": "Sending Record",
 				"type": "TXT",
 				"host": f"_dmarc.{self.domain_name}",
-				"value": f"v=DMARC1; p=reject; rua=mailto:{dmarc_mailbox}; ruf=mailto:{dmarc_mailbox}; fo=1; aspf=s; adkim=s; pct=100;",
+				"value": f"v=DMARC1; p=reject; rua=mailto:{dmarc_address}; ruf=mailto:{dmarc_address}; fo=1; aspf=s; adkim=s; pct=100;",
 				"ttl": ms_settings.default_ttl,
 			}
 		)
