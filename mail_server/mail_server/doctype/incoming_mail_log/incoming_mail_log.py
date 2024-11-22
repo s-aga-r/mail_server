@@ -109,7 +109,7 @@ class IncomingMailLog(Document):
 					for attachment in attachments:
 						file = frappe.get_doc("File", attachment)
 						xml_content = load_compressed_file(file_data=file.get_content())
-						create_dmarc_report(xml_content)
+						create_dmarc_report(xml_content, incoming_mail_log=self.name)
 				except Exception:
 					frappe.log_error(
 						title=_("DMARC Report Creation Failed"),

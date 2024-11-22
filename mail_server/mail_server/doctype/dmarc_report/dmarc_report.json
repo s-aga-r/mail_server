@@ -6,6 +6,7 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_nb25",
+  "incoming_mail_log",
   "domain_name",
   "policy_published",
   "column_break_kyq2",
@@ -116,12 +117,21 @@
    "label": "Report ID",
    "length": 255,
    "unique": 1
+  },
+  {
+   "fieldname": "incoming_mail_log",
+   "fieldtype": "Link",
+   "label": "Incoming Mail Log",
+   "no_copy": 1,
+   "options": "Incoming Mail Log",
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-21 18:16:14.062611",
+ "modified": "2024-11-22 16:58:22.429393",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "DMARC Report",

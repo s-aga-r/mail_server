@@ -345,8 +345,14 @@
  ],
  "in_create": 1,
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2024-10-28 17:09:33.744060",
+ "links": [
+  {
+   "group": "Reference",
+   "link_doctype": "DMARC Report",
+   "link_fieldname": "incoming_mail_log"
+  }
+ ],
+ "modified": "2024-11-22 17:01:13.993398",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Incoming Mail Log",
