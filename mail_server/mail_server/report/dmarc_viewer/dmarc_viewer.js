@@ -89,8 +89,8 @@ frappe.query_reports["DMARC Viewer"] = {
 			options: ["", "PASS", "FAIL"],
 		},
 		{
-			fieldname: "show_only_local_ip",
-			label: __("Show Only Local IP"),
+			fieldname: "show_local_ips_only",
+			label: __("Show Local IPs Only"),
 			fieldtype: "Check",
 			default: 1,
 		},
