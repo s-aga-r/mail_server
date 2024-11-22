@@ -15,6 +15,14 @@ frappe.query_reports["DMARC Viewer"] = {
 			value = data["is_local_ip"]
 				? "<span style='color:green'>" + value + "</span>"
 				: "<span style='color:red'>" + value + "</span>";
+		} else if (column.fieldname == "header_from" && data[column.fieldname]) {
+			value = data["is_header_from_same_as_domain_name"]
+				? "<span style='color:green'>" + value + "</span>"
+				: "<span style='color:red'>" + value + "</span>";
+		} else if (column.fieldname == "domain" && data[column.fieldname]) {
+			value = data["is_domain_same_as_domain_name"]
+				? "<span style='color:green'>" + value + "</span>"
+				: "<span style='color:red'>" + value + "</span>";
 		}
 
 		return value;
@@ -25,7 +33,7 @@ frappe.query_reports["DMARC Viewer"] = {
 			fieldname: "from_date",
 			label: __("From Date"),
 			fieldtype: "Date",
-			default: frappe.datetime.add_days(frappe.datetime.get_today(), -7),
+			default: frappe.datetime.add_days(frappe.datetime.get_today(), -1),
 			reqd: 1,
 		},
 		{
@@ -56,6 +64,42 @@ frappe.query_reports["DMARC Viewer"] = {
 			fieldname: "report_id",
 			label: __("Report ID"),
 			fieldtype: "Data",
+		},
+		{
+			fieldname: "source_ip",
+			label: __("Source IP"),
+			fieldtype: "Data",
+		},
+		{
+			fieldname: "disposition",
+			label: __("Disposition"),
+			fieldtype: "Select",
+			options: ["", "none", "quarantine", "reject"],
+		},
+		{
+			fieldname: "header_from",
+			label: __("Header From"),
+			fieldtype: "Data",
+		},
+		{
+			fieldname: "spf_result",
+			label: __("SPF Result"),
+			fieldtype: "Select",
+			options: ["", "PASS", "FAIL"],
+			default: "FAIL",
+		},
+		{
+			fieldname: "dkim_result",
+			label: __("DKIM Result"),
+			fieldtype: "Select",
+			options: ["", "PASS", "FAIL"],
+			default: "FAIL",
+		},
+		{
+			fieldname: "show_only_local_ip",
+			label: __("Show Only Local IP"),
+			fieldtype: "Check",
+			default: 1,
 		},
 	],
 };

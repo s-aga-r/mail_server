@@ -152,14 +152,23 @@ def get_data(filters: dict | None = None) -> list[list]:
 		if filters.get(field):
 			query = query.where(DR[field] == filters.get(field))
 
-	data = query.run(as_dict=True)
+	dmarc_reports = query.run(as_dict=True)
 	local_ips = get_local_ips()
 
-	formated_data = []
-	for d in data:
+	data = []
+	for dmarc_report in dmarc_reports:
+		records_filters = {"parenttype": "DMARC Report", "parent": dmarc_report.name}
+
+		for field in ["source_ip", "disposition", "header_from", "spf_result", "dkim_result"]:
+			if filters.get(field):
+				records_filters[field] = filters[field]
+
+		if filters.get("show_only_local_ip"):
+			records_filters["source_ip"] = ["in", local_ips]
+
 		records = frappe.db.get_all(
 			"DMARC Report Detail",
-			filters={"parenttype": "DMARC Report", "parent": d.name},
+			filters=records_filters,
 			fields=[
 				"source_ip",
 				"count",
@@ -171,25 +180,34 @@ def get_data(filters: dict | None = None) -> list[list]:
 			],
 		)
 
-		d["indent"] = 0
-		formated_data.append(d)
+		if not records:
+			continue
+
+		dmarc_report["indent"] = 0
+		data.append(dmarc_report)
+
 		for record in records:
 			record["indent"] = 1
 			record["is_local_ip"] = record["source_ip"] in local_ips
-			formated_data.append(record)
+			record["is_header_from_same_as_domain_name"] = (
+				record["header_from"] == dmarc_report["domain_name"]
+			)
+			data.append(record)
 
 			auth_results = json.loads(record.auth_results)
 			for auth_result in auth_results:
 				auth_result["indent"] = 2
+				auth_result["selector_or_scope"] = (
+					auth_result.get("selector")
+					if auth_result["auth_type"] == "DKIM"
+					else auth_result.get("scope")
+				)
+				auth_result["is_domain_same_as_domain_name"] = (
+					auth_result["domain"] == dmarc_report["domain_name"]
+				)
+				data.append(auth_result)
 
-				if auth_result["auth_type"] == "DKIM":
-					auth_result["selector_or_scope"] = auth_result.get("selector")
-				else:
-					auth_result["selector_or_scope"] = auth_result.get("scope")
-
-				formated_data.append(auth_result)
-
-	return formated_data
+	return data
 
 
 def get_local_ips() -> list[str]:
