@@ -4,7 +4,7 @@
 
 import json
 import time
-from email.utils import parseaddr
+from email.utils import formatdate, parseaddr
 
 import frappe
 import requests
@@ -17,7 +17,7 @@ from uuid_utils import uuid7
 
 from mail_server.mail_server.doctype.spam_check_log.spam_check_log import create_spam_check_log
 from mail_server.rabbitmq import OUTGOING_MAIL_QUEUE, OUTGOING_MAIL_STATUS_QUEUE, rabbitmq_context
-from mail_server.utils import convert_to_utc, parse_iso_datetime
+from mail_server.utils import convert_to_utc, get_host_by_ip, parse_iso_datetime
 from mail_server.utils.cache import get_root_domain_name, get_user_owned_domains
 from mail_server.utils.email_parser import EmailParser
 from mail_server.utils.user import is_system_manager
@@ -52,6 +52,11 @@ class OutgoingMailLog(Document):
 		"""Validate message and extract domain name."""
 
 		parser = EmailParser(self.message)
+
+		received_header_value = f"from {get_host_by_ip(self.ip_address) or 'unknown-host'} ({self.ip_address}) by {frappe.local.site} (Frappe Mail Server) via API; {formatdate()}"
+		received_header = ("Received", received_header_value)
+		parser.message._headers.insert(0, received_header)
+
 		parser.update_header("X-FM-OML", self.name)
 		self.priority = cint(parser.get_header("X-Priority"))
 		self.created_at = parser.get_date()
