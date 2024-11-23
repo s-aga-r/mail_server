@@ -12,11 +12,11 @@
  "modified": "2024-11-22 21:21:20.263252",
  "modified_by": "Administrator",
  "module": "Mail Server",
- "name": "DMARC Viewer",
+ "name": "DMARC Report Viewer",
  "owner": "Administrator",
  "prepared_report": 0,
  "ref_doctype": "DMARC Report",
- "report_name": "DMARC Viewer",
+ "report_name": "DMARC Report Viewer",
  "report_type": "Script Report",
  "roles": [
   {
