@@ -15,7 +15,7 @@ class DMARCReport(Document):
 	pass
 
 
-def create_dmarc_report(xml_content: str, incoming_mail_log: str | None = None) -> None:
+def create_dmarc_report(xml_content: str, incoming_mail_log: str | None = None) -> "DMARCReport":
 	"""Create a DMARC Report from the given XML content."""
 
 	root = xmltodict.parse(xml_content)
@@ -97,8 +97,9 @@ def create_dmarc_report(xml_content: str, incoming_mail_log: str | None = None) 
 
 	try:
 		doc.insert(ignore_permissions=True, ignore_if_duplicate=True)
-	except frappe.UniqueValidationError:
+		return doc
+	except Exception:
 		frappe.log_error(
-			title=_("Duplicate DMARC Report"),
+			title=_("Failed to create DMARC Report"),
 			message=frappe.get_traceback(with_context=True),
 		)
