@@ -6,9 +6,13 @@ import socket
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import cint
 
-from mail_server.rabbitmq import rabbitmq_context
+from mail_server.rabbitmq import (
+	INCOMING_MAIL_QUEUE,
+	OUTGOING_MAIL_QUEUE,
+	OUTGOING_MAIL_STATUS_QUEUE,
+	rabbitmq_context,
+)
 from mail_server.utils.cache import delete_cache
 from mail_server.utils.validation import is_valid_host
 
@@ -99,6 +103,20 @@ class MailServerSettings(Document):
 				as_list = False
 
 			frappe.msgprint(messages, _("Connection Failed"), as_list=as_list, indicator="red")
+
+	@frappe.whitelist()
+	def initialize_rabbitmq(self) -> None:
+		frappe.only_for("Administrator")
+
+		try:
+			with rabbitmq_context() as rmq:
+				rmq.declare_queue(INCOMING_MAIL_QUEUE)
+				rmq.declare_queue(OUTGOING_MAIL_QUEUE, max_priority=3)
+				rmq.declare_queue(OUTGOING_MAIL_STATUS_QUEUE, max_priority=3)
+				frappe.msgprint(_("RabbitMQ Initialized"), alert=True, indicator="green")
+		except Exception:
+			frappe.log_error(title=_("RabbitMQ Initialization Failed"), message=frappe.get_traceback())
+			raise
 
 
 def create_dmarc_dns_record_for_external_domains() -> None:

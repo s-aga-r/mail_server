@@ -19,6 +19,7 @@
   "rmq_port",
   "rmq_virtual_host",
   "test_rabbitmq_connection",
+  "initialize_rabbitmq",
   "column_break_yebz",
   "rmq_username",
   "rmq_password",
@@ -252,12 +253,18 @@
    "mandatory_depends_on": "eval: doc.enable_spam_detection_for_inbound",
    "precision": "1",
    "read_only_depends_on": "eval: !doc.enable_spam_detection || !doc.enable_spam_detection_for_inbound"
+  },
+  {
+   "depends_on": "eval: !doc.__unsaved",
+   "fieldname": "initialize_rabbitmq",
+   "fieldtype": "Button",
+   "label": "Initialize RabbitMQ"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-11-16 15:38:51.452664",
+ "modified": "2024-11-26 15:31:45.109039",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Server Settings",

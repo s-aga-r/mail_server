@@ -15,6 +15,15 @@ frappe.ui.form.on("Mail Server Settings", {
 		});
 	},
 
+	initialize_rabbitmq(frm) {
+		frappe.call({
+			method: "initialize_rabbitmq",
+			doc: frm.doc,
+			freeze: true,
+			freeze_message: __("Initializing RabbitMQ..."),
+		});
+	},
+
 	add_comments(frm) {
 		if (frm.doc.root_domain_name && (!frm.doc.dns_provider || !frm.doc.dns_provider_token)) {
 			let bold_root_domain_name = `<b>${frm.doc.root_domain_name}</b>`;

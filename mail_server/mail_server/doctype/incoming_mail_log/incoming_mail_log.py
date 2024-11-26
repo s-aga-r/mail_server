@@ -174,8 +174,6 @@ def fetch_emails_from_queue() -> None:
 
 	try:
 		with rabbitmq_context() as rmq:
-			rmq.declare_queue(INCOMING_MAIL_QUEUE)
-
 			while True:
 				result = rmq.basic_get(INCOMING_MAIL_QUEUE)
 

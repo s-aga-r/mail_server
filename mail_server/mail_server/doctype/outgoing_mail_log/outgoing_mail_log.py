@@ -325,7 +325,6 @@ class OutgoingMailLog(Document):
 
 		try:
 			with rabbitmq_context() as rmq:
-				rmq.declare_queue(OUTGOING_MAIL_QUEUE, max_priority=3)
 				rmq.publish(OUTGOING_MAIL_QUEUE, json.dumps(data), priority=3)
 
 			transfer_completed_at = now()
@@ -420,8 +419,6 @@ def push_emails_to_queue() -> None:
 			frappe.db.commit()
 
 			with rabbitmq_context() as rmq:
-				rmq.declare_queue(OUTGOING_MAIL_QUEUE, max_priority=3)
-
 				for mail in mails:
 					if mail["domain_name"] == root_domain_name:
 						mail["priority"] = max(mail["priority"], 2)
@@ -572,8 +569,6 @@ def fetch_and_update_delivery_statuses() -> None:
 
 	try:
 		with rabbitmq_context() as rmq:
-			rmq.declare_queue(OUTGOING_MAIL_STATUS_QUEUE, max_priority=3)
-
 			while True:
 				result = rmq.basic_get(OUTGOING_MAIL_STATUS_QUEUE)
 
