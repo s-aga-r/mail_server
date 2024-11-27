@@ -125,3 +125,36 @@ frappe.ui.form.on("Outgoing Mail Log", {
 		});
 	},
 });
+
+frappe.ui.form.on("Mail Log Recipient", {
+	validate_email_address(frm, cdt, cdn) {
+		let recipient = locals[cdt][cdn];
+		let email = recipient.email;
+
+		if (!email) return;
+
+		frappe.call({
+			method: "mail_server.mail_server.doctype.outgoing_mail_log.outgoing_mail_log.validate_email_address",
+			args: {
+				email: email,
+			},
+			freeze: true,
+			freeze_message: __("Validating Email Address..."),
+			callback: (r) => {
+				if (!r.exc) {
+					if (r.message) {
+						frappe.show_alert({
+							message: __("Email address {0} is valid.", [email.bold()]),
+							indicator: "green",
+						});
+					} else {
+						frappe.show_alert({
+							message: __("Email address {0} is invalid.", [email.bold()]),
+							indicator: "red",
+						});
+					}
+				}
+			},
+		});
+	},
+});

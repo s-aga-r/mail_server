@@ -4,6 +4,7 @@ import socket
 
 import frappe
 from frappe import _
+from validate_email_address import validate_email
 
 from mail_server.utils.cache import get_user_owned_domains
 from mail_server.utils.user import has_role
@@ -88,3 +89,11 @@ def validate_user_is_domain_owner(user: str, domain_name: str) -> None:
 			),
 			frappe.PermissionError,
 		)
+
+
+def validate_email_address(
+	email: str, check_mx: bool = True, verify: bool = True, smtp_timeout: int = 10
+) -> bool:
+	"""Validates the email address by checking MX records and RCPT TO."""
+
+	return bool(validate_email(email=email, check_mx=check_mx, verify=verify, smtp_timeout=smtp_timeout))
