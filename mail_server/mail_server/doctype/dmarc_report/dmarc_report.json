@@ -116,7 +116,8 @@
    "fieldtype": "Data",
    "label": "Report ID",
    "length": 255,
-   "unique": 1
+   "no_copy": 1,
+   "read_only": 1
   },
   {
    "fieldname": "incoming_mail_log",
@@ -131,7 +132,7 @@
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-23 09:53:40.824417",
+ "modified": "2024-11-28 10:47:28.652910",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "DMARC Report",
