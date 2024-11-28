@@ -179,14 +179,19 @@ def get_data(filters: dict | None = None) -> list[list]:
 	for field in [
 		"name",
 		"outgoing_mail",
-		"domain_name",
-		"agent",
 		"priority",
 		"ip_address",
 		"message_id",
 	]:
 		if filters.get(field):
 			query = query.where(OML[field] == filters.get(field))
+
+	for field in [
+		"domain_name",
+		"agent",
+	]:
+		if filters.get(field):
+			query = query.where(OML[field].isin(filters.get(field)))
 
 	for field in ["status", "email"]:
 		if filters.get(field):

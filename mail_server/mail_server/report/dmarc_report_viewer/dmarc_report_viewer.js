@@ -47,8 +47,10 @@ frappe.query_reports["DMARC Report Viewer"] = {
 		{
 			fieldname: "domain_name",
 			label: __("Domain Name"),
-			fieldtype: "Link",
-			options: "Mail Domain Registry",
+			fieldtype: "MultiSelectList",
+			get_data: (txt) => {
+				return frappe.db.get_link_options("Mail Domain Registry", txt);
+			},
 		},
 		{
 			fieldname: "organization",

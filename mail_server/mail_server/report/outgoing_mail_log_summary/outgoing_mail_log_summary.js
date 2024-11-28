@@ -38,21 +38,20 @@ frappe.query_reports["Outgoing Mail Log Summary"] = {
 		{
 			fieldname: "domain_name",
 			label: __("Domain Name"),
-			fieldtype: "Link",
-			options: "Mail Domain Registry",
+			fieldtype: "MultiSelectList",
+			get_data: (txt) => {
+				return frappe.db.get_link_options("Mail Domain Registry", txt);
+			},
 		},
 		{
 			fieldname: "agent",
 			label: __("Agent"),
-			fieldtype: "Link",
-			options: "Mail Agent",
-			get_query: () => {
-				return {
-					filters: {
-						enabled: 1,
-						type: "Outbound",
-					},
-				};
+			fieldtype: "MultiSelectList",
+			get_data: (txt) => {
+				return frappe.db.get_link_options("Mail Agent", txt, {
+					enabled: 1,
+					type: "Outbound",
+				});
 			},
 		},
 		{

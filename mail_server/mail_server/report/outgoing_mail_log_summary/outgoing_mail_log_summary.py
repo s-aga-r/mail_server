@@ -53,6 +53,12 @@ def get_columns() -> list[dict]:
 			"width": 120,
 		},
 		{
+			"label": _("Spam Score"),
+			"fieldname": "spam_score",
+			"fieldtype": "Int",
+			"width": 110,
+		},
+		{
 			"label": _("Priority"),
 			"fieldname": "priority",
 			"fieldtype": "Int",
@@ -128,6 +134,7 @@ def get_data(filters: dict | None = None) -> list[list]:
 			MLR.status,
 			MLR.retries,
 			OML.message_size,
+			OML.spam_score,
 			OML.priority,
 			OML.is_newsletter,
 			MLR.response,
@@ -155,14 +162,19 @@ def get_data(filters: dict | None = None) -> list[list]:
 	for field in [
 		"name",
 		"outgoing_mail",
-		"domain_name",
-		"agent",
 		"priority",
 		"ip_address",
 		"message_id",
 	]:
 		if filters.get(field):
 			query = query.where(OML[field] == filters.get(field))
+
+	for field in [
+		"domain_name",
+		"agent",
+	]:
+		if filters.get(field):
+			query = query.where(OML[field].isin(filters.get(field)))
 
 	for field in ["status", "email"]:
 		if filters.get(field):
