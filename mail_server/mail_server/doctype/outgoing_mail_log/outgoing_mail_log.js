@@ -8,7 +8,7 @@ frappe.ui.form.on("Outgoing Mail Log", {
 
 	add_actions(frm) {
 		if (["In Progress", "Blocked"].includes(frm.doc.status)) {
-			if (frappe.user_roles.includes("System Manager")) return;
+			if (!frappe.user_roles.includes("System Manager")) return;
 
 			frm.add_custom_button(
 				__("Force Accept"),
@@ -60,7 +60,7 @@ frappe.ui.form.on("Outgoing Mail Log", {
 				);
 			}
 		} else if (frm.doc.status === "Bounced") {
-			if (frappe.user_roles.includes("System Manager")) return;
+			if (!frappe.user_roles.includes("System Manager")) return;
 
 			frm.add_custom_button(
 				__("Retry"),
