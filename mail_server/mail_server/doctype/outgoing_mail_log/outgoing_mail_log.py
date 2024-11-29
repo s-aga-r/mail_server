@@ -10,8 +10,9 @@ import frappe
 import requests
 from frappe import _
 from frappe.model.document import Document
-from frappe.query_builder.functions import GroupConcat
-from frappe.utils import cint, now, time_diff_in_seconds
+from frappe.query_builder import Interval
+from frappe.query_builder.functions import GroupConcat, Now
+from frappe.utils import add_to_date, cint, now, time_diff_in_seconds
 from frappe.utils.caching import redis_cache
 from pypika import Order
 from uuid_utils import uuid7
@@ -348,8 +349,14 @@ class OutgoingMailLog(Document):
 			)
 		except Exception:
 			error_log = frappe.get_traceback(with_context=False)
+			failed_count = self.failed_count + 1
+			retry_after_minutes = failed_count * (failed_count + 1)  # 2, 6, 12, 20, 30 ...
 			self._db_set(
-				status="Failed", error_log=error_log, failed_count=self.failed_count + 1, commit=True
+				status="Failed",
+				error_log=error_log,
+				failed_count=failed_count,
+				retry_after=add_to_date(now(), minutes=retry_after_minutes),
+				commit=True,
 			)
 
 
@@ -411,7 +418,11 @@ def push_emails_to_queue() -> None:
 				OML.domain_name,
 				GroupConcat(MLR.email).as_("recipients"),
 			)
-			.where((OML.failed_count < MAX_FAILED_COUNT) & (OML.status.isin(["Accepted", "Failed"])))
+			.where(
+				(OML.failed_count < MAX_FAILED_COUNT)
+				& (OML.retry_after <= Now())
+				& (OML.status.isin(["Accepted", "Failed"]))
+			)
 			.groupby(OML.name)
 			.orderby(OML.priority, order=Order.desc)
 			.orderby(OML.received_at)
@@ -468,14 +479,25 @@ def push_emails_to_queue() -> None:
 			total_failures += 1
 			error_log = frappe.get_traceback(with_context=False)
 			frappe.log_error(title=_("Push Emails to Queue"), message=error_log)
-
-			(
-				frappe.qb.update(OML)
-				.set(OML.status, "Failed")
-				.set(OML.error_log, error_log)
-				.set(OML.failed_count, OML.failed_count + 1)
-				.where((OML.name.isin(mail_list)) & (OML.status == "Queuing (RMQ)"))
-			).run()
+			frappe.db.sql(
+				"""
+				UPDATE `tabOutgoing Mail Log`
+				SET
+					status = %s,
+					error_log = %s,
+					failed_count = failed_count + 1,
+					retry_after = NOW() + INTERVAL (failed_count * (failed_count + 1)) MINUTE
+				WHERE
+					status = %s AND
+					name IN %s
+				""",
+				(
+					"Failed",
+					error_log,
+					"Queuing (RMQ)",
+					tuple(mail_list),
+				),
+			)
 
 			if total_failures < max_failures:
 				time.sleep(2**total_failures)
