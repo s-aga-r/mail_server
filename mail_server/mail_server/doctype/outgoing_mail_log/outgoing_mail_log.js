@@ -8,6 +8,8 @@ frappe.ui.form.on("Outgoing Mail Log", {
 
 	add_actions(frm) {
 		if (["In Progress", "Blocked"].includes(frm.doc.status)) {
+			if (frappe.user_roles.includes("System Manager")) return;
+
 			frm.add_custom_button(
 				__("Force Accept"),
 				() => {
@@ -39,10 +41,27 @@ frappe.ui.form.on("Outgoing Mail Log", {
 				},
 				__("Actions")
 			);
-		} else if (
-			frm.doc.status === "Bounced" &&
-			has_common(frappe.user_roles, ["Administrator", "System Manager"])
-		) {
+
+			if (
+				["Queued (RMQ)", "Queued (Haraka)"].includes(frm.doc.status) &&
+				frappe.user_roles.includes("System Manager")
+			) {
+				frm.add_custom_button(
+					__("Force Push to Queue"),
+					() => {
+						frappe.confirm(
+							__(
+								"Are you sure you want to force push this email to the queue? It may cause duplicate emails to be sent."
+							),
+							() => frm.trigger("force_push_to_queue")
+						);
+					},
+					__("Actions")
+				);
+			}
+		} else if (frm.doc.status === "Bounced") {
+			if (frappe.user_roles.includes("System Manager")) return;
+
 			frm.add_custom_button(
 				__("Retry"),
 				() => {
@@ -107,6 +126,20 @@ frappe.ui.form.on("Outgoing Mail Log", {
 					]),
 					indicator: "green",
 				});
+			},
+		});
+	},
+
+	force_push_to_queue(frm) {
+		frappe.call({
+			doc: frm.doc,
+			method: "force_push_to_queue",
+			freeze: true,
+			freeze_message: __("Force Pushing to Queue..."),
+			callback: (r) => {
+				if (!r.exc) {
+					frm.refresh();
+				}
 			},
 		});
 	},

@@ -21,7 +21,6 @@ from mail_server.rabbitmq import OUTGOING_MAIL_QUEUE, OUTGOING_MAIL_STATUS_QUEUE
 from mail_server.utils import convert_to_utc, get_host_by_ip, parse_iso_datetime
 from mail_server.utils.cache import get_root_domain_name, get_user_owned_domains
 from mail_server.utils.email_parser import EmailParser
-from mail_server.utils.user import is_system_manager
 
 
 class OutgoingMailLog(Document):
@@ -261,8 +260,7 @@ class OutgoingMailLog(Document):
 	def force_accept(self) -> None:
 		"""Forces accept the email."""
 
-		if not is_system_manager(frappe.session.user):
-			frappe.throw(_("Only System Manager can force accept mail."))
+		frappe.only_for("System Manager")
 
 		if self.status in ["In Progress", "Blocked"]:
 			prev_status = self.status
@@ -286,11 +284,20 @@ class OutgoingMailLog(Document):
 			self.push_to_queue()
 
 	@frappe.whitelist()
+	def force_push_to_queue(self) -> None:
+		"""Forces push the email to the queue for sending."""
+
+		frappe.only_for("System Manager")
+
+		if self.status in ["Queued (RMQ)", "Queued (Haraka)"]:
+			frappe.flags.force_push_to_queue = True
+			self.push_to_queue()
+
+	@frappe.whitelist()
 	def retry_bounced(self) -> None:
 		"""Retries bounced email."""
 
-		if not is_system_manager(frappe.session.user):
-			frappe.throw(_("Only System Manager can retry bounced mail."))
+		frappe.only_for("System Manager")
 
 		if self.status == "Bounced":
 			self._db_set(status="Accepted", error_log=None, error_message=None, commit=True)
