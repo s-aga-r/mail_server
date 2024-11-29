@@ -122,8 +122,10 @@
    "read_only": 1
   },
   {
+   "collapsible": 1,
    "fieldname": "section_break_o1qt",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Message"
   },
   {
    "fieldname": "message",
@@ -136,7 +138,7 @@
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-18 19:02:13.151207",
+ "modified": "2024-11-29 17:15:20.791208",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Spam Check Log",
