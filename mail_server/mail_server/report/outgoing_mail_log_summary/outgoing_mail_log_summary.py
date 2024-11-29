@@ -55,7 +55,8 @@ def get_columns() -> list[dict]:
 		{
 			"label": _("Spam Score"),
 			"fieldname": "spam_score",
-			"fieldtype": "Int",
+			"fieldtype": "Float",
+			"precision": 1,
 			"width": 110,
 		},
 		{
