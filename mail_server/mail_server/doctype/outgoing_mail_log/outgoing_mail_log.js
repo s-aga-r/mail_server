@@ -25,7 +25,7 @@ frappe.ui.form.on("Outgoing Mail Log", {
 				},
 				__("Actions")
 			);
-		} else if (frm.doc.status === "Failed" && frm.doc.failed_count < 3) {
+		} else if (frm.doc.status === "Failed" && frm.doc.failed_count < 5) {
 			frm.add_custom_button(
 				__("Retry"),
 				() => {

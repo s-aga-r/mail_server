@@ -22,6 +22,8 @@ from mail_server.utils import convert_to_utc, get_host_by_ip, parse_iso_datetime
 from mail_server.utils.cache import get_root_domain_name, get_user_owned_domains
 from mail_server.utils.email_parser import EmailParser
 
+MAX_FAILED_COUNT = 5
+
 
 class OutgoingMailLog(Document):
 	def autoname(self) -> None:
@@ -279,7 +281,7 @@ class OutgoingMailLog(Document):
 	def retry_failed(self) -> None:
 		"""Retries failed email."""
 
-		if self.status == "Failed" and self.failed_count < 3:
+		if self.status == "Failed" and self.failed_count < MAX_FAILED_COUNT:
 			self._db_set(status="Accepted", error_log=None, error_message=None, commit=True)
 			self.push_to_queue()
 
@@ -311,7 +313,7 @@ class OutgoingMailLog(Document):
 			self.reload()
 
 			# Ensure the document is "Accepted"
-			if not (self.status == "Accepted" and self.failed_count < 3):
+			if not (self.status == "Accepted" and self.failed_count < MAX_FAILED_COUNT):
 				return
 
 		transfer_started_at = now()
@@ -409,7 +411,7 @@ def push_emails_to_queue() -> None:
 				OML.domain_name,
 				GroupConcat(MLR.email).as_("recipients"),
 			)
-			.where((OML.failed_count < 3) & (OML.status.isin(["Accepted", "Failed"])))
+			.where((OML.failed_count < MAX_FAILED_COUNT) & (OML.status.isin(["Accepted", "Failed"])))
 			.groupby(OML.name)
 			.orderby(OML.priority, order=Order.desc)
 			.orderby(OML.received_at)
