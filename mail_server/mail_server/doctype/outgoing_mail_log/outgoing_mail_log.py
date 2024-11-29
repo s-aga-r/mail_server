@@ -420,7 +420,7 @@ def push_emails_to_queue() -> None:
 			)
 			.where(
 				(OML.failed_count < MAX_FAILED_COUNT)
-				& (OML.retry_after <= Now())
+				& ((OML.retry_after.isnull()) | (OML.retry_after <= Now()))
 				& (OML.status.isin(["Accepted", "Failed"]))
 			)
 			.groupby(OML.name)
