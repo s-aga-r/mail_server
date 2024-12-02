@@ -10,7 +10,6 @@
   "column_break_3hud",
   "dns_provider",
   "dns_provider_token",
-  "section_break_71vy",
   "defaults_section",
   "default_ttl",
   "column_break_xlun",
@@ -33,6 +32,7 @@
   "section_break_f89w",
   "enable_spam_detection_for_outbound",
   "block_outbound_spam",
+  "block_outbound_invalid_dkim",
   "column_break_rdyc",
   "outbound_spam_threshold",
   "section_break_viyu",
@@ -72,10 +72,6 @@
    "fieldtype": "Password",
    "label": "DNS Provider Token",
    "mandatory_depends_on": "eval: doc.dns_provider"
-  },
-  {
-   "fieldname": "section_break_71vy",
-   "fieldtype": "Section Break"
   },
   {
    "fieldname": "defaults_section",
@@ -172,7 +168,7 @@
    "read_only_depends_on": "eval: !doc.enable_spam_detection"
   },
   {
-   "default": "Exclude Attachments",
+   "default": "Include Attachments",
    "fieldname": "scanning_mode",
    "fieldtype": "Select",
    "label": "Scanning Mode",
@@ -214,7 +210,7 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "3.5",
+   "default": "3",
    "fieldname": "outbound_spam_threshold",
    "fieldtype": "Float",
    "label": "Threshold",
@@ -259,12 +255,19 @@
    "fieldname": "initialize_rabbitmq",
    "fieldtype": "Button",
    "label": "Initialize RabbitMQ"
+  },
+  {
+   "default": "1",
+   "fieldname": "block_outbound_invalid_dkim",
+   "fieldtype": "Check",
+   "label": "Block Invalid DKIM",
+   "read_only_depends_on": "eval: !doc.enable_spam_detection || !doc.enable_spam_detection_for_outbound"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-11-26 15:31:45.109039",
+ "modified": "2024-12-02 14:48:13.182873",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Server Settings",

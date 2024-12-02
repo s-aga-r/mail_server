@@ -141,7 +141,7 @@ class OutgoingMailLog(Document):
 				"spam_check_response": log.spamd_response,
 				"is_spam": cint(log.spam_score > ms_settings.outbound_spam_threshold),
 			}
-			if kwargs["is_spam"] and ms_settings.block_outbound_spam:
+			if ms_settings.block_outbound_spam and kwargs["is_spam"]:
 				kwargs.update(
 					{
 						"status": "Blocked",
@@ -150,7 +150,7 @@ class OutgoingMailLog(Document):
 						),
 					}
 				)
-			elif "DKIM_INVALID" in kwargs["spam_check_response"]:
+			elif ms_settings.block_outbound_invalid_dkim and "DKIM_INVALID" in kwargs["spam_check_response"]:
 				kwargs.update(
 					{
 						"status": "Blocked",
