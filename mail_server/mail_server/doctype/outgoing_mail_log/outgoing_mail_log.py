@@ -175,6 +175,7 @@ class OutgoingMailLog(Document):
 		processed_after = time_diff_in_seconds(processed_at, self.received_at)
 		self._db_set(
 			status="Accepted",
+			error_message=None,
 			processed_at=processed_at,
 			processed_after=processed_after,
 			notify_update=True,
