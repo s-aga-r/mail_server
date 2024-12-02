@@ -151,7 +151,14 @@ class OutgoingMailLog(Document):
 					}
 				)
 			elif "DKIM_INVALID" in kwargs["spam_check_response"]:
-				kwargs.update({"status": "Blocked", "error_message": _("DKIM Signature is invalid.")})
+				kwargs.update(
+					{
+						"status": "Blocked",
+						"error_message": _(
+							"DKIM signature is invalid. If you recently added the domain {0} or rotated the DKIM keys, please wait 10-15 minutes for the DKIM public key to propagate in the DNS. If the issue persists, please contact our support team for assistance."
+						).format(self.domain_name),
+					}
+				)
 			else:
 				kwargs["status"] = "Accepted"
 
