@@ -10,10 +10,8 @@ import frappe
 import requests
 from frappe import _
 from frappe.model.document import Document
-from frappe.query_builder import Interval
 from frappe.query_builder.functions import GroupConcat, Now
 from frappe.utils import add_to_date, cint, now, time_diff_in_seconds
-from frappe.utils.caching import redis_cache
 from pypika import Order
 from uuid_utils import uuid7
 
@@ -366,16 +364,6 @@ class OutgoingMailLog(Document):
 				retry_after=add_to_date(now(), minutes=retry_after_minutes),
 				commit=True,
 			)
-
-
-@frappe.whitelist()
-@redis_cache(ttl=300)
-def validate_email_address(email: str) -> bool:
-	"""Wrapper function of `utils.validation.validate_email_address` for caching."""
-
-	from mail_server.utils.validation import validate_email_address
-
-	return validate_email_address(email)
 
 
 def create_outgoing_mail_log(

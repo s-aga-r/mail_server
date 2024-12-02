@@ -167,7 +167,7 @@ frappe.ui.form.on("Mail Log Recipient", {
 		if (!email) return;
 
 		frappe.call({
-			method: "mail_server.mail_server.doctype.outgoing_mail_log.outgoing_mail_log.validate_email_address",
+			method: "mail_server.utils.validation.validate_email_address_cache",
 			args: {
 				email: email,
 			},

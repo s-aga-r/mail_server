@@ -7,6 +7,7 @@
  "field_order": [
   "section_break_3lr7",
   "email",
+  "validate_email_address",
   "column_break_u47n",
   "bounce_count",
   "section_break_mcdk",
@@ -63,11 +64,17 @@
   {
    "fieldname": "column_break_jnmn",
    "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval: doc.email",
+   "fieldname": "validate_email_address",
+   "fieldtype": "Button",
+   "label": "Validate Email"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-02 14:09:49.300508",
+ "modified": "2024-12-02 16:18:06.701479",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Bounce History",
