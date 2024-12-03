@@ -338,7 +338,7 @@ class OutgoingMailLog(Document):
 			commit=True,
 		)
 
-		recipients = [r.email for r in self.recipients]
+		recipients = [r.email for r in self.recipients if r.status != "Blocked"]
 		data = {
 			"outgoing_mail_log": self.name,
 			"recipients": recipients,
@@ -420,7 +420,8 @@ def push_emails_to_queue() -> None:
 				GroupConcat(MLR.email).as_("recipients"),
 			)
 			.where(
-				(OML.failed_count < MAX_FAILED_COUNT)
+				(MLR.status != "Blocked")
+				& (OML.failed_count < MAX_FAILED_COUNT)
 				& ((OML.retry_after.isnull()) | (OML.retry_after <= Now()))
 				& (OML.status.isin(["Accepted", "Failed"]))
 			)
