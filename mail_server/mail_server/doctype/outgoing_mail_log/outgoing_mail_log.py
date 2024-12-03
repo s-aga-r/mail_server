@@ -139,6 +139,9 @@ class OutgoingMailLog(Document):
 		for recipient in self.recipients:
 			if is_email_blocked(recipient.email):
 				recipient.status = "Blocked"
+				recipient.error_message = _(
+					"Delivery to this recipient was blocked because their email address is on our blocklist. This action was taken after repeated delivery failures to this address. To protect your sender reputation and prevent further issues, this email was not sent to the blocked recipient."
+				)
 				recipient.db_update()
 
 		self.update_status()
@@ -147,7 +150,7 @@ class OutgoingMailLog(Document):
 				{
 					"status": "Blocked",
 					"error_message": _(
-						"Delivery of this email was blocked because the recipient's email address is on our blocklist. This action was taken after multiple unsuccessful attempts to deliver emails to this address. To protect your sender reputation and prevent further delivery issues, we’ve stopped this email from being sent."
+						"Delivery of this email was blocked because all recipients are on our blocklist. Repeated delivery failures to these addresses have led to their blocking. To protect your sender reputation and avoid further issues, this email was not sent. Please review the recipient list or contact support for assistance."
 					),
 				}
 			)
@@ -223,6 +226,7 @@ class OutgoingMailLog(Document):
 					"action_at": str(convert_to_utc(rcpt.action_at)),
 					"retries": rcpt.retries,
 					"response": rcpt.response,
+					"error_message": rcpt.error_message,
 				}
 				for rcpt in self.recipients
 				if rcpt.status
@@ -299,6 +303,7 @@ class OutgoingMailLog(Document):
 			for recipient in self.recipients:
 				if recipient.status == "Blocked":
 					recipient.status = ""
+					recipient.error_message = None
 					recipient.db_update()
 
 			prev_status = self.status
