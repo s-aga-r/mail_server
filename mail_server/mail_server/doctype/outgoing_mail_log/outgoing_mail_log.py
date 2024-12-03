@@ -37,7 +37,7 @@ class OutgoingMailLog(Document):
 		self.validate_priority()
 
 	def after_insert(self) -> None:
-		self.enqueue_check_for_spam()
+		self.enqueue_process_for_delivery()
 
 	def validate_status(self) -> None:
 		"""Set status to `In Progress` if not set."""
@@ -92,40 +92,24 @@ class OutgoingMailLog(Document):
 
 		self.priority = min(max(int(self.priority), 0), 3)
 
-	def enqueue_check_for_spam(self) -> None:
-		"""Enqueue spam check if spam detection is enabled."""
+	def enqueue_process_for_delivery(self) -> None:
+		"""Enqueue the job to process the email for delivery."""
 
-		if is_spam_detection_enabled_for_outbound():
-			# Emails with priority 3 are considered high-priority and should be enqueued at the front.
-			# Note: Existing jobs with priority 3 in the queue may lead to concurrent processing,
-			# which is acceptable (for now) as multiple workers can handle jobs in parallel.
-			at_front = self.priority == 3
+		# Emails with priority 3 are considered high-priority and should be enqueued at the front.
+		# Note: Existing jobs with priority 3 in the queue may lead to concurrent processing,
+		# which is acceptable (for now) as multiple workers can handle jobs in parallel.
+		at_front = self.priority == 3
 
-			frappe.enqueue_doc(
-				self.doctype,
-				self.name,
-				"check_for_spam",
-				queue="short",
-				enqueue_after_commit=True,
-				at_front=at_front,
-			)
-		else:
-			processed_at = now()
-			processed_after = time_diff_in_seconds(processed_at, self.received_at)
-			self._db_set(
-				status="Accepted",
-				processed_at=processed_at,
-				processed_after=processed_after,
-				notify_update=True,
-			)
+		frappe.enqueue_doc(
+			self.doctype,
+			self.name,
+			"process_for_delivery",
+			queue="short",
+			enqueue_after_commit=True,
+			at_front=at_front,
+		)
 
-			if self.priority == 3:
-				frappe.flags.force_push_to_queue = True
-				self.push_to_queue()
-
-	def check_for_spam(self) -> None:
-		"""Check if the email is spam and set status accordingly."""
-
+	def process_for_delivery(self) -> None:
 		# Reload the doc to ensure it reflects the latest status.
 		# This handles cases where the email's status might have been manually updated (e.g., Accepted) after the job was created.
 		self.reload()
@@ -164,28 +148,14 @@ class OutgoingMailLog(Document):
 			kwargs["processed_at"] = now()
 			kwargs["processed_after"] = time_diff_in_seconds(kwargs["processed_at"], self.received_at)
 			self._db_set(notify_update=True, **kwargs)
-
-			if kwargs["status"] == "Blocked":
-				self.update_delivery_status_in_mail_client()
 		else:
-			self.accept()
+			self._accept()
 
-		if self.status == "Accepted" and self.priority == 3:
+		if self.status == "Blocked":
+			self.update_delivery_status_in_mail_client()
+		elif self.status == "Accepted" and self.priority == 3:
 			frappe.flags.force_push_to_queue = True
 			self.push_to_queue()
-
-	def accept(self) -> None:
-		"""Accept the email and set status to `Accepted`."""
-
-		processed_at = now()
-		processed_after = time_diff_in_seconds(processed_at, self.received_at)
-		self._db_set(
-			status="Accepted",
-			error_message=None,
-			processed_at=processed_at,
-			processed_after=processed_after,
-			notify_update=True,
-		)
 
 	def update_delivery_status_in_mail_client(self) -> None:
 		"""Update delivery status in Mail Client."""
@@ -257,6 +227,19 @@ class OutgoingMailLog(Document):
 				self._db_set(status=status)
 				self.update_delivery_status_in_mail_client()
 
+	def _accept(self) -> None:
+		"""Accept the email and set status to `Accepted`."""
+
+		processed_at = now()
+		processed_after = time_diff_in_seconds(processed_at, self.received_at)
+		self._db_set(
+			status="Accepted",
+			error_message=None,
+			processed_at=processed_at,
+			processed_after=processed_after,
+			notify_update=True,
+		)
+
 	def _db_set(
 		self,
 		update_modified: bool = True,
@@ -279,7 +262,7 @@ class OutgoingMailLog(Document):
 
 		if self.status in ["In Progress", "Blocked"]:
 			prev_status = self.status
-			self.accept()
+			self._accept()
 
 			if prev_status == "Blocked":
 				self.update_delivery_status_in_mail_client()
