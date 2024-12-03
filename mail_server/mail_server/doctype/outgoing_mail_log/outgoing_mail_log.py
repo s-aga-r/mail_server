@@ -169,12 +169,14 @@ class OutgoingMailLog(Document):
 		log = create_spam_check_log(self.message)
 		ms_settings = frappe.get_cached_doc("Mail Server Settings")
 		is_spam = log.spam_score > ms_settings.outbound_spam_threshold
+		short_error_message = None
 		kwargs = {
 			"spam_score": log.spam_score,
 			"spam_check_response": log.spamd_response,
 			"is_spam": cint(is_spam),
 		}
 		if ms_settings.block_outbound_invalid_dkim and "DKIM_INVALID" in kwargs["spam_check_response"]:
+			short_error_message = _("DKIM signature is invalid.")
 			kwargs.update(
 				{
 					"status": "Blocked",
@@ -184,6 +186,7 @@ class OutgoingMailLog(Document):
 				}
 			)
 		elif ms_settings.block_outbound_spam and is_spam:
+			short_error_message = _("Spam score exceeded the permitted threshold.")
 			kwargs.update(
 				{
 					"status": "Blocked",
@@ -192,6 +195,12 @@ class OutgoingMailLog(Document):
 					),
 				}
 			)
+
+		if kwargs["status"] == "Blocked":
+			for recipient in self.recipients:
+				recipient.status = "Blocked"
+				recipient.error_message = short_error_message
+				recipient.db_update()
 
 		return kwargs
 
