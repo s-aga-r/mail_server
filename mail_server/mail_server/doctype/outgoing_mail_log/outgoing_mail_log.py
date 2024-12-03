@@ -227,29 +227,34 @@ class OutgoingMailLog(Document):
 		"""Updates the status of the email based on the status of the recipients."""
 
 		if not status:
-			deferred_count = 0
-			sent_count = 0
+			recipient_statuses = [r.status for r in self.recipients]
+			total_statuses = len(recipient_statuses)
+			status_counts = {
+				k: recipient_statuses.count(k) for k in ["", "Blocked", "Deferred", "Bounced", "Sent"]
+			}
 
-			for r in self.recipients:
-				if r.status == "Deferred":
-					deferred_count += 1
-				elif r.status == "Sent":
-					sent_count += 1
+			if status_counts[""] == total_statuses:  # All recipients are in pending state (no status)
+				return
 
-			if deferred_count > 0:
+			if status_counts["Blocked"] == total_statuses:  # All recipients are blocked
+				status = "Blocked"
+			elif status_counts["Deferred"] > 0:  # Any recipient is deferred
 				status = "Deferred"
-			elif sent_count == len(self.recipients):
+			elif status_counts["Sent"] == total_statuses:  # All recipients are sent
 				status = "Sent"
-			elif sent_count > 0:
+			elif status_counts["Sent"] > 0:  # Any recipient is sent
 				status = "Partially Sent"
-			else:
+			elif (
+				status_counts["Bounced"] > 0
+			):  # All recipients are bounced or some are blocked and some are bounced
 				status = "Bounced"
 
-		self.status = status
+		if status:
+			self.status = status
 
-		if db_set:
-			self._db_set(status=status)
-			self.update_delivery_status_in_mail_client()
+			if db_set:
+				self._db_set(status=status)
+				self.update_delivery_status_in_mail_client()
 
 	def _db_set(
 		self,
