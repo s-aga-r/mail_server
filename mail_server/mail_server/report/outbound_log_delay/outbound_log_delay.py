@@ -193,9 +193,10 @@ def get_data(filters: dict | None = None) -> list[list]:
 		if filters.get(field):
 			query = query.where(OML[field].isin(filters.get(field)))
 
-	for field in ["status", "email"]:
-		if filters.get(field):
-			query = query.where(MLR[field] == filters.get(field))
+	if filters.get("email"):
+		query = query.where(MLR["email"] == filters.get("email"))
+	if filters.get("status"):
+		query = query.where(MLR["status"].isin(filters.get("status")))
 
 	return query.run(as_dict=True)
 

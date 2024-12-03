@@ -131,11 +131,8 @@ def get_dmarc_reports(filters: dict) -> list[dict]:
 		if filters.get(field):
 			query = query.where(DR[field] == filters.get(field))
 
-	for field in [
-		"domain_name",
-	]:
-		if filters.get(field):
-			query = query.where(DR[field].isin(filters.get(field)))
+	if filters.get("domain_name"):
+		query = query.where(DR["domain_name"].isin(filters.get("domain_name")))
 
 	return query.run(as_dict=True)
 
