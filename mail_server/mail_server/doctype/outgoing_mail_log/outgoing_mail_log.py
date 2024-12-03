@@ -15,7 +15,10 @@ from frappe.utils import add_to_date, cint, now, time_diff_in_seconds
 from pypika import Order
 from uuid_utils import uuid7
 
-from mail_server.mail_server.doctype.bounce_history.bounce_history import create_or_update_bounce_history
+from mail_server.mail_server.doctype.bounce_history.bounce_history import (
+	create_or_update_bounce_history,
+	is_email_blocked,
+)
 from mail_server.mail_server.doctype.spam_check_log.spam_check_log import create_spam_check_log
 from mail_server.rabbitmq import OUTGOING_MAIL_QUEUE, OUTGOING_MAIL_STATUS_QUEUE, rabbitmq_context
 from mail_server.utils import convert_to_utc, get_host_by_ip, parse_iso_datetime
@@ -42,8 +45,7 @@ class OutgoingMailLog(Document):
 	def validate_status(self) -> None:
 		"""Set status to `In Progress` if not set."""
 
-		if not self.status:
-			self.status = "In Progress"
+		self.status = self.status or "In Progress"
 
 	def set_ip_address(self) -> None:
 		"""Set IP Address to current request IP."""
@@ -55,10 +57,12 @@ class OutgoingMailLog(Document):
 
 		parser = EmailParser(self.message)
 
-		received_header_value = f"from {get_host_by_ip(self.ip_address) or 'unknown-host'} ({self.ip_address}) by {frappe.local.site} (Frappe Mail Server) via API; {formatdate()}"
-		received_header = ("Received", received_header_value)
+		received_header = (
+			"Received",
+			f"from {get_host_by_ip(self.ip_address) or 'unknown-host'} "
+			f"({self.ip_address}) by {frappe.local.site} (Frappe Mail Server) via API; {formatdate()}",
+		)
 		parser.message._headers.insert(0, received_header)
-
 		parser.update_header("X-FM-OML", self.name)
 		self.priority = cint(parser.get_header("X-Priority"))
 		self.created_at = parser.get_date()
@@ -90,7 +94,7 @@ class OutgoingMailLog(Document):
 	def validate_priority(self) -> None:
 		"""Validate priority and set it to a value between 0 and 3."""
 
-		self.priority = min(max(int(self.priority), 0), 3)
+		self.priority = min(max(self.priority, 0), 3)
 
 	def enqueue_process_for_delivery(self) -> None:
 		"""Enqueue the job to process the email for delivery."""
@@ -110,52 +114,83 @@ class OutgoingMailLog(Document):
 		)
 
 	def process_for_delivery(self) -> None:
+		"""Process the email for delivery."""
+
 		# Reload the doc to ensure it reflects the latest status.
 		# This handles cases where the email's status might have been manually updated (e.g., Accepted) after the job was created.
 		self.reload()
 		if self.status != "In Progress":
 			return
 
-		if is_spam_detection_enabled_for_outbound():
-			log = create_spam_check_log(self.message)
-			ms_settings = frappe.get_cached_doc("Mail Server Settings")
-			kwargs = {
-				"spam_score": log.spam_score,
-				"spam_check_response": log.spamd_response,
-				"is_spam": cint(log.spam_score > ms_settings.outbound_spam_threshold),
-			}
-			if ms_settings.block_outbound_spam and kwargs["is_spam"]:
-				kwargs.update(
-					{
-						"status": "Blocked",
-						"error_message": _(
-							"This email was blocked because it was flagged as spam by our system. The spam score exceeded the allowed threshold. Please review the content of your email and try removing any suspicious links or attachments, or contact support for further assistance."
-						),
-					}
-				)
-			elif ms_settings.block_outbound_invalid_dkim and "DKIM_INVALID" in kwargs["spam_check_response"]:
-				kwargs.update(
-					{
-						"status": "Blocked",
-						"error_message": _(
-							"DKIM signature is invalid. If you recently added the domain {0} or rotated the DKIM keys, please wait 10-15 minutes for the DKIM public key to propagate in the DNS. If the issue persists, please contact our support team for assistance."
-						).format(self.domain_name),
-					}
-				)
-			else:
-				kwargs["status"] = "Accepted"
-
-			kwargs["processed_at"] = now()
-			kwargs["processed_after"] = time_diff_in_seconds(kwargs["processed_at"], self.received_at)
-			self._db_set(notify_update=True, **kwargs)
-		else:
-			self._accept()
+		kwargs = self._prepare_delivery_args()
+		self._db_set(notify_update=True, **kwargs)
 
 		if self.status == "Blocked":
 			self.update_delivery_status_in_mail_client()
 		elif self.status == "Accepted" and self.priority == 3:
 			frappe.flags.force_push_to_queue = True
 			self.push_to_queue()
+
+	def _prepare_delivery_args(self) -> dict:
+		"""Prepare arguments for delivery processing."""
+
+		kwargs = {"status": "Accepted"}
+
+		for recipient in self.recipients:
+			if is_email_blocked(recipient.email):
+				recipient.status = "Blocked"
+				recipient.db_update()
+
+		self.update_status()
+		if self.status == "Blocked":
+			kwargs.update(
+				{
+					"status": "Blocked",
+					"error_message": _(
+						"Delivery of this email was blocked because the recipient's email address is on our blocklist. This action was taken after multiple unsuccessful attempts to deliver emails to this address. To protect your sender reputation and prevent further delivery issues, we’ve stopped this email from being sent."
+					),
+				}
+			)
+
+		if kwargs["status"] == "Accepted" and is_spam_detection_enabled_for_outbound():
+			kwargs.update(self._check_for_spam())
+
+		kwargs["processed_at"] = now()
+		kwargs["processed_after"] = time_diff_in_seconds(kwargs["processed_at"], self.received_at)
+
+		return kwargs
+
+	def _check_for_spam(self) -> dict:
+		"""Check the message for spam and update the status if necessary."""
+
+		log = create_spam_check_log(self.message)
+		ms_settings = frappe.get_cached_doc("Mail Server Settings")
+		is_spam = log.spam_score > ms_settings.outbound_spam_threshold
+		kwargs = {
+			"spam_score": log.spam_score,
+			"spam_check_response": log.spamd_response,
+			"is_spam": cint(is_spam),
+		}
+		if ms_settings.block_outbound_invalid_dkim and "DKIM_INVALID" in kwargs["spam_check_response"]:
+			kwargs.update(
+				{
+					"status": "Blocked",
+					"error_message": _(
+						"The DKIM signature for this email is invalid. If you recently added the domain {0} or updated its DKIM keys, please allow 10-15 minutes for the changes to propagate in the DNS. If the problem continues after this period, please reach out to our support team for further assistance."
+					).format(self.domain_name),
+				}
+			)
+		elif ms_settings.block_outbound_spam and is_spam:
+			kwargs.update(
+				{
+					"status": "Blocked",
+					"error_message": _(
+						"This email has been blocked because our system flagged it as spam. The spam score exceeded the permitted threshold. To resolve this, review your email content, remove any potentially suspicious links or attachments, and try sending it again. If the issue persists, please contact our support team for assistance."
+					),
+				}
+			)
+
+		return kwargs
 
 	def update_delivery_status_in_mail_client(self) -> None:
 		"""Update delivery status in Mail Client."""
@@ -313,11 +348,10 @@ class OutgoingMailLog(Document):
 				return
 
 		transfer_started_at = now()
-		transfer_started_after = time_diff_in_seconds(transfer_started_at, self.processed_at)
 		self._db_set(
 			status="Queuing (RMQ)",
 			transfer_started_at=transfer_started_at,
-			transfer_started_after=transfer_started_after,
+			transfer_started_after=time_diff_in_seconds(transfer_started_at, self.processed_at),
 			notify_update=False,
 			commit=True,
 		)

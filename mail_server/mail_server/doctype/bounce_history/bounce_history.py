@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from frappe.utils import add_days, now
+from frappe.utils import add_days, now, now_datetime
 
 
 class BounceHistory(Document):
@@ -38,3 +38,10 @@ def create_or_update_bounce_history(email: str, bounce_increment: int = 1) -> No
 		doc.bounce_count = bounce_increment
 
 	doc.save(ignore_permissions=True)
+
+
+def is_email_blocked(email: str) -> bool:
+	"""Check if a email is blocked."""
+
+	blocked_until = frappe.db.get_value("Bounce History", {"email": email}, "blocked_until")
+	return blocked_until and blocked_until > now_datetime()
