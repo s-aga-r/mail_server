@@ -296,6 +296,11 @@ class OutgoingMailLog(Document):
 		frappe.only_for("System Manager")
 
 		if self.status in ["In Progress", "Blocked"]:
+			for recipient in self.recipients:
+				if recipient.status == "Blocked":
+					recipient.status = ""
+					recipient.db_update()
+
 			prev_status = self.status
 			self._accept()
 
