@@ -196,7 +196,7 @@ class OutgoingMailLog(Document):
 				}
 			)
 
-		if kwargs["status"] == "Blocked":
+		if kwargs.get("status") == "Blocked":
 			for recipient in self.recipients:
 				recipient.status = "Blocked"
 				recipient.error_message = short_error_message
