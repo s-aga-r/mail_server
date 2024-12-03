@@ -21,7 +21,8 @@ class BounceHistory(Document):
 		"""Sets the blocked until date based on the bounce count"""
 
 		bounce_count = self.bounce_count
-		block_durations = [1, 7, 30, 36500]  # 1 day, 7 days, 30 days, 100 years
+		# ~1 hour, ~3 hours, 6 hours, 12 hours, 1 day, 7 days, 30 days, 100 years
+		block_durations = [0.04, 0.12, 0.25, 0.5, 1, 7, 30, 36500]
 		block_for_days = block_durations[min(bounce_count - 1, len(block_durations) - 1)]
 		self.blocked_until = add_days(now(), block_for_days)
 
