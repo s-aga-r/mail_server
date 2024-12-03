@@ -229,7 +229,6 @@ class OutgoingMailLog(Document):
 					"error_message": rcpt.error_message,
 				}
 				for rcpt in self.recipients
-				if rcpt.status
 			],
 		}
 
