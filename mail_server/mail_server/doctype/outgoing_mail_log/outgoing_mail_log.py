@@ -15,6 +15,7 @@ from frappe.utils import add_to_date, cint, now, time_diff_in_seconds
 from pypika import Order
 from uuid_utils import uuid7
 
+from mail_server.mail_server.doctype.bounce_history.bounce_history import create_or_update_bounce_history
 from mail_server.mail_server.doctype.spam_check_log.spam_check_log import create_spam_check_log
 from mail_server.rabbitmq import OUTGOING_MAIL_QUEUE, OUTGOING_MAIL_STATUS_QUEUE, rabbitmq_context
 from mail_server.utils import convert_to_utc, get_host_by_ip, parse_iso_datetime
@@ -556,6 +557,9 @@ def fetch_and_update_delivery_statuses() -> None:
 					)
 					recipient.response = json.dumps(recipients[recipient.email], indent=4)
 					recipient.db_update()
+
+					if status == "Bounced":
+						create_or_update_bounce_history(recipient.email, bounce_increment=1)
 
 			doc.update_status(db_set=True)
 
