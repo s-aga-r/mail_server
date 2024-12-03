@@ -29,9 +29,8 @@ class BounceHistory(Document):
 def create_or_update_bounce_history(email: str, bounce_increment: int = 1) -> None:
 	"""Create or update the bounce history for the given email"""
 
-	doc = frappe.get_doc("Bounce History", {"email": email})
-
-	if doc:
+	if bounce_history := frappe.db.exists("Bounce History", {"email": email}):
+		doc = frappe.get_doc("Bounce History", bounce_history)
 		doc.bounce_count += bounce_increment
 	else:
 		doc = frappe.new_doc("Bounce History")
