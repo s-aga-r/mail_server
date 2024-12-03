@@ -357,6 +357,10 @@ class OutgoingMailLog(Document):
 		)
 
 		recipients = [r.email for r in self.recipients if r.status != "Blocked"]
+
+		if not recipients:
+			frappe.throw(_("All recipients are blocked."))
+
 		data = {
 			"outgoing_mail_log": self.name,
 			"recipients": recipients,
@@ -473,6 +477,9 @@ def push_emails_to_queue() -> None:
 				for mail in mails:
 					if mail["domain_name"] == root_domain_name:
 						mail["priority"] = max(mail["priority"], 2)
+
+					if not mail["recipients"]:
+						continue
 
 					data = {
 						"outgoing_mail_log": mail["name"],

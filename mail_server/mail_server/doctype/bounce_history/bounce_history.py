@@ -43,5 +43,5 @@ def create_or_update_bounce_history(email: str, bounce_increment: int = 1) -> No
 def is_email_blocked(email: str) -> bool:
 	"""Check if a email is blocked."""
 
-	blocked_until = frappe.db.get_value("Bounce History", {"email": email}, "blocked_until")
+	blocked_until = frappe.get_cached_value("Bounce History", {"email": email}, "blocked_until")
 	return blocked_until and blocked_until > now_datetime()
