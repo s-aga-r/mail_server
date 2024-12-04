@@ -71,6 +71,7 @@ class DNSRecord(Document):
 				host=self.host,
 				value=self.value,
 				ttl=self.ttl,
+				priority=self.priority,
 			)
 
 		self._db_set(is_verified=cint(result), last_checked_at=now(), notify_update=True)
@@ -87,9 +88,7 @@ class DNSRecord(Document):
 			provider=ms_settings.dns_provider,
 			token=ms_settings.get_password("dns_provider_token"),
 		)
-		dns_provider.delete_dns_record_if_exists(
-			domain=ms_settings.root_domain_name, type=self.type, host=self.host
-		)
+		dns_provider.delete_dns_record(domain=ms_settings.root_domain_name, type=self.type, host=self.host)
 
 	def get_fqdn(self) -> str:
 		"""Returns the Fully Qualified Domain Name"""
