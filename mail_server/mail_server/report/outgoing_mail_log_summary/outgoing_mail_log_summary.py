@@ -104,6 +104,12 @@ def get_columns() -> list[dict]:
 			"width": 200,
 		},
 		{
+			"label": _("Subject"),
+			"fieldname": "subject",
+			"fieldtype": "Data",
+			"width": 500,
+		},
+		{
 			"label": _("Outgoing Mail"),
 			"fieldname": "outgoing_mail",
 			"fieldtype": "Data",
@@ -144,6 +150,7 @@ def get_data(filters: dict | None = None) -> list[list]:
 			OML.agent,
 			OML.ip_address,
 			MLR.email.as_("recipient"),
+			OML.subject,
 			OML.outgoing_mail,
 			OML.message_id,
 		)
@@ -157,9 +164,6 @@ def get_data(filters: dict | None = None) -> list[list]:
 			(Date(OML.received_at) >= Date(filters.get("from_date")))
 			& (Date(OML.received_at) <= Date(filters.get("to_date")))
 		)
-
-	if not filters.get("include_newsletter"):
-		query = query.where(OML.is_newsletter == 0)
 
 	for field in [
 		"name",
@@ -177,6 +181,11 @@ def get_data(filters: dict | None = None) -> list[list]:
 	]:
 		if filters.get(field):
 			query = query.where(OML[field].isin(filters.get(field)))
+
+	if not filters.get("include_newsletter"):
+		query = query.where(OML.is_newsletter == 0)
+	if filters.get("subject"):
+		query = query.where(OML.subject.like(f"%{filters.get('subject')}%"))
 
 	if filters.get("email"):
 		query = query.where(MLR["email"] == filters.get("email"))

@@ -9,6 +9,7 @@
   "priority",
   "column_break_bvbh",
   "outgoing_mail",
+  "subject",
   "section_break_tjoe",
   "recipients",
   "section_break_heps",
@@ -343,12 +344,20 @@
    "no_copy": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "subject",
+   "fieldtype": "Small Text",
+   "in_standard_filter": 1,
+   "label": "Subject",
+   "no_copy": 1,
+   "read_only": 1
   }
  ],
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-29 18:57:21.437297",
+ "modified": "2024-12-05 09:56:53.109614",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Outgoing Mail Log",
@@ -370,5 +379,6 @@
  ],
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "subject"
 }

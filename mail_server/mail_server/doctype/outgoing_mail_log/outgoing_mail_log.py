@@ -64,6 +64,7 @@ class OutgoingMailLog(Document):
 		)
 		parser.message._headers.insert(0, received_header)
 		parser.update_header("X-FM-OML", self.name)
+		self.subject = parser.get_subject()
 		self.priority = cint(parser.get_header("X-Priority"))
 		self.created_at = parser.get_date()
 		self.message_id = parser.get_message_id()
