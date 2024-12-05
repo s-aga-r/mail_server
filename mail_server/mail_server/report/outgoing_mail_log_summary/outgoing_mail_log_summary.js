@@ -84,4 +84,30 @@ frappe.query_reports["Outgoing Mail Log Summary"] = {
 			default: 0,
 		},
 	],
+
+	get_datatable_options(options) {
+		return Object.assign(options, {
+			checkboxColumn: true,
+		});
+	},
+
+	onload(report) {
+		if (!frappe.user_roles.includes("System Manager")) return;
+
+		report.page.add_inner_button(__("Retry"), () => {
+			let indexes = frappe.query_report.datatable.rowmanager.getCheckedRows();
+			let selected_rows = indexes.map((i) => frappe.query_report.data[i]);
+
+			if (!selected_rows.length) {
+				frappe.throw(__("No rows selected. Please select at least one row to retry."));
+			}
+
+			frappe.call({
+				method: "mail_server.mail_server.report.outgoing_mail_log_summary.outgoing_mail_log_summary.retry",
+				args: {
+					rows: selected_rows,
+				},
+			});
+		});
+	},
 };

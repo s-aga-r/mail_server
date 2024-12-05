@@ -8,6 +8,7 @@ import frappe
 from frappe import _
 from frappe.query_builder import Order
 from frappe.query_builder.functions import Date, IfNull
+from frappe.utils import parse_json
 
 
 def execute(filters: dict | None = None) -> tuple:
@@ -311,3 +312,40 @@ def get_summary(data: list) -> list[dict]:
 			"indicator": "grey",
 		},
 	]
+
+
+@frappe.whitelist()
+def retry(rows: str | list) -> None:
+	"""Retry the specified outgoing mail logs."""
+
+	frappe.only_for("System Manager")
+
+	if isinstance(rows, str):
+		rows = parse_json(rows)
+
+	retried_mails = []
+	valid_statuses = ["Blocked", "Bounced"]
+
+	for row in rows:
+		row = frappe._dict(row)
+
+		if row.name in retried_mails or row.status not in valid_statuses:
+			continue
+
+		doc = frappe.get_doc("Outgoing Mail Log", row.name)
+
+		if doc.status == "Blocked":
+			doc.force_accept()
+		elif doc.status == "Bounced":
+			doc.retry_bounced()
+
+		retried_mails.append(row.name)
+
+	if retried_mails:
+		frappe.msgprint(_("Retried {0} outgoing mail(s).").format(len(retried_mails)))
+	else:
+		frappe.msgprint(
+			_(
+				"No outgoing mails were retried. Please ensure the selected mails are eligible for retry (Blocked or Bounced)."
+			)
+		)
