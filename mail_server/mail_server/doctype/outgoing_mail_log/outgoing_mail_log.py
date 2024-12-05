@@ -375,7 +375,7 @@ class OutgoingMailLog(Document):
 			commit=True,
 		)
 
-		recipients = [r.email for r in self.recipients if r.status != "Blocked"]
+		recipients = [r.email for r in self.recipients if r.status not in ["Blocked", "Sent"]]
 
 		if not recipients:
 			frappe.throw(_("All recipients are blocked."))
@@ -461,7 +461,7 @@ def push_emails_to_queue() -> None:
 				GroupConcat(MLR.email).as_("recipients"),
 			)
 			.where(
-				(MLR.status != "Blocked")
+				(MLR.status.notin(["Blocked", "Sent"]))
 				& (OML.failed_count < MAX_FAILED_COUNT)
 				& ((OML.retry_after.isnull()) | (OML.retry_after <= Now()))
 				& (OML.status.isin(["Accepted", "Failed"]))
