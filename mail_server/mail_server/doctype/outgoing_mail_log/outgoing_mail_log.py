@@ -33,11 +33,14 @@ class OutgoingMailLog(Document):
 		self.name = str(uuid7())
 
 	def validate(self) -> None:
-		self.validate_status()
-		self.set_ip_address()
-		self.validate_message()
-		self.validate_domain_name()
-		self.validate_priority()
+		if self.is_new():
+			self.validate_status()
+			self.set_ip_address()
+			self.validate_message()
+			self.validate_domain_name()
+			self.validate_priority()
+			self.validate_include_agents()
+			self.validate_exclude_agents()
 
 	def after_insert(self) -> None:
 		self.enqueue_process_for_delivery()
@@ -96,6 +99,20 @@ class OutgoingMailLog(Document):
 		"""Validate priority and set it to a value between 0 and 3."""
 
 		self.priority = min(max(self.priority, 0), 3)
+
+	def validate_include_agents(self) -> None:
+		"""Validate include agents and set it to the value from the domain registry."""
+
+		self.include_agents = self.include_agents or frappe.get_cached_value(
+			"Mail Domain Registry", self.domain_name, "include_agents"
+		)
+
+	def validate_exclude_agents(self) -> None:
+		"""Validate exclude agents and set it to the value from the domain registry."""
+
+		self.exclude_agents = self.exclude_agents or frappe.get_cached_value(
+			"Mail Domain Registry", self.domain_name, "exclude_agents"
+		)
 
 	def enqueue_process_for_delivery(self) -> None:
 		"""Enqueue the job to process the email for delivery."""
