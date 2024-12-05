@@ -397,6 +397,12 @@ class OutgoingMailLog(Document):
 		if not recipients:
 			frappe.throw(_("All recipients are blocked."))
 
+		headers = {}
+		if self.include_agents:
+			headers["include_agents"] = self.include_agents.split("\n")
+		if self.exclude_agents:
+			headers["exclude_agents"] = self.exclude_agents.split("\n")
+
 		data = {
 			"outgoing_mail_log": self.name,
 			"recipients": recipients,
@@ -405,7 +411,7 @@ class OutgoingMailLog(Document):
 
 		try:
 			with rabbitmq_context() as rmq:
-				rmq.publish(OUTGOING_MAIL_QUEUE, json.dumps(data), priority=3)
+				rmq.publish(OUTGOING_MAIL_QUEUE, json.dumps(data), priority=3, headers=headers)
 
 			transfer_completed_at = now()
 			transfer_completed_after = time_diff_in_seconds(transfer_completed_at, transfer_started_at)
@@ -475,6 +481,8 @@ def push_emails_to_queue() -> None:
 				OML.message,
 				OML.priority,
 				OML.domain_name,
+				OML.include_agents,
+				OML.exclude_agents,
 				GroupConcat(MLR.email).as_("recipients"),
 			)
 			.where(
@@ -517,12 +525,21 @@ def push_emails_to_queue() -> None:
 					if not mail["recipients"]:
 						continue
 
+					headers = {}
+					if mail["include_agents"]:
+						headers["include_agents"] = mail["include_agents"].split("\n")
+					if mail["exclude_agents"]:
+						headers["exclude_agents"] = mail["exclude_agents"].split("\n")
+
 					data = {
 						"outgoing_mail_log": mail["name"],
 						"recipients": mail["recipients"].split(","),
 						"message": mail["message"],
 					}
-					rmq.publish(OUTGOING_MAIL_QUEUE, json.dumps(data), priority=mail["priority"])
+
+					rmq.publish(
+						OUTGOING_MAIL_QUEUE, json.dumps(data), priority=mail["priority"], headers=headers
+					)
 
 			frappe.db.sql(
 				"""
