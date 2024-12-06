@@ -68,9 +68,6 @@ def get_data(filters: dict | None = None) -> list[list]:
 		for record in records:
 			record["indent"] = 1
 			record["is_local_ip"] = record["source_ip"] in local_ips
-			record["is_header_from_same_as_domain_name"] = (
-				record["header_from"] == dmarc_report["domain_name"]
-			)
 			data.append(record)
 
 			auth_results = json.loads(record.auth_results)
@@ -80,9 +77,6 @@ def get_data(filters: dict | None = None) -> list[list]:
 					auth_result.get("selector")
 					if auth_result["auth_type"] == "DKIM"
 					else auth_result.get("scope")
-				)
-				auth_result["is_domain_same_as_domain_name"] = (
-					auth_result["domain"] == dmarc_report["domain_name"]
 				)
 				data.append(auth_result)
 

@@ -5,19 +5,15 @@ frappe.query_reports["DMARC Report Viewer"] = {
 	formatter(value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
 
-		const highlight_value = (condition) =>
-			condition
-				? `<span style='color:green'>${value}</span>`
-				: `<span style='color:red'>${value}</span>`;
-
 		if (["spf_result", "dkim_result", "result"].includes(column.fieldname)) {
-			value = highlight_value(data[column.fieldname] === "PASS");
+			value =
+				data[column.fieldname] === "PASS"
+					? `<span style='color:green'>${value}</span>`
+					: `<span style='color:red'>${value}</span>`;
 		} else if (column.fieldname === "source_ip" && data[column.fieldname]) {
-			value = highlight_value(data["is_local_ip"]);
-		} else if (column.fieldname === "header_from" && data[column.fieldname]) {
-			value = highlight_value(data["is_header_from_same_as_domain_name"]);
-		} else if (column.fieldname === "domain" && data[column.fieldname]) {
-			value = highlight_value(data["is_domain_same_as_domain_name"]);
+			value = data["is_local_ip"]
+				? `<span style='color:green'>${value}</span>`
+				: `<span style='color:black'>${value}</span>`;
 		}
 
 		return value;
