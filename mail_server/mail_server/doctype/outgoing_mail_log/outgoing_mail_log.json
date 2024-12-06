@@ -42,6 +42,10 @@
   "failed_count",
   "retry_after",
   "section_break_rwda",
+  "include_agents",
+  "column_break_ekup",
+  "exclude_agents",
+  "section_break_dutw",
   "spam_check_response",
   "message"
  ],
@@ -352,12 +356,32 @@
    "label": "Subject",
    "no_copy": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "include_agents",
+   "fieldtype": "Small Text",
+   "label": "Include Agents",
+   "no_copy": 1
+  },
+  {
+   "fieldname": "column_break_ekup",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "exclude_agents",
+   "fieldtype": "Small Text",
+   "label": "Exclude Agents",
+   "no_copy": 1
+  },
+  {
+   "fieldname": "section_break_dutw",
+   "fieldtype": "Section Break"
   }
  ],
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-05 09:56:53.109614",
+ "modified": "2024-12-05 18:46:47.419107",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Outgoing Mail Log",

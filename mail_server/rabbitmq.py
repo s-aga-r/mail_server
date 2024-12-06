@@ -90,12 +90,14 @@ class RabbitMQ:
 		exchange: str = "",
 		priority: int = 0,
 		persistent: bool = True,
+		headers: dict | None = None,
 	) -> None:
 		"""Publishes a message to the exchange with the given routing key."""
 
 		properties = pika.BasicProperties(
 			delivery_mode=pika.DeliveryMode.Persistent if persistent else None,
 			priority=priority if priority > 0 else None,
+			headers=headers if headers else {},
 		)
 		self.channel.basic_publish(
 			exchange=exchange,

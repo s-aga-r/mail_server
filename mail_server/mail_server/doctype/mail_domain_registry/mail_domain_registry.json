@@ -15,6 +15,10 @@
   "access_token",
   "domain_owner",
   "mail_client_host",
+  "section_break_imq5",
+  "include_agents",
+  "column_break_rojg",
+  "exclude_agents",
   "section_break_jcxr",
   "dkim_public_key",
   "section_break_uyww",
@@ -119,6 +123,26 @@
    "fieldtype": "Code",
    "no_copy": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_imq5",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "include_agents",
+   "fieldtype": "Small Text",
+   "label": "Include Agents",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "exclude_agents",
+   "fieldtype": "Small Text",
+   "label": "Exclude Agents",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "column_break_rojg",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -139,7 +163,7 @@
    "link_fieldname": "domain_name"
   }
  ],
- "modified": "2024-11-14 19:27:31.302028",
+ "modified": "2024-12-05 18:36:34.935971",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Domain Registry",
