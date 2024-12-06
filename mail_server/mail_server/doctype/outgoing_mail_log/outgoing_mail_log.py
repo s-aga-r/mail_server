@@ -604,7 +604,7 @@ def fetch_and_update_delivery_statuses() -> None:
 			{"status": "Queued (Haraka)", "agent": agent, "queue_id": data["queue_id"]},
 		)
 
-	def undelivered(data: dict) -> None:
+	def undelivered(agent: str, data: dict) -> None:
 		try:
 			outgoing_mail_log = data.get("outgoing_mail_log")
 			queue_id = data["queue_id"]
@@ -617,7 +617,9 @@ def fetch_and_update_delivery_statuses() -> None:
 				outgoing_mail_log = frappe.db.exists("Outgoing Mail Log", {"queue_id": queue_id})
 
 				if not outgoing_mail_log:
-					frappe.log_error(title=_("Outgoing Mail Log Not Found"), message=str(data))
+					frappe.log_error(
+						title=_("Outgoing Mail Log Not Found - {0}").format(agent), message=str(data)
+					)
 					return
 
 			doc = frappe.get_doc("Outgoing Mail Log", outgoing_mail_log, for_update=True)
@@ -643,7 +645,7 @@ def fetch_and_update_delivery_statuses() -> None:
 		except Exception:
 			frappe.log_error(title=_("Update Delivery Status - Undelivered"), message=frappe.get_traceback())
 
-	def delivered(data: dict) -> None:
+	def delivered(agent: str, data: dict) -> None:
 		try:
 			outgoing_mail_log = data.get("outgoing_mail_log")
 			queue_id = data["queue_id"]
@@ -655,7 +657,9 @@ def fetch_and_update_delivery_statuses() -> None:
 				outgoing_mail_log = frappe.db.exists("Outgoing Mail Log", {"queue_id": queue_id})
 
 				if not outgoing_mail_log:
-					frappe.log_error(title=_("Outgoing Mail Log Not Found"), message=str(data))
+					frappe.log_error(
+						title=_("Outgoing Mail Log Not Found - {0}").format(agent), message=str(data)
+					)
 					return
 
 			doc = frappe.get_doc("Outgoing Mail Log", outgoing_mail_log, for_update=True)
@@ -702,15 +706,16 @@ def fetch_and_update_delivery_statuses() -> None:
 
 				method, properties, body = result
 				if body:
+					app_id = properties.app_id
 					data = json.loads(body)
 					hook = data["hook"]
 
 					if hook == "queue_ok":
-						queue_ok(properties.app_id, data)
+						queue_ok(app_id, data)
 					elif hook in ["bounce", "deferred"]:
-						undelivered(data)
+						undelivered(app_id, data)
 					elif hook == "delivered":
-						delivered(data)
+						delivered(app_id, data)
 
 				rmq.channel.basic_ack(delivery_tag=method.delivery_tag)
 
