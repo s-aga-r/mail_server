@@ -40,6 +40,7 @@ def get_columns() -> list[dict]:
 		{"label": _("Count"), "fieldname": "count", "fieldtype": "Int", "width": 70},
 		{"label": _("Disposition"), "fieldname": "disposition", "fieldtype": "Data", "width": 150},
 		{"label": _("Header From"), "fieldname": "header_from", "fieldtype": "Data", "width": 150},
+		{"label": _("Envelope From"), "fieldname": "envelope_from", "fieldtype": "Data", "width": 150},
 		{"label": _("SPF Result"), "fieldname": "spf_result", "fieldtype": "Data", "width": 150},
 		{"label": _("DKIM Result"), "fieldname": "dkim_result", "fieldtype": "Data", "width": 150},
 		{"label": _("Auth Type"), "fieldname": "auth_type", "fieldtype": "Data", "width": 150},
@@ -142,7 +143,7 @@ def get_dmarc_report_records(filters: dict, dmarc_report: str, local_ips: list) 
 
 	records_filters = {"parenttype": "DMARC Report", "parent": dmarc_report}
 
-	for field in ["source_ip", "disposition", "header_from", "spf_result", "dkim_result"]:
+	for field in ["source_ip", "disposition", "header_from", "envelope_from", "spf_result", "dkim_result"]:
 		if filters.get(field):
 			records_filters[field] = filters[field]
 
@@ -157,6 +158,7 @@ def get_dmarc_report_records(filters: dict, dmarc_report: str, local_ips: list) 
 			"count",
 			"disposition",
 			"header_from",
+			"envelope_from",
 			"spf_result",
 			"dkim_result",
 			"auth_results",

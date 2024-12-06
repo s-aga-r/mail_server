@@ -79,6 +79,11 @@ frappe.query_reports["DMARC Report Viewer"] = {
 			fieldtype: "Data",
 		},
 		{
+			fieldname: "envelope_from",
+			label: __("Envelope From"),
+			fieldtype: "Data",
+		},
+		{
 			fieldname: "spf_result",
 			label: __("SPF Result"),
 			fieldtype: "Select",
