@@ -66,9 +66,10 @@ def create_dmarc_report(xml_content: str, incoming_mail_log: str | None = None) 
 		source_ip = row["source_ip"]
 		count = row["count"]
 		disposition = policy_evaluated["disposition"]
-		dkim_result = policy_evaluated["dkim"].upper()
-		spf_result = policy_evaluated["spf"].upper()
 		header_from = identifiers["header_from"]
+		envelope_from = identifiers.get("envelope_from", "")  # Optional
+		spf_result = policy_evaluated["spf"].upper()
+		dkim_result = policy_evaluated["dkim"].upper()
 
 		results = []
 		for auth_type, auth_result in auth_results.items():
@@ -86,9 +87,10 @@ def create_dmarc_report(xml_content: str, incoming_mail_log: str | None = None) 
 				"source_ip": source_ip,
 				"count": cint(count),
 				"disposition": disposition,
-				"dkim_result": dkim_result,
-				"spf_result": spf_result,
 				"header_from": header_from,
+				"envelope_from": envelope_from,
+				"spf_result": spf_result,
+				"dkim_result": dkim_result,
 				"auth_results": json.dumps(results, indent=4),
 			},
 		)
