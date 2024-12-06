@@ -10,8 +10,8 @@ import frappe
 import requests
 from frappe import _
 from frappe.model.document import Document
-from frappe.query_builder.functions import GroupConcat, Now
-from frappe.utils import add_to_date, cint, now, time_diff_in_seconds
+from frappe.query_builder.functions import GroupConcat
+from frappe.utils import add_to_date, cint, now, now_datetime, time_diff_in_seconds
 from pypika import Order
 from uuid_utils import uuid7
 
@@ -488,7 +488,7 @@ def push_emails_to_queue() -> None:
 			.where(
 				(MLR.status.notin(["Blocked", "Sent"]))
 				& (OML.failed_count < MAX_FAILED_COUNT)
-				& ((OML.retry_after.isnull()) | (OML.retry_after <= Now()))
+				& ((OML.retry_after.isnull()) | (OML.retry_after <= now_datetime()))
 				& (OML.status.isin(["Accepted", "Failed"]))
 			)
 			.groupby(OML.name)
