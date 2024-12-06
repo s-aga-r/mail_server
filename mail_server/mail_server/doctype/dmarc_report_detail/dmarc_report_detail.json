@@ -13,6 +13,7 @@
   "section_break_bqnt",
   "disposition",
   "header_from",
+  "envelope_from",
   "column_break_q04b",
   "spf_result",
   "dkim_result",
@@ -81,12 +82,18 @@
   {
    "fieldname": "section_break_0qf4",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "envelope_from",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Envelope From"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-11-22 15:46:53.083901",
+ "modified": "2024-12-06 13:36:29.285052",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "DMARC Report Detail",
