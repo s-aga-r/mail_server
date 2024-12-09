@@ -583,6 +583,23 @@ def push_emails_to_queue() -> None:
 				time.sleep(2**total_failures)
 
 
+def push_stuck_emails_to_queue() -> None:
+	"""Pushes stuck emails to the queue for sending."""
+
+	mails = frappe.db.get_all(
+		"Outgoing Mail Log",
+		{
+			"status": ["in", ["Queued (RMQ)", "Queued (Haraka)"]],
+			"transfer_completed_at": ["<=", add_to_date(now(), minutes=-60)],
+		},
+		pluck="name",
+	)
+	for mail in mails:
+		doc = frappe.get_doc("Outgoing Mail Log", mail)
+		doc.force_push_to_queue()
+		doc.add_comment("Comment", _("Mail re-queued due to inactivity."))
+
+
 def fetch_and_update_delivery_statuses() -> None:
 	"""Fetches and updates delivery statuses of the emails."""
 

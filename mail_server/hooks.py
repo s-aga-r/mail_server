@@ -174,6 +174,9 @@ scheduler_events = {
 	# "hourly": [
 	# 	"mail_server.tasks.hourly"
 	# ],
+	"hourly_long": [
+		"mail_server.mail_server.doctype.outgoing_mail_log.outgoing_mail_log.push_stuck_emails_to_queue",
+	],
 	# "weekly": [
 	# 	"mail_server.tasks.weekly"
 	# ],
