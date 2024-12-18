@@ -24,14 +24,14 @@ class MailAgent(Document):
 		self.validate_agent()
 
 	def on_update(self) -> None:
-		if self.type == "Outbound":
+		if self.agent_type == "Outbound":
 			create_or_update_spf_dns_record()
 
 	def on_trash(self) -> None:
 		if frappe.session.user != "Administrator":
 			frappe.throw(_("Only Administrator can delete Mail Agent."))
 
-		if self.type == "Outbound":
+		if self.agent_type == "Outbound":
 			self.db_set("enabled", 0)
 			create_or_update_spf_dns_record()
 
@@ -55,7 +55,7 @@ def create_or_update_spf_dns_record(spf_host: str | None = None) -> None:
 	spf_host = spf_host or ms_settings.spf_host
 	outbound_agents = frappe.db.get_all(
 		"Mail Agent",
-		filters={"enabled": 1, "type": "Outbound"},
+		filters={"enabled": 1, "agent_type": "Outbound"},
 		pluck="agent",
 		order_by="agent asc",
 	)

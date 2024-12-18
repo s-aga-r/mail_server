@@ -8,7 +8,7 @@
   "section_break_excr",
   "enabled",
   "section_break_whcz",
-  "type",
+  "agent_type",
   "section_break_syxq",
   "agent_group",
   "agent",
@@ -57,16 +57,6 @@
    "search_index": 1
   },
   {
-   "fieldname": "type",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Type",
-   "options": "\nInbound\nOutbound",
-   "reqd": 1,
-   "search_index": 1,
-   "set_only_once": 1
-  },
-  {
    "fieldname": "section_break_excr",
    "fieldtype": "Section Break"
   },
@@ -83,13 +73,23 @@
    "fieldtype": "Column Break"
   },
   {
-   "depends_on": "eval: doc.type == \"Inbound\"",
+   "depends_on": "eval: [\"Inbound\", \"Inbound & Outbound\"].includes(doc.agent_type)",
    "fieldname": "agent_group",
    "fieldtype": "Link",
    "label": "Agent Group",
-   "mandatory_depends_on": "eval: doc.type == \"Inbound\"",
+   "mandatory_depends_on": "eval: [\"Inbound\", \"Inbound & Outbound\"].includes(doc.agent_type)",
    "options": "Mail Agent Group",
    "search_index": 1
+  },
+  {
+   "fieldname": "agent_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Agent Type",
+   "options": "\nInbound\nOutbound\nInbound & Outbound",
+   "reqd": 1,
+   "search_index": 1,
+   "set_only_once": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -105,7 +105,7 @@
    "link_fieldname": "agent"
   }
  ],
- "modified": "2024-11-16 15:39:09.432773",
+ "modified": "2024-12-18 18:32:24.229325",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Agent",
