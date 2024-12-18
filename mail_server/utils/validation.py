@@ -4,7 +4,6 @@ import socket
 
 import frappe
 from frappe import _
-from frappe.utils.caching import redis_cache
 from validate_email_address import validate_email
 
 from mail_server.utils.cache import get_user_owned_domains
@@ -98,11 +97,3 @@ def validate_email_address(
 	"""Validates the email address by checking MX records and RCPT TO."""
 
 	return bool(validate_email(email=email, check_mx=check_mx, verify=verify, smtp_timeout=smtp_timeout))
-
-
-@frappe.whitelist()
-@redis_cache(ttl=3600)
-def validate_email_address_cache(email: str) -> bool:
-	"""Wrapper function of `utils.validation.validate_email_address` for caching."""
-
-	return validate_email_address(email)

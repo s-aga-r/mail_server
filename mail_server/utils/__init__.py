@@ -12,8 +12,10 @@ import frappe
 from frappe import _
 from frappe.utils import convert_utc_to_system_timezone, get_datetime, get_datetime_str, get_system_timezone
 from frappe.utils.background_jobs import get_jobs
+from frappe.utils.caching import redis_cache
 
 from mail_server.utils.cache import get_root_domain_name
+from mail_server.utils.validation import validate_email_address
 
 
 def get_dns_record(fqdn: str, type: str = "A", raise_exception: bool = False) -> dns.resolver.Answer | None:
@@ -172,3 +174,11 @@ def get_dmarc_address() -> str:
 	"""Returns DMARC address."""
 
 	return f"dmarc@{get_root_domain_name()}"
+
+
+@frappe.whitelist()
+@redis_cache(ttl=3600)
+def check_deliverability(email: str) -> bool:
+	"""Wrapper function of `utils.validation.validate_email_address` for caching."""
+
+	return validate_email_address(email, check_mx=True, verify=True, smtp_timeout=10)

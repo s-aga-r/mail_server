@@ -7,7 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "email",
-  "validate_email_address",
+  "check_deliverability",
   "column_break_7hc6",
   "status",
   "action_at",
@@ -72,24 +72,24 @@
    "fieldtype": "Column Break"
   },
   {
-   "depends_on": "eval: doc.parenttype == \"Outgoing Mail Log\"",
-   "fieldname": "validate_email_address",
-   "fieldtype": "Button",
-   "label": "Validate Email"
-  },
-  {
    "depends_on": "eval: doc.error_message",
    "fieldname": "error_message",
    "fieldtype": "Code",
    "label": "Error Message",
    "no_copy": 1,
    "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.parenttype == \"Outgoing Mail Log\"",
+   "fieldname": "check_deliverability",
+   "fieldtype": "Button",
+   "label": "Check Deliverability"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-12-03 16:37:38.124313",
+ "modified": "2024-12-18 19:03:52.570959",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Log Recipient",

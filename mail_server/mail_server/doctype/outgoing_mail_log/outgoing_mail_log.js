@@ -160,29 +160,31 @@ frappe.ui.form.on("Outgoing Mail Log", {
 });
 
 frappe.ui.form.on("Mail Log Recipient", {
-	validate_email_address(frm, cdt, cdn) {
+	check_deliverability(frm, cdt, cdn) {
 		let recipient = locals[cdt][cdn];
 		let email = recipient.email;
 
 		if (!email) return;
 
 		frappe.call({
-			method: "mail_server.utils.validation.validate_email_address_cache",
+			method: "mail_server.utils.check_deliverability",
 			args: {
 				email: email,
 			},
 			freeze: true,
-			freeze_message: __("Validating Email Address..."),
+			freeze_message: __("Checking email deliverability..."),
 			callback: (r) => {
 				if (!r.exc) {
 					if (r.message) {
 						frappe.show_alert({
-							message: __("Email address {0} is valid.", [email.bold()]),
+							message: __("The email address {0} is deliverable.", [email.bold()]),
 							indicator: "green",
 						});
 					} else {
 						frappe.show_alert({
-							message: __("Email address {0} is invalid.", [email.bold()]),
+							message: __("The email address {0} appears to be invalid.", [
+								email.bold(),
+							]),
 							indicator: "red",
 						});
 					}

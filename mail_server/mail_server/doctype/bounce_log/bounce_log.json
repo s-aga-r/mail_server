@@ -7,7 +7,7 @@
  "field_order": [
   "section_break_3lr7",
   "email",
-  "validate_email_address",
+  "check_deliverability",
   "column_break_u47n",
   "bounce_count",
   "section_break_mcdk",
@@ -70,14 +70,14 @@
   },
   {
    "depends_on": "eval: doc.email",
-   "fieldname": "validate_email_address",
+   "fieldname": "check_deliverability",
    "fieldtype": "Button",
-   "label": "Validate Email"
+   "label": "Check Deliverability"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-03 12:15:03.449346",
+ "modified": "2024-12-18 19:03:45.577274",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Bounce Log",
