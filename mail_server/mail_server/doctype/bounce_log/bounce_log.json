@@ -80,7 +80,7 @@
  "modified": "2024-12-03 12:15:03.449346",
  "modified_by": "Administrator",
  "module": "Mail Server",
- "name": "Bounce History",
+ "name": "Bounce Log",
  "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [

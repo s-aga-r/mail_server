@@ -15,8 +15,8 @@ from frappe.utils import add_to_date, cint, now, now_datetime, time_diff_in_seco
 from pypika import Order
 from uuid_utils import uuid7
 
-from mail_server.mail_server.doctype.bounce_history.bounce_history import (
-	create_or_update_bounce_history,
+from mail_server.mail_server.doctype.bounce_log.bounce_log import (
+	create_or_update_bounce_log,
 	is_email_blocked,
 )
 from mail_server.mail_server.doctype.spam_check_log.spam_check_log import create_spam_check_log
@@ -655,7 +655,7 @@ def fetch_and_update_delivery_statuses() -> None:
 					recipient.db_update()
 
 					if status == "Bounced":
-						create_or_update_bounce_history(recipient.email, bounce_increment=1)
+						create_or_update_bounce_log(recipient.email, bounce_increment=1)
 
 			doc.update_status(db_set=True)
 

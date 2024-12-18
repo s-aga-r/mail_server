@@ -1,7 +1,7 @@
 // Copyright (c) 2024, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on("Bounce History", {
+frappe.ui.form.on("Bounce Log", {
 	validate_email_address(frm) {
 		let email = frm.doc.email;
 
