@@ -52,7 +52,7 @@ frappe.query_reports["Outbound Log Delay"] = {
 			get_data: (txt) => {
 				return frappe.db.get_link_options("Mail Agent", txt, {
 					enabled: 1,
-					type: "Outbound",
+					enable_outbound: 1,
 				});
 			},
 		},

@@ -87,7 +87,7 @@ def get_local_ips() -> list[str]:
 	"""Returns list of local IPs (Mail Agents IPs)."""
 
 	ips = []
-	for ip in frappe.db.get_all("Mail Agent", {"type": "Outbound"}, ["ipv4", "ipv6"]):
+	for ip in frappe.db.get_all("Mail Agent", {"enable_outbound": 1}, ["ipv4", "ipv6"]):
 		for field in ["ipv4", "ipv6"]:
 			if ip.get(field):
 				ips.append(ip[field])
