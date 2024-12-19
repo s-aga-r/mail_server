@@ -21,6 +21,7 @@ class MailAgent(Document):
 		if self.is_new():
 			validate_mail_server_settings()
 
+		self.validate_api_key()
 		self.validate_agent()
 
 	def on_update(self) -> None:
@@ -34,6 +35,13 @@ class MailAgent(Document):
 		if self.enable_outbound:
 			self.db_set("enabled", 0)
 			create_or_update_spf_dns_record()
+
+	def validate_api_key(self) -> None:
+		"""Validates the API Key or Username and Password."""
+
+		if not self.api_key:
+			if not self.username or not self.password:
+				frappe.throw(_("API Key or Username and Password is required."))
 
 	def validate_agent(self) -> None:
 		"""Validates the agent and fetches the IP addresses."""

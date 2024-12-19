@@ -12,6 +12,12 @@
   "column_break_0mtp",
   "agent_group",
   "agent",
+  "section_break_0gph",
+  "base_url",
+  "api_key",
+  "column_break_q7yu",
+  "username",
+  "password",
   "section_break_3jtz",
   "ipv4",
   "column_break_mgw4",
@@ -92,6 +98,35 @@
    "in_list_view": 1,
    "label": "Outbound",
    "search_index": 1
+  },
+  {
+   "fieldname": "section_break_0gph",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "username",
+   "fieldtype": "Data",
+   "label": "Username"
+  },
+  {
+   "fieldname": "password",
+   "fieldtype": "Password",
+   "label": "Password"
+  },
+  {
+   "fieldname": "api_key",
+   "fieldtype": "Password",
+   "label": "API Key"
+  },
+  {
+   "fieldname": "column_break_q7yu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "base_url",
+   "fieldtype": "Data",
+   "label": "Base URL",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -107,7 +142,7 @@
    "link_fieldname": "agent"
   }
  ],
- "modified": "2024-12-19 09:53:19.930726",
+ "modified": "2024-12-19 15:54:11.025222",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Agent",
