@@ -15,7 +15,7 @@ class Principal:
 	type: Literal["domain", "apiKey"]
 	id: int = 0
 	quota: int = 0
-	secrets: list[str] = field(default_factory=list)
+	secrets: str | list[str] = field(default_factory=list)
 	emails: list[str] = field(default_factory=list)
 	urls: list[str] = field(default_factory=list)
 	memberOf: list[str] = field(default_factory=list)
@@ -88,8 +88,8 @@ class AgentAPI:
 		response.raise_for_status()
 		response = response.json()
 
-		if response.get("error"):
-			frappe.throw(response)
+		if error := response.get("error"):
+			frappe.throw(error)
 
 		return response
 
@@ -110,3 +110,16 @@ class AgentPrincipalAPI(AgentAPI):
 		params = {"type": type, "limit": limit, "page": page}
 		result = self.request(method="GET", params=params, endpoint=endpoint)["data"]
 		return [Principal(**data) for data in result["items"]]
+
+	def get(self, name: str) -> Principal:
+		"""Get a principal from the Agent."""
+
+		endpoint = f"/api/principal/{name}"
+		result = self.request(method="GET", endpoint=endpoint)["data"]
+		return Principal(**result)
+
+	def delete(self, name: str) -> None:
+		"""Delete a principal from the Agent."""
+
+		endpoint = f"/api/principal/{name}"
+		self.request(method="DELETE", endpoint=endpoint)

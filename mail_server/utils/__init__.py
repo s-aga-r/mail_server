@@ -1,5 +1,7 @@
 import gzip
+import secrets
 import socket
+import string
 import zipfile
 from collections.abc import Callable
 from datetime import datetime, timezone
@@ -174,6 +176,13 @@ def get_dmarc_address() -> str:
 	"""Returns DMARC address."""
 
 	return f"dmarc@{get_root_domain_name()}"
+
+
+def generate_secret(length: int = 32):
+	"""Generates a random secret key."""
+
+	characters = string.ascii_letters + string.digits
+	return "".join(secrets.choice(characters) for _ in range(length))
 
 
 @frappe.whitelist()

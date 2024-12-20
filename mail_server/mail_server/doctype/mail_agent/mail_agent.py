@@ -1,15 +1,19 @@
 # Copyright (c) 2024, Frappe Technologies Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
+import base64
+
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from frappe.utils import random_string
 
+from mail_server.agent import AgentPrincipalAPI, Principal
 from mail_server.mail_server.doctype.dns_record.dns_record import create_or_update_dns_record
 from mail_server.mail_server.doctype.mail_server_settings.mail_server_settings import (
 	validate_mail_server_settings,
 )
-from mail_server.utils import get_dns_record
+from mail_server.utils import generate_secret, get_dns_record
 
 
 class MailAgent(Document):
@@ -21,8 +25,8 @@ class MailAgent(Document):
 		if self.is_new():
 			validate_mail_server_settings()
 
-		self.validate_api_key()
 		self.validate_agent()
+		self.validate_api_key()
 
 	def on_update(self) -> None:
 		if self.enable_outbound:
@@ -36,13 +40,6 @@ class MailAgent(Document):
 			self.db_set("enabled", 0)
 			create_or_update_spf_dns_record()
 
-	def validate_api_key(self) -> None:
-		"""Validates the API Key or Username and Password."""
-
-		if not self.api_key:
-			if not self.username or not self.password:
-				frappe.throw(_("API Key or Username and Password is required."))
-
 	def validate_agent(self) -> None:
 		"""Validates the agent and fetches the IP addresses."""
 
@@ -54,6 +51,29 @@ class MailAgent(Document):
 
 		self.ipv4 = ipv4[0].address if ipv4 else None
 		self.ipv6 = ipv6[0].address if ipv6 else None
+
+	def validate_api_key(self) -> None:
+		"""Validates the API Key or Username and Password."""
+
+		if not self.api_key:
+			if not self.username or not self.password:
+				frappe.throw(_("API Key or Username and Password is required."))
+
+			self.api_key = self.__generate_api_key()
+
+	def __generate_api_key(self) -> str:
+		"""Generates API Key for the given agent."""
+
+		name = f"{random_string(10)}-{self.agent}".lower()
+		secret = generate_secret()
+		principal = Principal(
+			name=name, type="apiKey", secrets=secret, roles=["admin"], enabledPermissions=["authenticate"]
+		)
+		principal_api = AgentPrincipalAPI(
+			self.base_url, username=self.username, password=self.get_password("password")
+		)
+		principal_api.create(principal=principal)
+		return f"api_{base64.b64encode(f'{name}:{secret}'.encode()).decode()}"
 
 
 def create_or_update_spf_dns_record(spf_host: str | None = None) -> None:
