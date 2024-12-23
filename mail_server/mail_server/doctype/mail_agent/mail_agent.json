@@ -7,6 +7,7 @@
  "field_order": [
   "section_break_excr",
   "enabled",
+  "is_primary",
   "enable_inbound",
   "enable_outbound",
   "column_break_0mtp",
@@ -126,6 +127,13 @@
    "label": "IPv6 Addresses",
    "no_copy": 1,
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_primary",
+   "fieldtype": "Check",
+   "label": "Primary",
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -141,7 +149,7 @@
    "link_fieldname": "agent"
   }
  ],
- "modified": "2024-12-23 10:34:29.918955",
+ "modified": "2024-12-23 10:42:36.328597",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Agent",

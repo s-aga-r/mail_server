@@ -26,6 +26,7 @@ class MailAgent(Document):
 			validate_mail_server_settings()
 
 		self.validate_agent()
+		self.validate_is_primary()
 		self.validate_api_key()
 
 	def on_update(self) -> None:
@@ -48,6 +49,21 @@ class MailAgent(Document):
 
 		self.ipv4_addresses = "\n".join([r.address for r in get_dns_record(self.agent, "A") or []])
 		self.ipv6_addresses = "\n".join([r.address for r in get_dns_record(self.agent, "AAAA") or []])
+
+	def validate_is_primary(self) -> None:
+		"""Validates the Is Primary field."""
+
+		filters = {
+			"is_primary": 1,
+			"agent_group": self.agent_group,
+			"name": ["!=", self.name],
+		}
+
+		if self.is_primary:
+			frappe.db.set_value("Mail Agent", filters, "is_primary", 0)
+		else:
+			if not frappe.db.exists("Mail Agent", filters):
+				self.is_primary = 1
 
 	def validate_api_key(self) -> None:
 		"""Validates the API Key or Username and Password."""
