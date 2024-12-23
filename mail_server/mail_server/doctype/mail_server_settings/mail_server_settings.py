@@ -27,6 +27,9 @@ class MailServerSettings(Document):
 	def on_update(self) -> None:
 		delete_cache("root_domain_name")
 
+		if self.has_value_changed("root_domain_name"):
+			create_dmarc_dns_record_for_external_domains()
+
 	def validate_root_domain_name(self) -> None:
 		"""Validates the Root Domain Name."""
 
@@ -34,7 +37,6 @@ class MailServerSettings(Document):
 
 		if self.has_value_changed("root_domain_name"):
 			frappe.db.set_value("DNS Record", {"is_verified": 1}, "is_verified", 0)
-			create_dmarc_dns_record_for_external_domains()
 
 			if self.get_doc_before_save().get("root_domain_name"):
 				dns_record_list_link = f'<a href="/app/dns-record">{_("DNS Records")}</a>'
