@@ -26,11 +26,12 @@ class MailAgent(Document):
 			validate_mail_server_settings()
 
 		self.validate_agent()
+		self.validate_agent_group()
 		self.validate_is_primary()
 		self.validate_api_key()
 
 	def on_update(self) -> None:
-		if self.enable_outbound:
+		if self.has_value_changed("enable_outbound"):
 			create_or_update_spf_dns_record()
 
 	def on_trash(self) -> None:
@@ -49,6 +50,12 @@ class MailAgent(Document):
 
 		self.ipv4_addresses = "\n".join([r.address for r in get_dns_record(self.agent, "A") or []])
 		self.ipv6_addresses = "\n".join([r.address for r in get_dns_record(self.agent, "AAAA") or []])
+
+	def validate_agent_group(self) -> None:
+		"""Validates the Mail Agent Group."""
+
+		if not frappe.db.get_value("Mail Agent Group", self.agent_group, "enabled"):
+			frappe.throw(_("Mail Agent Group {0} is disabled.").format(frappe.bold(self.agent_group)))
 
 	def validate_is_primary(self) -> None:
 		"""Validates the Is Primary field."""

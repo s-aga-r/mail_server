@@ -58,6 +58,8 @@
   {
    "fieldname": "agent_group",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Agent Group",
    "options": "Mail Agent Group",
    "reqd": 1,
@@ -88,6 +90,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "default": "admin",
    "fieldname": "username",
    "fieldtype": "Data",
    "label": "Username"
@@ -149,7 +152,7 @@
    "link_fieldname": "agent"
   }
  ],
- "modified": "2024-12-23 10:42:36.328597",
+ "modified": "2024-12-23 13:46:43.286560",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Agent",

@@ -26,6 +26,7 @@
    "depends_on": "eval: !doc.__islocal",
    "fieldname": "enabled",
    "fieldtype": "Check",
+   "in_list_view": 1,
    "label": "Enabled",
    "search_index": 1
   },
@@ -37,7 +38,7 @@
    "depends_on": "eval: doc.inbound",
    "fieldname": "priority",
    "fieldtype": "Int",
-   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Priority",
    "mandatory_depends_on": "eval: doc.inbound",
    "no_copy": 1,
@@ -64,6 +65,7 @@
    "default": "1",
    "fieldname": "inbound",
    "fieldtype": "Check",
+   "in_list_view": 1,
    "label": "Inbound",
    "search_index": 1
   },
@@ -71,6 +73,7 @@
    "default": "1",
    "fieldname": "outbound",
    "fieldtype": "Check",
+   "in_list_view": 1,
    "label": "Outbound",
    "search_index": 1
   },
@@ -99,7 +102,7 @@
    "link_fieldname": "agent_group"
   }
  ],
- "modified": "2024-12-23 10:32:30.399193",
+ "modified": "2024-12-23 13:45:28.393030",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Agent Group",

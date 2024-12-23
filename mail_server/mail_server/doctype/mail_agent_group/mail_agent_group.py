@@ -14,8 +14,15 @@ class MailAgentGroup(Document):
 		self.name = self.agent_group
 
 	def validate(self) -> None:
+		self.validate_enabled()
 		self.validate_agent_group()
 		self.validate_priority()
+
+	def validate_enabled(self) -> None:
+		"""Validates the enabled status of the agent group."""
+
+		if self.enabled and not self.inbound and not self.outbound:
+			self.enabled = 0
 
 	def validate_agent_group(self) -> None:
 		"""Validates the agent group and fetches the IP addresses."""
@@ -30,7 +37,8 @@ class MailAgentGroup(Document):
 		"""Validates the priority of the agent group."""
 
 		if frappe.db.exists(
-			"Mail Agent Group", {"enabled": 1, "priority": self.priority, "name": ["!=", self.name]}
+			"Mail Agent Group",
+			{"enabled": 1, "inbound": 1, "priority": self.priority, "name": ["!=", self.name]},
 		):
 			frappe.throw(
 				_("Mail Agent Group with priority {0} already exists.").format(frappe.bold(self.priority))
