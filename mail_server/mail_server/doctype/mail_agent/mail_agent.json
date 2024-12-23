@@ -19,9 +19,9 @@
   "username",
   "password",
   "section_break_3jtz",
-  "ipv4",
+  "ipv4_addresses",
   "column_break_mgw4",
-  "ipv6"
+  "ipv6_addresses"
  ],
  "fields": [
   {
@@ -33,22 +33,6 @@
    "reqd": 1,
    "set_only_once": 1,
    "unique": 1
-  },
-  {
-   "fieldname": "ipv4",
-   "fieldtype": "Data",
-   "in_standard_filter": 1,
-   "label": "IPv4",
-   "no_copy": 1,
-   "read_only": 1
-  },
-  {
-   "fieldname": "ipv6",
-   "fieldtype": "Data",
-   "in_standard_filter": 1,
-   "label": "IPv6",
-   "no_copy": 1,
-   "read_only": 1
   },
   {
    "default": "1",
@@ -71,12 +55,11 @@
    "fieldtype": "Column Break"
   },
   {
-   "depends_on": "eval: doc.enable_inbound",
    "fieldname": "agent_group",
    "fieldtype": "Link",
    "label": "Agent Group",
-   "mandatory_depends_on": "eval: doc.enable_inbound",
    "options": "Mail Agent Group",
+   "reqd": 1,
    "search_index": 1
   },
   {
@@ -127,6 +110,22 @@
    "fieldtype": "Data",
    "label": "Base URL",
    "reqd": 1
+  },
+  {
+   "fieldname": "ipv4_addresses",
+   "fieldtype": "Small Text",
+   "in_standard_filter": 1,
+   "label": "IPv4 Addresses",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "ipv6_addresses",
+   "fieldtype": "Small Text",
+   "in_standard_filter": 1,
+   "label": "IPv6 Addresses",
+   "no_copy": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -142,7 +141,7 @@
    "link_fieldname": "agent"
   }
  ],
- "modified": "2024-12-19 15:54:11.025222",
+ "modified": "2024-12-23 10:34:29.918955",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Agent",

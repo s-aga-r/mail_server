@@ -23,11 +23,8 @@ class MailAgentGroup(Document):
 		if self.is_new() and frappe.db.exists("Mail Agent Group", self.agent_group):
 			frappe.throw(_("Mail Agent Group {0} already exists.").format(frappe.bold(self.agent_group)))
 
-		ipv4 = get_dns_record(self.agent_group, "A")
-		ipv6 = get_dns_record(self.agent_group, "AAAA")
-
-		self.ipv4 = ipv4[0].address if ipv4 else None
-		self.ipv6 = ipv6[0].address if ipv6 else None
+		self.ipv4_addresses = "\n".join([r.address for r in get_dns_record(self.agent_group, "A") or []])
+		self.ipv6_addresses = "\n".join([r.address for r in get_dns_record(self.agent_group, "AAAA") or []])
 
 	def validate_priority(self) -> None:
 		"""Validates the priority of the agent group."""

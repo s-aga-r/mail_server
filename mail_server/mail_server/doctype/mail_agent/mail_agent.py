@@ -46,11 +46,8 @@ class MailAgent(Document):
 		if self.is_new() and frappe.db.exists("Mail Agent", self.agent):
 			frappe.throw(_("Mail Agent {0} already exists.").format(frappe.bold(self.agent)))
 
-		ipv4 = get_dns_record(self.agent, "A")
-		ipv6 = get_dns_record(self.agent, "AAAA")
-
-		self.ipv4 = ipv4[0].address if ipv4 else None
-		self.ipv6 = ipv6[0].address if ipv6 else None
+		self.ipv4_addresses = "\n".join([r.address for r in get_dns_record(self.agent, "A") or []])
+		self.ipv6_addresses = "\n".join([r.address for r in get_dns_record(self.agent, "AAAA") or []])
 
 	def validate_api_key(self) -> None:
 		"""Validates the API Key or Username and Password."""

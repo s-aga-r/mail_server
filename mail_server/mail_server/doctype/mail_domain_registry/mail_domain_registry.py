@@ -126,7 +126,7 @@ class MailDomainRegistry(Document):
 		# MX Record(s)
 		if inbound_agent_groups := frappe.db.get_all(
 			"Mail Agent Group",
-			filters={"enabled": 1},
+			filters={"enabled": 1, "inbound": 1},
 			fields=["agent_group", "priority"],
 			order_by="priority asc",
 		):

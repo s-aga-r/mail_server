@@ -6,14 +6,15 @@
  "field_order": [
   "section_break_krzj",
   "enabled",
-  "section_break_2ygm",
-  "agent_group",
+  "inbound",
+  "outbound",
   "column_break_fkha",
+  "agent_group",
   "priority",
   "section_break_0q8l",
-  "ipv4",
+  "ipv4_addresses",
   "column_break_79yp",
-  "ipv6"
+  "ipv6_addresses"
  ],
  "fields": [
   {
@@ -29,20 +30,17 @@
    "search_index": 1
   },
   {
-   "fieldname": "section_break_2ygm",
-   "fieldtype": "Section Break"
-  },
-  {
    "fieldname": "column_break_fkha",
    "fieldtype": "Column Break"
   },
   {
+   "depends_on": "eval: doc.inbound",
    "fieldname": "priority",
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "Priority",
+   "mandatory_depends_on": "eval: doc.inbound",
    "no_copy": 1,
-   "reqd": 1,
    "search_index": 1
   },
   {
@@ -50,24 +48,8 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "ipv4",
-   "fieldtype": "Data",
-   "in_standard_filter": 1,
-   "label": "IPv4",
-   "no_copy": 1,
-   "read_only": 1
-  },
-  {
    "fieldname": "column_break_79yp",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "ipv6",
-   "fieldtype": "Data",
-   "in_standard_filter": 1,
-   "label": "IPv6",
-   "no_copy": 1,
-   "read_only": 1
   },
   {
    "fieldname": "agent_group",
@@ -77,6 +59,36 @@
    "reqd": 1,
    "set_only_once": 1,
    "unique": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "inbound",
+   "fieldtype": "Check",
+   "label": "Inbound",
+   "search_index": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "outbound",
+   "fieldtype": "Check",
+   "label": "Outbound",
+   "search_index": 1
+  },
+  {
+   "fieldname": "ipv4_addresses",
+   "fieldtype": "Small Text",
+   "in_standard_filter": 1,
+   "label": "IPv4 Addresses",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "ipv6_addresses",
+   "fieldtype": "Small Text",
+   "in_standard_filter": 1,
+   "label": "IPv6 Addresses",
+   "no_copy": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -87,7 +99,7 @@
    "link_fieldname": "agent_group"
   }
  ],
- "modified": "2024-10-30 16:39:27.695709",
+ "modified": "2024-12-23 10:32:30.399193",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Agent Group",
