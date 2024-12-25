@@ -31,7 +31,7 @@ class MailAgent(Document):
 		self.validate_api_key()
 
 	def on_update(self) -> None:
-		if self.has_value_changed("enable_outbound"):
+		if self.has_value_changed("enabled") or self.has_value_changed("enable_outbound"):
 			create_or_update_spf_dns_record()
 
 	def on_trash(self) -> None:
@@ -108,10 +108,7 @@ def create_or_update_spf_dns_record(spf_host: str | None = None) -> None:
 		order_by="agent asc",
 	)
 
-	if not outbound_agents:
-		if spf_dns_record := frappe.db.exists("DNS Record", {"host": spf_host, "type": "TXT"}):
-			frappe.delete_doc("DNS Record", spf_dns_record, ignore_permissions=True)
-	else:
+	if outbound_agents:
 		outbound_agents = [f"a:{outbound_agent}" for outbound_agent in outbound_agents]
 		create_or_update_dns_record(
 			host=spf_host,
@@ -120,3 +117,6 @@ def create_or_update_spf_dns_record(spf_host: str | None = None) -> None:
 			ttl=ms_settings.default_ttl,
 			category="Server Record",
 		)
+	else:
+		if spf_dns_record := frappe.db.exists("DNS Record", {"host": spf_host, "type": "TXT"}):
+			frappe.delete_doc("DNS Record", spf_dns_record, ignore_permissions=True)
