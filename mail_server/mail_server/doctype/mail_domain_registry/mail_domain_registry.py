@@ -8,7 +8,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import now
 
-from mail_server.agent import AgentPrincipalAPI, Principal
+from mail_server.agent import Principal
 from mail_server.mail_server.doctype.dns_record.dns_record import create_or_update_dns_record
 from mail_server.mail_server.doctype.mail_server_settings.mail_server_settings import (
 	validate_mail_server_settings,
@@ -30,14 +30,7 @@ class MailDomainRegistry(Document):
 		self.validate_domain_owner()
 
 	def after_insert(self) -> None:
-		frappe.enqueue(
-			create_or_delete_domain_on_agents,
-			is_async=True,
-			enqueue_after_commit=True,
-			at_front=True,
-			action="create",
-			domain_name=self.domain_name,
-		)
+		create_or_delete_domain_on_agents(action="create", domain_name=self.domain_name)
 
 	def on_update(self) -> None:
 		delete_cache(f"user|{self.domain_owner}")
@@ -53,14 +46,7 @@ class MailDomainRegistry(Document):
 		if frappe.session.user != "Administrator":
 			frappe.throw(_("Only Administrator can delete Mail Domain Registry."))
 
-		frappe.enqueue(
-			create_or_delete_domain_on_agents,
-			is_async=True,
-			enqueue_after_commit=True,
-			at_front=True,
-			action="delete",
-			domain_name=self.domain_name,
-		)
+		create_or_delete_domain_on_agents(action="delete", domain_name=self.domain_name)
 
 	def validate_domain_name(self) -> None:
 		"""Validates Domain Name"""
@@ -236,18 +222,17 @@ def create_or_delete_domain_on_agents(
 	if not primary_agents:
 		return
 
-	principal = Principal(name=domain_name, type="domain")
+	principal = Principal(name=domain_name, type="domain").__dict__
 	for agent in primary_agents:
-		try:
-			agent = frappe.get_cached_doc("Mail Agent", agent)
-			principal_api = AgentPrincipalAPI(base_url=agent.base_url, api_key=agent.get_password("api_key"))
+		agent_job = frappe.new_doc("Mail Agent Job")
+		agent_job.agent = agent
 
-			if action == "create":
-				principal_api.create(principal)
-			elif action == "delete":
-				principal_api.delete(domain_name)
-		except Exception:
-			frappe.log_error(
-				title=_("Failed to {0} domain on agent").format(action),
-				message=frappe.get_traceback(),
-			)
+		if action == "create":
+			agent_job.method = "POST"
+			agent_job.endpoint = "/api/principal"
+			agent_job.request_data = principal
+		elif action == "delete":
+			agent_job.method = "DELETE"
+			agent_job.endpoint = f"/api/principal/{domain_name}"
+
+		agent_job.insert()

@@ -8,7 +8,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import random_string
 
-from mail_server.agent import AgentPrincipalAPI, Principal
+from mail_server.agent import AgentAPI, Principal
 from mail_server.mail_server.doctype.dns_record.dns_record import create_or_update_dns_record
 from mail_server.mail_server.doctype.mail_server_settings.mail_server_settings import (
 	validate_mail_server_settings,
@@ -89,10 +89,12 @@ class MailAgent(Document):
 		principal = Principal(
 			name=name, type="apiKey", secrets=secret, roles=["admin"], enabledPermissions=["authenticate"]
 		)
-		principal_api = AgentPrincipalAPI(
-			self.base_url, username=self.username, password=self.get_password("password")
-		)
-		principal_api.create(principal=principal)
+		agent_api = AgentAPI(self.base_url, username=self.username, password=self.get_password("password"))
+		response = agent_api.request(method="POST", endpoint="/api/principal", json=principal.__dict__)
+
+		if error := response.get("error"):
+			frappe.throw(error)
+
 		return f"api_{base64.b64encode(f'{name}:{secret}'.encode()).decode()}"
 
 

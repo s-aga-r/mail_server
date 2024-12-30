@@ -86,40 +86,5 @@ class AgentAPI:
 			json=json,
 		)
 		response.raise_for_status()
-		response = response.json()
 
-		if error := response.get("error"):
-			frappe.throw(error)
-
-		return response
-
-
-class AgentPrincipalAPI(AgentAPI):
-	"""Class to interact with the Principal API of the Agent."""
-
-	def create(self, principal: Principal) -> int:
-		"""Create a principal in the Agent."""
-
-		endpoint = "/api/principal"
-		return self.request(method="POST", endpoint=endpoint, json=principal.__dict__)["data"]
-
-	def read(self, type: str, limit: int = 10, page: int = 1) -> list[Principal]:
-		"""Read all the principals from the Agent."""
-
-		endpoint = "/api/principal"
-		params = {"type": type, "limit": limit, "page": page}
-		result = self.request(method="GET", params=params, endpoint=endpoint)["data"]
-		return [Principal(**data) for data in result["items"]]
-
-	def get(self, name: str) -> Principal:
-		"""Get a principal from the Agent."""
-
-		endpoint = f"/api/principal/{name}"
-		result = self.request(method="GET", endpoint=endpoint)["data"]
-		return Principal(**result)
-
-	def delete(self, name: str) -> None:
-		"""Delete a principal from the Agent."""
-
-		endpoint = f"/api/principal/{name}"
-		self.request(method="DELETE", endpoint=endpoint)
+		return response.json()
