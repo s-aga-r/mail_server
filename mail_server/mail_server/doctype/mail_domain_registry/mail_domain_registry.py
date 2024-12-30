@@ -1,11 +1,14 @@
 # Copyright (c) 2024, Frappe Technologies Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
+from typing import Literal
+
 import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import now
 
+from mail_server.agent import AgentPrincipalAPI, Principal
 from mail_server.mail_server.doctype.dns_record.dns_record import create_or_update_dns_record
 from mail_server.mail_server.doctype.mail_server_settings.mail_server_settings import (
 	validate_mail_server_settings,
@@ -26,6 +29,16 @@ class MailDomainRegistry(Document):
 		self.validate_is_subdomain()
 		self.validate_domain_owner()
 
+	def after_insert(self) -> None:
+		frappe.enqueue(
+			create_or_delete_domain_on_agents,
+			is_async=True,
+			enqueue_after_commit=True,
+			at_front=True,
+			action="create",
+			domain_name=self.domain_name,
+		)
+
 	def on_update(self) -> None:
 		delete_cache(f"user|{self.domain_owner}")
 
@@ -39,6 +52,15 @@ class MailDomainRegistry(Document):
 	def on_trash(self) -> None:
 		if frappe.session.user != "Administrator":
 			frappe.throw(_("Only Administrator can delete Mail Domain Registry."))
+
+		frappe.enqueue(
+			create_or_delete_domain_on_agents,
+			is_async=True,
+			enqueue_after_commit=True,
+			at_front=True,
+			action="delete",
+			domain_name=self.domain_name,
+		)
 
 	def validate_domain_name(self) -> None:
 		"""Validates Domain Name"""
@@ -200,3 +222,32 @@ def has_permission(doc: "Document", ptype: str, user: str) -> bool:
 		return False
 
 	return (user == doc.domain_owner) or is_system_manager(user)
+
+
+def create_or_delete_domain_on_agents(
+	action: Literal["create", "delete"], domain_name: str, agents: list[str] | None = None
+) -> None:
+	"""Creates or Deletes Domain on Agents"""
+
+	primary_agents = agents or frappe.db.get_all(
+		"Mail Agent", filters={"enabled": 1, "is_primary": 1}, pluck="name"
+	)
+
+	if not primary_agents:
+		return
+
+	principal = Principal(name=domain_name, type="domain")
+	for agent in primary_agents:
+		try:
+			agent = frappe.get_cached_doc("Mail Agent", agent)
+			principal_api = AgentPrincipalAPI(base_url=agent.base_url, api_key=agent.get_password("api_key"))
+
+			if action == "create":
+				principal_api.create(principal)
+			elif action == "delete":
+				principal_api.delete(domain_name)
+		except Exception:
+			frappe.log_error(
+				title=_("Failed to {0} domain on agent").format(action),
+				message=frappe.get_traceback(),
+			)
