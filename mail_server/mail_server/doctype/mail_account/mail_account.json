@@ -80,14 +80,9 @@
    "group": "Reference",
    "link_doctype": "Mail Account Email",
    "link_fieldname": "account"
-  },
-  {
-   "group": "Reference",
-   "link_doctype": "Mail Group Member",
-   "link_fieldname": "account"
   }
  ],
- "modified": "2024-12-24 16:41:07.641494",
+ "modified": "2024-12-30 14:39:31.879404",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Account",
