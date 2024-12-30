@@ -17,8 +17,11 @@
   "column_break_zwxg",
   "duration",
   "section_break_b0pd",
+  "request_headers",
+  "request_params",
   "request_data",
-  "response_data",
+  "request_json",
+  "response_json",
   "section_break_66yy",
   "error_log"
  ],
@@ -107,22 +110,15 @@
    "in_standard_filter": 1,
    "label": "Method",
    "no_copy": 1,
-   "options": "\nGET\nPOST\nDELETE",
+   "options": "\nGET\nPOST\nPATCH\nDELETE",
    "reqd": 1,
    "set_only_once": 1
   },
   {
    "fieldname": "request_data",
    "fieldtype": "JSON",
-   "label": "Request Data (JSON)",
+   "label": "Request (Data)",
    "set_only_once": 1
-  },
-  {
-   "fieldname": "response_data",
-   "fieldtype": "JSON",
-   "label": "Response Data (JSON)",
-   "no_copy": 1,
-   "read_only": 1
   },
   {
    "fieldname": "duration",
@@ -130,11 +126,36 @@
    "label": "Duration (Seconds)",
    "no_copy": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "request_headers",
+   "fieldtype": "JSON",
+   "label": "Request (Headers)",
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "request_params",
+   "fieldtype": "JSON",
+   "label": "Request (Params)",
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "request_json",
+   "fieldtype": "JSON",
+   "label": "Request (JSON)",
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "response_json",
+   "fieldtype": "JSON",
+   "label": "Response (JSON)",
+   "no_copy": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-30 14:18:21.906412",
+ "modified": "2024-12-30 18:57:34.469733",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Agent Job",

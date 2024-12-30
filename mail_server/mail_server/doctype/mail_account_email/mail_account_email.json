@@ -8,8 +8,9 @@
   "section_break_aahg",
   "account",
   "column_break_jysp",
+  "type",
   "email",
-  "type"
+  "domain_name"
  ],
  "fields": [
   {
@@ -51,11 +52,22 @@
   {
    "fieldname": "column_break_jysp",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "domain_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Domain Name",
+   "no_copy": 1,
+   "options": "Mail Domain Registry",
+   "search_index": 1,
+   "set_only_once": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-24 16:20:30.613740",
+ "modified": "2024-12-30 19:15:10.018343",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Account Email",

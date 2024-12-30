@@ -80,16 +80,22 @@ class MailDomainRegistry(Document):
 	def create_or_update_dkim_dns_record(self) -> None:
 		"""Creates or Updates DKIM DNS Record"""
 
-		frappe.flags.enqueue_dns_record_update = True
-		create_or_update_dns_record(
-			host=self.get_dkim_host(),
-			type="TXT",
-			value=f"v=DKIM1; k=rsa; p={self.dkim_public_key}",
-			ttl=300,
-			category="Sending Record",
-			attached_to_doctype=self.doctype,
-			attached_to_docname=self.name,
-		)
+		if self.dkim_public_key:
+			frappe.flags.enqueue_dns_record_update = True
+			create_or_update_dns_record(
+				host=self.get_dkim_host(),
+				type="TXT",
+				value=f"v=DKIM1; k=rsa; p={self.dkim_public_key}",
+				ttl=300,
+				category="Sending Record",
+				attached_to_doctype=self.doctype,
+				attached_to_docname=self.name,
+			)
+		else:
+			if dkim_dns_record := frappe.db.exists(
+				"DNS Record", {"host": self.get_dkim_host(), "type": "TXT"}
+			):
+				frappe.delete_doc("DNS Record", dkim_dns_record, ignore_permissions=True)
 
 	def get_dns_records(self) -> list[dict]:
 		"""Returns DNS Records"""
@@ -230,7 +236,7 @@ def create_or_delete_domain_on_agents(
 		if action == "create":
 			agent_job.method = "POST"
 			agent_job.endpoint = "/api/principal"
-			agent_job.request_data = principal
+			agent_job.request_json = principal
 		elif action == "delete":
 			agent_job.method = "DELETE"
 			agent_job.endpoint = f"/api/principal/{domain_name}"

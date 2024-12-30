@@ -12,9 +12,10 @@ class Principal:
 	"""Dataclass to represent a principal."""
 
 	name: str
-	type: Literal["domain", "apiKey"]
+	type: Literal["domain", "apiKey", "individual"]
 	id: int = 0
 	quota: int = 0
+	description: str = ""
 	secrets: str | list[str] = field(default_factory=list)
 	emails: list[str] = field(default_factory=list)
 	urls: list[str] = field(default_factory=list)

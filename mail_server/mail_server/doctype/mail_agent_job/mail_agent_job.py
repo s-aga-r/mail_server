@@ -1,6 +1,8 @@
 # Copyright (c) 2024, Frappe Technologies Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
+from urllib.parse import quote
+
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -12,6 +14,7 @@ from mail_server.agent import AgentAPI
 class MailAgentJob(Document):
 	def validate(self) -> None:
 		self.validate_agent()
+		self.validate_endpoint()
 
 	def after_insert(self) -> None:
 		self.execute()
@@ -21,9 +24,12 @@ class MailAgentJob(Document):
 		if not frappe.get_cached_value("Mail Agent", self.agent, "enabled"):
 			frappe.throw(_("Mail Agent {0} is disabled.").format(self.agent))
 
+	def validate_endpoint(self) -> None:
+		"""Validates the endpoint."""
+		self.endpoint = quote(self.endpoint)
+
 	def execute(self) -> None:
 		"""Executes the job."""
-
 		self.started_at = now()
 
 		try:
@@ -41,14 +47,17 @@ class MailAgentJob(Document):
 			response = agent_api.request(
 				method=self.method,
 				endpoint=self.endpoint,
-				json=self.request_data,
+				params=self.request_params,
+				data=self.request_data,
+				json=self.request_json,
+				headers=self.request_headers,
 			)
 
 			self.status = "Completed"
 			if response.get("error"):
 				self.status = "Failed"
 
-			self.response_data = response
+			self.response_json = response
 		except Exception:
 			self.status = "Failed"
 			self.error_log = frappe.get_traceback()

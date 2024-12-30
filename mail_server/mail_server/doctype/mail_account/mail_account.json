@@ -49,11 +49,9 @@
    "fieldtype": "Column Break"
   },
   {
-   "depends_on": "eval: doc.type === \"individual\"",
    "fieldname": "password",
    "fieldtype": "Password",
    "label": "Password",
-   "mandatory_depends_on": "eval: doc.type === \"individual\"",
    "read_only_depends_on": "eval: doc.type === \"group\""
   },
   {
@@ -82,7 +80,7 @@
    "link_fieldname": "account"
   }
  ],
- "modified": "2024-12-30 14:39:31.879404",
+ "modified": "2024-12-30 15:39:31.269092",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Account",
