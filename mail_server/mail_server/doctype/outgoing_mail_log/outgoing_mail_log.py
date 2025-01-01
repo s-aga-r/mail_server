@@ -3,6 +3,7 @@
 
 
 import json
+import random
 import time
 from email.utils import formatdate, parseaddr
 
@@ -20,9 +21,10 @@ from mail_server.mail_server.doctype.bounce_log.bounce_log import (
 	is_email_blocked,
 )
 from mail_server.mail_server.doctype.spam_check_log.spam_check_log import create_spam_check_log
-from mail_server.rabbitmq import OUTGOING_MAIL_QUEUE, OUTGOING_MAIL_STATUS_QUEUE, rabbitmq_context
+from mail_server.rabbitmq import OUTGOING_MAIL_STATUS_QUEUE, rabbitmq_context
+from mail_server.smtp import SMTPContext
 from mail_server.utils import convert_to_utc, get_host_by_ip, parse_iso_datetime
-from mail_server.utils.cache import get_root_domain_name, get_user_owned_domains
+from mail_server.utils.cache import get_user_owned_domains
 from mail_server.utils.email_parser import EmailParser
 
 MAX_FAILED_COUNT = 5
@@ -38,7 +40,8 @@ class OutgoingMailLog(Document):
 			self.set_ip_address()
 			self.validate_message()
 			self.validate_domain_name()
-			self.validate_priority()
+			self.validate_include_agent_groups()
+			self.validate_exclude_agent_groups()
 			self.validate_include_agents()
 			self.validate_exclude_agents()
 
@@ -67,14 +70,20 @@ class OutgoingMailLog(Document):
 		)
 		parser.message._headers.insert(0, received_header)
 		parser.update_header("X-FM-OML", self.name)
+
+		is_newsletter = cint(parser.get_header("X-Newsletter"))
+		priority = 3 if is_newsletter else min(max(parser.get_priority(), 1), 3)
+		parser.update_header("X-Priority", str(priority))
+
+		self.sender = parser.get_sender()[1]
 		self.subject = parser.get_subject()
-		self.priority = cint(parser.get_header("X-Priority"))
+		self.priority = priority
+		self.is_newsletter = is_newsletter
 		self.created_at = parser.get_date()
 		self.message_id = parser.get_message_id()
 		self.received_at = now()
-		self.domain_name = parser.get_sender()[1].split("@")[1]
+		self.domain_name = self.sender.split("@")[1]
 		self.message_size = parser.get_size()
-		self.is_newsletter = cint(parser.get_header("X-Newsletter"))
 		self.received_after = time_diff_in_seconds(self.received_at, self.created_at)
 		self.message = parser.get_message()
 
@@ -95,10 +104,19 @@ class OutgoingMailLog(Document):
 			frappe.PermissionError,
 		)
 
-	def validate_priority(self) -> None:
-		"""Validate priority and set it to a value between 0 and 3."""
+	def validate_include_agent_groups(self) -> None:
+		"""Validate include agent groups and set it to the value from the domain registry."""
 
-		self.priority = min(max(self.priority, 0), 3)
+		self.include_agent_groups = self.include_agent_groups or frappe.get_cached_value(
+			"Mail Domain Registry", self.domain_name, "include_agent_groups"
+		)
+
+	def validate_exclude_agent_groups(self) -> None:
+		"""Validate exclude agent groups and set it to the value from the domain registry."""
+
+		self.exclude_agent_groups = self.exclude_agent_groups or frappe.get_cached_value(
+			"Mail Domain Registry", self.domain_name, "exclude_agent_groups"
+		)
 
 	def validate_include_agents(self) -> None:
 		"""Validate include agents and set it to the value from the domain registry."""
@@ -117,10 +135,10 @@ class OutgoingMailLog(Document):
 	def enqueue_process_for_delivery(self) -> None:
 		"""Enqueue the job to process the email for delivery."""
 
-		# Emails with priority 3 are considered high-priority and should be enqueued at the front.
-		# Note: Existing jobs with priority 3 in the queue may lead to concurrent processing,
+		# Emails with priority 1 are considered high-priority and should be enqueued at the front.
+		# Note: Existing jobs with priority 1 in the queue may lead to concurrent processing,
 		# which is acceptable (for now) as multiple workers can handle jobs in parallel.
-		at_front = self.priority == 3
+		at_front = self.priority == 1
 
 		frappe.enqueue_doc(
 			self.doctype,
@@ -145,7 +163,7 @@ class OutgoingMailLog(Document):
 
 		if self.status == "Blocked":
 			self.update_delivery_status_in_mail_client()
-		elif self.status == "Accepted" and self.priority == 3:
+		elif self.status == "Accepted" and self.priority == 1:
 			frappe.flags.force_push_to_queue = True
 			self.push_to_queue()
 
@@ -340,7 +358,7 @@ class OutgoingMailLog(Document):
 
 			self.add_comment("Comment", _("Mail accepted by System Manager {0}.").format(frappe.session.user))
 
-			if self.priority == 3:
+			if self.priority == 1:
 				frappe.flags.force_push_to_queue = True
 				self.push_to_queue()
 
@@ -358,7 +376,7 @@ class OutgoingMailLog(Document):
 
 		frappe.only_for("System Manager")
 
-		if self.status in ["Queued (RMQ)", "Queued (Haraka)"]:
+		if self.status in ["Queued (Agent)", "Queued (Haraka)"]:
 			frappe.flags.force_push_to_queue = True
 			self.push_to_queue()
 
@@ -385,38 +403,32 @@ class OutgoingMailLog(Document):
 
 		transfer_started_at = now()
 		self._db_set(
-			status="Queuing (RMQ)",
+			status="Queuing (Agent)",
 			transfer_started_at=transfer_started_at,
 			transfer_started_after=time_diff_in_seconds(transfer_started_at, self.processed_at),
 			notify_update=False,
 			commit=True,
 		)
 
-		recipients = [r.email for r in self.recipients if r.status not in ["Blocked", "Sent"]]
-
-		if not recipients:
-			frappe.throw(_("All recipients are blocked."))
-
-		headers = {}
-		if self.include_agents:
-			headers["include_agents"] = self.include_agents.split("\n")
-		if self.exclude_agents:
-			headers["exclude_agents"] = self.exclude_agents.split("\n")
-
-		data = {
-			"outgoing_mail_log": self.name,
-			"recipients": recipients,
-			"message": self.message,
-		}
-
 		try:
-			with rabbitmq_context() as rmq:
-				rmq.publish(OUTGOING_MAIL_QUEUE, json.dumps(data), priority=3, headers=headers)
+			recipients = [r.email for r in self.recipients if r.status not in ["Blocked", "Sent"]]
+
+			if not recipients:
+				frappe.throw(_("All recipients are blocked or sent."))
+
+			agent_or_group = get_random_agent_or_agent_group(
+				self.include_agent_groups, self.exclude_agent_groups, self.include_agents, self.exclude_agents
+			)
+			username, password = get_account_username_and_password(self.sender)
+
+			with SMTPContext(agent_or_group, 465, username, password, use_ssl=True) as server:
+				mail_options = [f"ENVID={self.name}"]
+				server.sendmail(self.sender, recipients, self.message, mail_options=mail_options)
 
 			transfer_completed_at = now()
 			transfer_completed_after = time_diff_in_seconds(transfer_completed_at, transfer_started_at)
 			self._db_set(
-				status="Queued (RMQ)",
+				status="Queued (Agent)",
 				transfer_completed_at=transfer_completed_at,
 				transfer_completed_after=transfer_completed_after,
 				notify_update=False,
@@ -467,7 +479,6 @@ def push_emails_to_queue() -> None:
 	batch_size = 1000
 	max_failures = 3
 	total_failures = 0
-	root_domain_name = get_root_domain_name()
 
 	while total_failures < max_failures:
 		OML = frappe.qb.DocType("Outgoing Mail Log")
@@ -478,11 +489,12 @@ def push_emails_to_queue() -> None:
 			.on(OML.name == MLR.parent)
 			.select(
 				OML.name,
+				OML.sender,
 				OML.message,
-				OML.priority,
-				OML.domain_name,
 				OML.include_agents,
 				OML.exclude_agents,
+				OML.include_agent_groups,
+				OML.exclude_agent_groups,
 				GroupConcat(MLR.email).as_("recipients"),
 			)
 			.where(
@@ -492,7 +504,7 @@ def push_emails_to_queue() -> None:
 				& (OML.status.isin(["Accepted", "Failed"]))
 			)
 			.groupby(OML.name)
-			.orderby(OML.priority, order=Order.desc)
+			.orderby(OML.priority)
 			.orderby(OML.received_at)
 			.limit(batch_size)
 		).run(as_dict=True, as_iterator=False)
@@ -513,32 +525,29 @@ def push_emails_to_queue() -> None:
 					status IN %s AND
 					name IN %s
 				""",
-				("Queuing (RMQ)", now(), ("Accepted", "Failed"), tuple(mail_list)),
+				("Queuing (Agent)", now(), ("Accepted", "Failed"), tuple(mail_list)),
 			)
 			frappe.db.commit()
 
-			with rabbitmq_context() as rmq:
-				for mail in mails:
-					if mail["domain_name"] == root_domain_name:
-						mail["priority"] = max(mail["priority"], 2)
+			for mail in mails:
+				if not mail["recipients"]:
+					continue
 
-					if not mail["recipients"]:
-						continue
+				agent_or_group = get_random_agent_or_agent_group(
+					mail["include_agent_groups"],
+					mail["exclude_agent_groups"],
+					mail["include_agents"],
+					mail["exclude_agents"],
+				)
+				username, password = get_account_username_and_password(mail["sender"])
 
-					headers = {}
-					if mail["include_agents"]:
-						headers["include_agents"] = mail["include_agents"].split("\n")
-					if mail["exclude_agents"]:
-						headers["exclude_agents"] = mail["exclude_agents"].split("\n")
-
-					data = {
-						"outgoing_mail_log": mail["name"],
-						"recipients": mail["recipients"].split(","),
-						"message": mail["message"],
-					}
-
-					rmq.publish(
-						OUTGOING_MAIL_QUEUE, json.dumps(data), priority=mail["priority"], headers=headers
+				with SMTPContext(agent_or_group, 465, username, password, use_ssl=True) as server:
+					mail_options = [f"ENVID={mail['name']}"]
+					server.sendmail(
+						mail["sender"],
+						mail["recipients"].split(","),
+						mail["message"],
+						mail_options=mail_options,
 					)
 
 			frappe.db.sql(
@@ -552,7 +561,7 @@ def push_emails_to_queue() -> None:
 					status = %s AND
 					name IN %s
 				""",
-				("Queued (RMQ)", now(), "Queuing (RMQ)", tuple(mail_list)),
+				("Queued (Agent)", now(), "Queuing (Agent)", tuple(mail_list)),
 			)
 
 		except Exception:
@@ -574,7 +583,7 @@ def push_emails_to_queue() -> None:
 				(
 					"Failed",
 					error_log,
-					"Queuing (RMQ)",
+					"Queuing (Agent)",
 					tuple(mail_list),
 				),
 			)
@@ -589,7 +598,7 @@ def push_stuck_emails_to_queue() -> None:
 	mails = frappe.db.get_all(
 		"Outgoing Mail Log",
 		{
-			"status": ["in", ["Queued (RMQ)", "Queued (Haraka)"]],
+			"status": ["in", ["Queued (Agent)", "Queued (Haraka)"]],
 			"transfer_completed_at": ["<=", add_to_date(now(), minutes=-60)],
 		},
 		pluck="name",
@@ -608,7 +617,7 @@ def fetch_and_update_delivery_statuses() -> None:
 		mails = (
 			frappe.qb.from_(OML)
 			.select(OML.name)
-			.where(OML.status.isin(["Queued (RMQ)", "Queued (Haraka)", "Deferred"]))
+			.where(OML.status.isin(["Queued (Agent)", "Queued (Haraka)", "Deferred"]))
 			.limit(1)
 		).run(pluck="name")
 
@@ -739,3 +748,55 @@ def fetch_and_update_delivery_statuses() -> None:
 	except Exception:
 		error_log = frappe.get_traceback(with_context=False)
 		frappe.log_error(title=_("Fetch and Update Delivery Statuses"), message=error_log)
+
+
+def get_random_agent_or_agent_group(
+	include_agent_groups: str | list[str] | None = None,
+	exclude_agent_groups: str | list[str] | None = None,
+	include_agents: str | list[str] | None = None,
+	exclude_agents: str | list[str] | None = None,
+	raise_if_not_found: bool = True,
+) -> str:
+	"""Returns a random agent or agent group based on the given criteria."""
+
+	selected_agent = None
+	selected_agent_group = None
+	agent_groups = set(frappe.db.get_all("Mail Agent Group", {"enabled": 1, "outbound": 1}, pluck="name"))
+
+	if include_agents or exclude_agents:
+		agents = set(frappe.db.get_all("Mail Agent", {"enabled": 1, "enable_outbound": 1}, pluck="name"))
+
+		for agent in include_agents.split("\n"):
+			if agent not in agents:
+				frappe.throw(_("Agent {0} does not exist or is not enabled for outbound.").format(agent))
+		for agent in exclude_agents.split("\n"):
+			agents.remove(agent)
+
+		selected_agent = random.choice(list(agents))
+
+	elif include_agent_groups or exclude_agent_groups:
+		for agent_group in include_agent_groups.split("\n"):
+			frappe.throw(
+				_("Agent Group {0} does not exist or is not enabled for outbound.").format(agent_group)
+			)
+		for agent_group in exclude_agent_groups.split("\n"):
+			agent_groups.remove(agent_group)
+
+		selected_agent_group = random.choice(list(agent_groups))
+
+	else:
+		selected_agent_group = random.choice(list(agent_groups))
+
+	if not selected_agent and not selected_agent_group and raise_if_not_found:
+		frappe.throw(_("No agents found for outbound mail."))
+
+	return selected_agent or selected_agent_group
+
+
+def get_account_username_and_password(account_email: str) -> tuple[str, str]:
+	"""Returns the account's username and password."""
+
+	account = frappe.get_cached_doc(
+		"Mail Account", frappe.get_cached_value("Mail Account Email", account_email, "account")
+	)
+	return account.email, account.get_password("password")

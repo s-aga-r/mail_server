@@ -9,6 +9,7 @@
   "priority",
   "column_break_bvbh",
   "outgoing_mail",
+  "sender",
   "subject",
   "section_break_tjoe",
   "recipients",
@@ -41,6 +42,10 @@
   "transfer_completed_after",
   "failed_count",
   "retry_after",
+  "section_break_lswz",
+  "include_agent_groups",
+  "column_break_ydjl",
+  "exclude_agent_groups",
   "section_break_rwda",
   "include_agents",
   "column_break_ekup",
@@ -79,7 +84,7 @@
    "in_standard_filter": 1,
    "label": "Status",
    "no_copy": 1,
-   "options": "In Progress\nBlocked\nAccepted\nQueuing (RMQ)\nFailed\nQueued (RMQ)\nQueued (Haraka)\nDeferred\nBounced\nPartially Sent\nSent",
+   "options": "In Progress\nBlocked\nAccepted\nQueuing (Agent)\nFailed\nQueued (Agent)\nQueued (Haraka)\nDeferred\nBounced\nPartially Sent\nSent",
    "read_only": 1,
    "reqd": 1,
    "search_index": 1
@@ -376,12 +381,39 @@
   {
    "fieldname": "section_break_dutw",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "sender",
+   "fieldtype": "Data",
+   "label": "Sender",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_lswz",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "include_agent_groups",
+   "fieldtype": "Small Text",
+   "label": "Include Agent Groups",
+   "no_copy": 1
+  },
+  {
+   "fieldname": "column_break_ydjl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "exclude_agent_groups",
+   "fieldtype": "Small Text",
+   "label": "Exclude Agent Groups",
+   "no_copy": 1
   }
  ],
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-05 18:46:47.419107",
+ "modified": "2025-01-01 15:07:55.059223",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Outgoing Mail Log",

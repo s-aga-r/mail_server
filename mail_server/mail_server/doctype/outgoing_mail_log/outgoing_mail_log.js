@@ -33,7 +33,7 @@ frappe.ui.form.on("Outgoing Mail Log", {
 				},
 				__("Actions")
 			);
-		} else if (["Queued (RMQ)", "Queued (Haraka)", "Deferred"].includes(frm.doc.status)) {
+		} else if (["Queued (Agent)", "Queued (Haraka)", "Deferred"].includes(frm.doc.status)) {
 			frm.add_custom_button(
 				__("Fetch Delivery Status"),
 				() => {
@@ -43,7 +43,7 @@ frappe.ui.form.on("Outgoing Mail Log", {
 			);
 
 			if (
-				["Queued (RMQ)", "Queued (Haraka)"].includes(frm.doc.status) &&
+				["Queued (Agent)", "Queued (Haraka)"].includes(frm.doc.status) &&
 				frappe.user_roles.includes("System Manager")
 			) {
 				frm.add_custom_button(
