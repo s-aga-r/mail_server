@@ -1,13 +1,13 @@
+from imaplib import IMAP4, IMAP4_SSL
 from queue import Queue
-from smtplib import SMTP, SMTP_SSL
 from threading import Lock
 
 
-class SMTPConnectionPool:
+class IMAPConnectionPool:
 	_instance = None
 	_lock = Lock()
 
-	def __new__(cls, *args, **kwargs) -> "SMTPConnectionPool":
+	def __new__(cls, *args, **kwargs) -> "IMAPConnectionPool":
 		with cls._lock:
 			if cls._instance is None:
 				cls._instance = super().__new__(cls, *args, **kwargs)
@@ -21,10 +21,9 @@ class SMTPConnectionPool:
 		port: int,
 		username: str,
 		password: str,
-		use_ssl: bool = False,
-		use_tls: bool = False,
+		use_ssl: bool = True,
 		max_connections: int = 5,
-	) -> type[SMTP] | type[SMTP_SSL]:
+	) -> type[IMAP4] | type[IMAP4_SSL]:
 		key = (host, port, username)
 		with self._pool_lock:
 			if key not in self._pools:
@@ -36,11 +35,11 @@ class SMTPConnectionPool:
 			if not pool.empty():
 				return pool.get()
 			if pool.qsize() < max_connections:
-				return self._create_connection(host, port, username, password, use_ssl, use_tls)
-			raise Exception(f"SMTP connection pool limit reached for {key}")
+				return self._create_connection(host, port, username, password, use_ssl)
+			raise Exception(f"IMAP connection pool limit reached for {key}")
 
 	def return_connection(
-		self, host: str, port: int, username: str, connection: type[SMTP] | type[SMTP_SSL]
+		self, host: str, port: int, username: str, connection: type[IMAP4] | type[IMAP4_SSL]
 	) -> None:
 		key = (host, port, username)
 		with self._pool_lock:
@@ -50,60 +49,52 @@ class SMTPConnectionPool:
 					if pool.qsize() < pool.maxsize:
 						pool.put(connection)
 						return
-		connection.quit()
+		connection.logout()
 
 	def close_all(self) -> None:
 		with self._pool_lock:
 			for pool in list(self._pools.values()):
 				while not pool.empty():
 					connection = pool.get()
-					connection.quit()
+					connection.logout()
 			self._pools.clear()
 
 	@staticmethod
 	def _create_connection(
-		host: str, port: int, username: str, password: str, use_ssl: bool, use_tls: bool
-	) -> type[SMTP] | type[SMTP_SSL]:
-		_SMTP = SMTP_SSL if use_ssl else SMTP
+		host: str, port: int, username: str, password: str, use_ssl: bool
+	) -> type[IMAP4] | type[IMAP4_SSL]:
+		_IMAP = IMAP4_SSL if use_ssl else IMAP4
 
-		connection = _SMTP(host, port)
-
-		if use_tls:
-			connection.ehlo()
-			connection.starttls()
-			connection.ehlo()
-
+		connection = _IMAP(host, port)
 		connection.login(username, password)
 		return connection
 
 
-class SMTPContext:
+class IMAPContext:
 	def __init__(
 		self,
 		host: str,
 		port: int,
 		username: str,
 		password: str,
-		use_ssl: bool = False,
-		use_tls: bool = False,
+		use_ssl: bool = True,
 	) -> None:
-		self._pool = SMTPConnectionPool()
+		self._pool = IMAPConnectionPool()
 		self._host = host
 		self._port = port
 		self._username = username
 		self._password = password
 		self._use_ssl = use_ssl
-		self._use_tls = use_tls
 		self._connection = None
 
-	def __enter__(self) -> SMTP | SMTP_SSL:
+	def __enter__(self) -> type[IMAP4] | type[IMAP4_SSL]:
 		self._connection = self._pool.get_connection(
-			self._host, self._port, self._username, self._password, self._use_ssl, self._use_tls
+			self._host, self._port, self._username, self._password, self._use_ssl
 		)
 		return self._connection
 
 	def __exit__(self, exc_type, exc_value, traceback) -> None:
 		if exc_type is not None:
-			self._connection.quit()
+			self._connection.logout()
 		else:
 			self._pool.return_connection(self._host, self._port, self._username, self._connection)
