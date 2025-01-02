@@ -10,9 +10,9 @@ from frappe.model.document import Document
 from frappe.utils import cint, now, time_diff_in_seconds, validate_email_address
 from uuid_utils import uuid7
 
+from mail_server.imap import IMAPContext
 from mail_server.mail_server.doctype.dmarc_report.dmarc_report import create_dmarc_report
 from mail_server.mail_server.doctype.spam_check_log.spam_check_log import create_spam_check_log
-from mail_server.rabbitmq import INCOMING_MAIL_QUEUE, rabbitmq_context
 from mail_server.utils import convert_to_utc, get_dmarc_address, load_compressed_file, parse_iso_datetime
 from mail_server.utils.email_parser import EmailParser, extract_ip_and_host
 from mail_server.utils.validation import is_domain_registry_exists
@@ -169,31 +169,49 @@ def create_incoming_mail_log(agent: str, message: str) -> "IncomingMailLog":
 def fetch_emails_from_queue() -> None:
 	"""Fetch emails from queue and create Incoming Mail Log."""
 
-	max_failures = 3
-	total_failures = 0
+	agents = frappe.db.get_all("Mail Agent", filters={"enabled": 1}, pluck="name")
 
-	try:
-		with rabbitmq_context() as rmq:
-			while True:
-				result = rmq.basic_get(INCOMING_MAIL_QUEUE)
+	if not agents:
+		return
 
-				if not result:
-					break
+	folders = ["INBOX"]
+	for agent in agents:
+		max_failures = 3
+		total_failures = 0
 
-				method, properties, body = result
-				if body:
-					message = body.decode("utf-8")
-					create_incoming_mail_log(properties.app_id, message)
+		try:
+			account = frappe.get_cached_doc("Mail Account", "test@example.org")
+			with IMAPContext(
+				"localhost", 993, account.email, account.get_password("password"), True
+			) as server:
+				for folder in folders:
+					while True:
+						status, response = server.select(folder)
 
-				rmq.channel.basic_ack(delivery_tag=method.delivery_tag)
+						if status != "OK":
+							break
 
-	except Exception:
-		total_failures += 1
-		error_log = frappe.get_traceback(with_context=False)
-		frappe.log_error(title=_("Fetch Emails from Queue"), message=error_log)
+						status, message_numbers = server.search(None, "ALL")
 
-		if total_failures < max_failures:
-			time.sleep(2**total_failures)
+						if status != "OK" or not message_numbers[0]:
+							break
+
+						for num in message_numbers[0].split():
+							status, data = server.fetch(num, "(RFC822)")
+
+							if status == "OK" and data:
+								message = data[0][1].decode("utf-8")
+								create_incoming_mail_log(agent, message)
+								server.store(num, "+FLAGS", r"(\Deleted)")
+
+						server.expunge()
+		except Exception:
+			total_failures += 1
+			error_log = frappe.get_traceback(with_context=False)
+			frappe.log_error(title=_(f"Fetch Emails from IMAP - {folder}"), message=error_log)
+
+			if total_failures < max_failures:
+				time.sleep(2**total_failures)
 
 
 def is_spam_detection_enabled_for_inbound() -> bool:
