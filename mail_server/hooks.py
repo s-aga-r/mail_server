@@ -7,25 +7,6 @@ app_license = "agpl-3.0"
 # required_apps = []
 
 
-website_redirects = [
-	{
-		"source": "/spamd/scan",
-		"target": "/api/method/mail_server.api.spamd.scan",
-		"redirect_http_status": 307,
-	},
-	{
-		"source": "/spamd/is-spam",
-		"target": "/api/method/mail_server.api.spamd.is_spam",
-		"redirect_http_status": 307,
-	},
-	{
-		"source": "/spamd/score",
-		"target": "/api/method/mail_server.api.spamd.get_spam_score",
-		"redirect_http_status": 307,
-	},
-]
-
-
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [
 # 	{
@@ -263,12 +244,3 @@ scheduler_events = {
 
 # Automatically update python controller files with type annotations for this app.
 # export_python_type_annotations = True
-
-default_log_clearing_doctypes = {"Spam Check Log": 7}
-
-fixtures = [
-	{
-		"dt": "Role",
-		"filters": [["role_name", "in", ["Domain Owner"]]],
-	},
-]

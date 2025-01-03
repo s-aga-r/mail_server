@@ -1,6 +1,5 @@
 import frappe
 
-from mail_server.mail_server.doctype.dns_record.dns_record import verify_all_dns_records
 from mail_server.mail_server.doctype.incoming_mail_log.incoming_mail_log import fetch_emails_from_queue
 from mail_server.mail_server.doctype.outgoing_mail_log.outgoing_mail_log import (
 	fetch_and_update_delivery_statuses,
@@ -30,10 +29,3 @@ def enqueue_fetch_emails_from_queue() -> None:
 
 	frappe.session.user = "Administrator"
 	enqueue_job(fetch_emails_from_queue, queue="long")
-
-
-@frappe.whitelist()
-def enqueue_verify_all_dns_records() -> None:
-	"Called by the scheduler to enqueue the `verify_all_dns_records` job."
-
-	enqueue_job(verify_all_dns_records, queue="long")
