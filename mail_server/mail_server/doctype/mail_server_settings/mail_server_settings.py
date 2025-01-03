@@ -7,12 +7,6 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 
-from mail_server.rabbitmq import (
-	INCOMING_MAIL_QUEUE,
-	OUTGOING_MAIL_QUEUE,
-	OUTGOING_MAIL_STATUS_QUEUE,
-	rabbitmq_context,
-)
 from mail_server.utils.cache import delete_cache
 from mail_server.utils.validation import is_valid_host
 
@@ -22,7 +16,6 @@ class MailServerSettings(Document):
 		self.validate_root_domain_name()
 		self.validate_dns_provider()
 		self.validate_spf_host()
-		self.validate_rmq_host()
 
 	def on_update(self) -> None:
 		delete_cache("root_domain_name")
@@ -73,50 +66,6 @@ class MailServerSettings(Document):
 				frappe.delete_doc("DNS Record", spf_dns_record, ignore_permissions=True)
 
 		create_or_update_spf_dns_record(self.spf_host)
-
-	def validate_rmq_host(self) -> None:
-		"""Validates the rmq_host and converts it to lowercase."""
-
-		if self.rmq_host:
-			self.rmq_host = self.rmq_host.lower()
-
-	@frappe.whitelist()
-	def test_rabbitmq_connection(self) -> None:
-		"""Tests the connection to the RabbitMQ server."""
-
-		try:
-			with rabbitmq_context():
-				frappe.msgprint(_("Connection Successful"), alert=True, indicator="green")
-		except socket.gaierror as e:
-			frappe.msgprint(e.args[1], _("Connection Failed"), indicator="red")
-		except Exception as e:
-			messages = []
-			for error in e.args:
-				if not isinstance(error, str):
-					error = error.exception
-
-				messages.append(f"{frappe.bold(e.__class__.__name__)}: {error}")
-
-			as_list = True
-			if len(messages) == 1:
-				messages = messages[0]
-				as_list = False
-
-			frappe.msgprint(messages, _("Connection Failed"), as_list=as_list, indicator="red")
-
-	@frappe.whitelist()
-	def initialize_rabbitmq(self) -> None:
-		frappe.only_for("Administrator")
-
-		try:
-			with rabbitmq_context() as rmq:
-				rmq.declare_queue(INCOMING_MAIL_QUEUE)
-				rmq.declare_queue(OUTGOING_MAIL_QUEUE, max_priority=3)
-				rmq.declare_queue(OUTGOING_MAIL_STATUS_QUEUE, max_priority=3)
-				frappe.msgprint(_("RabbitMQ Initialized"), alert=True, indicator="green")
-		except Exception:
-			frappe.log_error(title=_("RabbitMQ Initialization Failed"), message=frappe.get_traceback())
-			raise
 
 
 def create_dmarc_dns_record_for_external_domains() -> None:
