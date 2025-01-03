@@ -10,7 +10,7 @@ from mail_server.utils.validation import (
 
 @frappe.whitelist(methods=["POST"])
 def add_or_update_domain(
-	domain_name: str, access_token: str, dkim_public_key: str, mail_client_host: str | None = None
+	domain_name: str, access_token: str, dkim_public_key: str, mail_host: str | None = None
 ) -> None:
 	"""Add or update domain in Mail Domain Registry."""
 
@@ -30,7 +30,7 @@ def add_or_update_domain(
 
 	doc.access_token = access_token
 	doc.dkim_public_key = dkim_public_key
-	doc.mail_client_host = mail_client_host
+	doc.mail_host = mail_host
 	doc.save(ignore_permissions=True)
 
 

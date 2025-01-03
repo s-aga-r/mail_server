@@ -144,7 +144,7 @@ class OutgoingMailLog(Document):
 		self._db_set(notify_update=True, **kwargs)
 
 		if self.status == "Blocked":
-			self.update_delivery_status_in_mail_client()
+			self.update_delivery_status_in_mail()
 		elif self.status == "Accepted" and self.priority == 3:
 			frappe.flags.force_push_to_queue = True
 			self.push_to_queue()
@@ -222,16 +222,16 @@ class OutgoingMailLog(Document):
 
 		return kwargs
 
-	def update_delivery_status_in_mail_client(self) -> None:
-		"""Update delivery status in Mail Client."""
+	def update_delivery_status_in_mail(self) -> None:
+		"""Update delivery status in Mail."""
 
-		if host := frappe.get_cached_value("Mail Domain Registry", self.domain_name, "mail_client_host"):
+		if host := frappe.get_cached_value("Mail Domain Registry", self.domain_name, "mail_host"):
 			data = self.get_delivery_status()
 			try:
-				requests.post(f"{host}/api/method/mail_client.api.webhook.update_delivery_status", json=data)
+				requests.post(f"{host}/api/method/mail.api.webhook.update_delivery_status", json=data)
 			except Exception:
 				frappe.log_error(
-					title=_("Mail Client Delivery Status Update Failed"), message=frappe.get_traceback()
+					title=_("Mail Delivery Status Update Failed"), message=frappe.get_traceback()
 				)
 
 	def get_delivery_status(self) -> dict:
@@ -290,7 +290,7 @@ class OutgoingMailLog(Document):
 
 			if db_set:
 				self._db_set(status=status)
-				self.update_delivery_status_in_mail_client()
+				self.update_delivery_status_in_mail()
 
 	def _accept(self) -> None:
 		"""Accept the email and set status to `Accepted`."""
@@ -336,7 +336,7 @@ class OutgoingMailLog(Document):
 			self._accept()
 
 			if prev_status == "Blocked":
-				self.update_delivery_status_in_mail_client()
+				self.update_delivery_status_in_mail()
 
 			self.add_comment("Comment", _("Mail accepted by System Manager {0}.").format(frappe.session.user))
 
