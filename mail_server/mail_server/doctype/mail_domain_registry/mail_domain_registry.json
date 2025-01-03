@@ -14,7 +14,7 @@
   "last_verified_at",
   "access_token",
   "domain_owner",
-  "mail_client_host",
+  "mail_host",
   "section_break_imq5",
   "include_agents",
   "column_break_rojg",
@@ -96,9 +96,9 @@
    "label": "DKIM Public Key"
   },
   {
-   "fieldname": "mail_client_host",
+   "fieldname": "mail_host",
    "fieldtype": "Data",
-   "label": "Mail Client Host"
+   "label": "Mail Host"
   },
   {
    "fieldname": "access_token",
@@ -163,7 +163,7 @@
    "link_fieldname": "domain_name"
   }
  ],
- "modified": "2024-12-05 18:36:34.935971",
+ "modified": "2025-01-03 18:36:34.935971",
  "modified_by": "Administrator",
  "module": "Mail Server",
  "name": "Mail Domain Registry",

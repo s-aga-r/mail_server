@@ -116,17 +116,17 @@ class IncomingMailLog(Document):
 						message=frappe.get_traceback(with_context=True),
 					)
 			else:
-				self.deliver_email_to_mail_client()
+				self.deliver_email_to_mail()
 
-	def deliver_email_to_mail_client(self):
-		"""Deliver email to mail client."""
+	def deliver_email_to_mail(self):
+		"""Deliver email to mail."""
 
 		domain_registry = frappe.get_cached_doc("Mail Domain Registry", self.domain_name)
-		if domain_registry.mail_client_host:
+		if domain_registry.mail_host:
 			if not domain_registry.access_token:
 				return
 
-			host = domain_registry.mail_client_host
+			host = domain_registry.mail_host
 			data = {
 				"incoming_mail_log": self.name,
 				"is_spam": self.is_spam,
@@ -137,9 +137,9 @@ class IncomingMailLog(Document):
 			}
 
 			try:
-				requests.post(f"{host}/api/method/mail_client.api.webhook.receive_email", json=data)
+				requests.post(f"{host}/api/method/mail.api.webhook.receive_email", json=data)
 			except Exception:
-				frappe.log_error(title=_("Mail Client Email Delivery Failed"), message=frappe.get_traceback())
+				frappe.log_error(title=_("Mail Email Delivery Failed"), message=frappe.get_traceback())
 
 	def _db_set(
 		self,
